@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { OrderConfirmationDialog } from '@/components/OrderConfirmationDialog';
 import { toast } from 'sonner';
 import { Star, Clock, Edit, Trash2, User } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export default function GigDetail() {
   const [seller, setSeller] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [showOrderDialog, setShowOrderDialog] = useState(false);
 
   useEffect(() => {
     fetchGig();
@@ -183,7 +185,7 @@ export default function GigDetail() {
                     </AlertDialog>
                   </div>
                 ) : (
-                  <Button className="w-full" onClick={() => toast.info('Order functionality coming in Phase 5!')}>
+                  <Button className="w-full" onClick={() => setShowOrderDialog(true)}>
                     Order Now
                   </Button>
                 )}
@@ -227,6 +229,14 @@ export default function GigDetail() {
         </div>
       </main>
       <Footer />
+      
+      {gig && (
+        <OrderConfirmationDialog 
+          open={showOrderDialog}
+          onOpenChange={setShowOrderDialog}
+          gig={gig}
+        />
+      )}
     </div>
   );
 }

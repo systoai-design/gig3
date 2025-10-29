@@ -3,6 +3,8 @@ import { Search, Menu, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,7 +51,9 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3">
+            <WalletMultiButton />
+            
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -59,11 +63,17 @@ export const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-                    Dashboard
+                  <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
+                    My Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/profile')}>
-                    Profile
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
+                    My Orders
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
+                    Seller Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/create-gig')}>
+                    Create Gig
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
                     <LogOut className="h-4 w-4 mr-2" />

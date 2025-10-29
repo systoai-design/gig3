@@ -44,7 +44,14 @@ export default function EditGig() {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    category: string;
+    price_sol: string;
+    delivery_days: string;
+    status: 'active' | 'draft' | 'paused' | 'deleted';
+  }>({
     title: '',
     description: '',
     category: '',
