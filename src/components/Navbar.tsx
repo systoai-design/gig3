@@ -1,9 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -40,12 +50,37 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button size="sm" className="bg-gradient-primary hover:opacity-90 transition-opacity">
-              Connect Wallet
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Account
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')}>
+                  Sign In
+                </Button>
+                <Button size="sm" className="bg-gradient-primary hover:opacity-90 transition-opacity" onClick={() => navigate('/auth')}>
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -75,12 +110,25 @@ export const Navbar = () => {
               <a href="#" className="text-sm font-medium text-foreground hover:text-primary">
                 Become a Seller
               </a>
-              <Button variant="ghost" size="sm" className="justify-start">
-                Sign In
-              </Button>
-              <Button size="sm" className="bg-gradient-primary">
-                Connect Wallet
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/dashboard')}>
+                    Dashboard
+                  </Button>
+                  <Button variant="ghost" size="sm" className="justify-start text-destructive" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/auth')}>
+                    Sign In
+                  </Button>
+                  <Button size="sm" className="bg-gradient-primary" onClick={() => navigate('/auth')}>
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
