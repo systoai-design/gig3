@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,8 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MessageList } from '@/components/MessageList';
+import { ReviewDialog } from '@/components/ReviewDialog';
 import { toast } from 'sonner';
-import { Calendar, DollarSign, Package, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, MessageSquare } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -17,11 +20,14 @@ interface Order {
   buyer_id: string;
   seller_id: string;
   amount_sol: number;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+  status: 'pending' | 'in_progress' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
   transaction_signature: string | null;
   created_at: string;
-  gigs: {
+  gig: {
+    id: string;
     title: string;
+    description: string;
+    category: string;
     images: string[];
     delivery_days: number;
   };
@@ -39,201 +45,297 @@ export default function OrderDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [hasReview, setHasReview] = useState(false);
 
   useEffect(() => {
     fetchOrder();
+    checkExistingReview();
   }, [id]);
+
+  const checkExistingReview = async () => {
+    if (!user || !id) return;
+    
+    try {
+      const { data } = await supabase
+        .from('reviews')
+        .select('id')
+        .eq('order_id', id)
+        .eq('reviewer_id', user.id)
+        .single();
+      
+      setHasReview(!!data);
+    } catch (error) {
+      // No review found
+    }
+  };
 
   const fetchOrder = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .select(`
           *,
-          gigs (title, images, delivery_days),
+          gig:gigs!orders_gig_id_fkey (
+            id,
+            title,
+            description,
+            category,
+            images,
+            delivery_days
+          ),
           buyer_profile:profiles!orders_buyer_id_fkey (username, avatar_url),
           seller_profile:profiles!orders_seller_id_fkey (username, avatar_url)
         `)
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (orderError) throw orderError;
 
-      // Check if user is part of this order
-      if (data.buyer_id !== user?.id && data.seller_id !== user?.id) {
-        toast.error('Unauthorized');
+      // Check authorization
+      if (orderData.buyer_id !== user?.id && orderData.seller_id !== user?.id) {
+        toast.error('You are not authorized to view this order');
         navigate('/');
         return;
       }
 
-      setOrder(data as any);
+      setOrder(orderData as any);
     } catch (error: any) {
-      toast.error('Failed to load order');
+      toast.error('Failed to load order details');
       navigate('/');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'in_progress': return 'bg-blue-500';
-      case 'cancelled': return 'bg-red-500';
-      case 'disputed': return 'bg-amber-500';
-      default: return 'bg-slate-500';
+  const handleStatusUpdate = async (newStatus: 'delivered' | 'completed' | 'disputed') => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success(`Order marked as ${newStatus}`);
+      fetchOrder();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update order status');
     }
   };
 
-  if (loading) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'default';
+      case 'in_progress': return 'secondary';
+      case 'delivered': return 'outline';
+      case 'completed': return 'default';
+      case 'cancelled': return 'destructive';
+      case 'disputed': return 'destructive';
+      default: return 'default';
+    }
+  };
+
+  if (loading || !order) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 py-12 max-w-4xl">
-          <Skeleton className="h-12 w-64 mb-8" />
-          <Skeleton className="h-96 w-full" />
+        <main className="container mx-auto px-4 py-12">
+          <Skeleton className="h-10 w-32 mb-6" />
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
+              <Skeleton className="h-64 w-full" />
+            </div>
+            <Skeleton className="h-64 w-full" />
+          </div>
         </main>
       </div>
     );
   }
 
-  if (!order) return null;
-
   const isBuyer = user?.id === order.buyer_id;
-  const otherParty = isBuyer ? order.seller_profile : order.buyer_profile;
-  const role = isBuyer ? 'Buyer' : 'Seller';
+  const isSeller = user?.id === order.seller_id;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Order Details</h1>
-            <p className="text-muted-foreground">Order #{order.id.slice(0, 8)}</p>
-          </div>
-          <Badge className={getStatusColor(order.status)}>
-            {order.status.replace('_', ' ').toUpperCase()}
-          </Badge>
-        </div>
+      <main className="container mx-auto px-4 py-12">
+        <Button 
+          variant="ghost" 
+          className="mb-6"
+          onClick={() => navigate(isBuyer ? '/dashboard/buyer' : '/dashboard/seller')}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Button>
 
-        <div className="grid gap-6">
-          {/* Gig Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Gig Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4">
-                {order.gigs.images?.[0] && (
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Main Order Info */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Gig Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-4">
                   <img 
-                    src={order.gigs.images[0]} 
-                    alt={order.gigs.title}
-                    className="w-24 h-24 rounded-lg object-cover"
+                    src={order.gig.images?.[0] || '/placeholder.svg'} 
+                    alt={order.gig.title}
+                    className="w-24 h-24 object-cover rounded"
                   />
-                )}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">{order.gigs.title}</h3>
-                  <div className="space-y-1 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4" />
-                      <span>{order.amount_sol} SOL</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Package className="h-4 w-4" />
-                      <span>{order.gigs.delivery_days} days delivery</span>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1">{order.gig.title}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {order.gig.description}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge>{order.gig.category}</Badge>
+                      <span className="text-sm font-semibold">{order.amount_sol} SOL</span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Order Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Your Role</p>
-                  <p className="font-semibold">{role}</p>
+                <div className="border-t pt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Your Role</p>
+                    <p className="font-medium">{isBuyer ? 'Buyer' : 'Seller'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Order Date</p>
+                    <p className="font-medium">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Status</p>
+                    <Badge variant={getStatusColor(order.status)}>
+                      {order.status.replace('_', ' ')}
+                    </Badge>
+                  </div>
+                  {order.transaction_signature && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Transaction</p>
+                      <a
+                        href={`https://explorer.solana.com/tx/${order.transaction_signature}?cluster=devnet`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary hover:underline flex items-center gap-1"
+                      >
+                        View on Explorer
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
+              </CardContent>
+            </Card>
+
+            {/* Messaging Section */}
+            <Card>
+              <Tabs defaultValue="messages" className="w-full">
+                <TabsList className="w-full">
+                  <TabsTrigger value="messages" className="flex-1">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Messages
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="messages" className="h-[500px]">
+                  <MessageList 
+                    orderId={order.id}
+                    otherUserId={isBuyer ? order.seller_id : order.buyer_id}
+                  />
+                </TabsContent>
+              </Tabs>
+            </Card>
+          </div>
+
+          {/* Actions Sidebar */}
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {/* Seller Actions */}
+                {isSeller && order.status === 'in_progress' && (
+                  <Button 
+                    className="w-full"
+                    onClick={() => handleStatusUpdate('delivered')}
+                  >
+                    Mark as Delivered
+                  </Button>
+                )}
+
+                {/* Buyer Actions */}
+                {isBuyer && order.status === 'delivered' && (
+                  <>
+                    <Button 
+                      className="w-full"
+                      onClick={() => handleStatusUpdate('completed')}
+                    >
+                      Approve Delivery
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      className="w-full"
+                      onClick={() => handleStatusUpdate('disputed')}
+                    >
+                      Request Refund
+                    </Button>
+                  </>
+                )}
+
+                {/* Review Button for Completed Orders */}
+                {isBuyer && order.status === 'completed' && !hasReview && (
+                  <Button 
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowReviewDialog(true)}
+                  >
+                    Leave a Review
+                  </Button>
+                )}
+
+                {/* View Gig */}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate(`/gigs/${order.gig.id}`)}
+                >
+                  View Gig
+                </Button>
+
+                {/* Contact Info */}
+                <div className="pt-4 border-t">
+                  <p className="text-sm font-medium mb-2">
                     {isBuyer ? 'Seller' : 'Buyer'}
                   </p>
-                  <p className="font-semibold">{otherParty.username}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {isBuyer ? order.seller_profile.username : order.buyer_profile.username}
+                  </p>
                 </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Order Date</p>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>{new Date(order.created_at).toLocaleDateString()}</span>
-                </div>
-              </div>
-
-              {order.transaction_signature && (
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Transaction</p>
-                  <a 
-                    href={`https://explorer.solana.com/tx/${order.transaction_signature}?cluster=devnet`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-primary hover:underline"
-                  >
-                    <span className="font-mono text-sm">{order.transaction_signature.slice(0, 8)}...{order.transaction_signature.slice(-8)}</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3">
-                {order.status === 'pending' && (
-                  <Button className="flex-1" disabled>
-                    Awaiting Payment
-                  </Button>
-                )}
-                {order.status === 'in_progress' && isBuyer && (
-                  <Button variant="outline" className="flex-1" disabled>
-                    Waiting for Delivery
-                  </Button>
-                )}
-                {order.status === 'in_progress' && !isBuyer && (
-                  <Button className="flex-1" disabled>
-                    Mark as Delivered (Coming Soon)
-                  </Button>
-                )}
-                {order.status === 'completed' && (
-                  <Button variant="outline" disabled>
-                    Order Completed
-                  </Button>
-                )}
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate(isBuyer ? '/dashboard/buyer' : '/dashboard/seller')}
-                >
-                  Back to Dashboard
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
       <Footer />
+
+      {order && (
+        <ReviewDialog
+          open={showReviewDialog}
+          onOpenChange={setShowReviewDialog}
+          orderId={order.id}
+          sellerId={order.seller_id}
+          onReviewSubmitted={() => {
+            setHasReview(true);
+            checkExistingReview();
+          }}
+        />
+      )}
     </div>
   );
 }

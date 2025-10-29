@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { OrderConfirmationDialog } from '@/components/OrderConfirmationDialog';
+import { ReviewList } from '@/components/ReviewList';
 import { toast } from 'sonner';
 import { Star, Clock, Edit, Trash2, User } from 'lucide-react';
 
@@ -226,6 +227,12 @@ export default function GigDetail() {
               </Card>
             )}
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">Reviews</h2>
+          <ReviewList sellerId={gig.seller_id} />
         </div>
       </main>
       <Footer />
