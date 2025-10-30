@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Search, Menu, User, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,27 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isSeller, setIsSeller] = useState(false);
+
+  useEffect(() => {
+    const checkSellerRole = async () => {
+      if (!user) {
+        setIsSeller(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'seller')
+        .maybeSingle();
+
+      setIsSeller(!!data);
+    };
+
+    checkSellerRole();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -32,9 +54,11 @@ export const Navbar = () => {
               <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                 Explore
               </a>
-              <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-                Become a Seller
-              </a>
+              {!isSeller && user && (
+                <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                  Become a Seller
+                </a>
+              )}
             </div>
           </div>
 
@@ -69,12 +93,16 @@ export const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
                     My Orders
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
-                    Seller Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/create-gig')}>
-                    Create Gig
-                  </DropdownMenuItem>
+                  {isSeller && (
+                    <>
+                      <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
+                        Seller Dashboard
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/create-gig')}>
+                        Create Gig
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuItem onClick={signOut} className="text-destructive">
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
@@ -117,9 +145,11 @@ export const Navbar = () => {
               <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">
                 Explore
               </a>
-              <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary">
-                Become a Seller
-              </a>
+              {!isSeller && user && (
+                <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary">
+                  Become a Seller
+                </a>
+              )}
               {user ? (
                 <>
                   <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/dashboard')}>

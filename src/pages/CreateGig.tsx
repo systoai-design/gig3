@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,6 +37,7 @@ export default function CreateGig() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(true);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   
@@ -47,6 +48,33 @@ export default function CreateGig() {
     price_sol: '',
     delivery_days: '',
   });
+
+  useEffect(() => {
+    const checkSellerRole = async () => {
+      if (!user) {
+        toast.error('Please sign in to create gigs');
+        navigate('/auth');
+        return;
+      }
+
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'seller')
+        .maybeSingle();
+
+      if (!data) {
+        toast.error('You must be a seller to create gigs');
+        navigate('/become-seller');
+        return;
+      }
+
+      setCheckingRole(false);
+    };
+
+    checkSellerRole();
+  }, [user, navigate]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -145,6 +173,17 @@ export default function CreateGig() {
       setLoading(false);
     }
   };
+
+  if (checkingRole) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-12 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
