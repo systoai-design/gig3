@@ -95,10 +95,14 @@ export type Database = {
         Row: {
           amount_sol: number
           buyer_id: string
+          completed_at: string | null
           created_at: string
+          delivered_at: string | null
+          disputed_at: string | null
           escrow_account: string | null
           gig_id: string
           id: string
+          payment_confirmed_at: string | null
           seller_id: string
           status: Database["public"]["Enums"]["order_status"]
           transaction_signature: string | null
@@ -107,10 +111,14 @@ export type Database = {
         Insert: {
           amount_sol: number
           buyer_id: string
+          completed_at?: string | null
           created_at?: string
+          delivered_at?: string | null
+          disputed_at?: string | null
           escrow_account?: string | null
           gig_id: string
           id?: string
+          payment_confirmed_at?: string | null
           seller_id: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null
@@ -119,10 +127,14 @@ export type Database = {
         Update: {
           amount_sol?: number
           buyer_id?: string
+          completed_at?: string | null
           created_at?: string
+          delivered_at?: string | null
+          disputed_at?: string | null
           escrow_account?: string | null
           gig_id?: string
           id?: string
+          payment_confirmed_at?: string | null
           seller_id?: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null
@@ -202,6 +214,50 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: true
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seller_profiles: {
+        Row: {
+          application_notes: string | null
+          created_at: string
+          id: string
+          portfolio_links: string[]
+          skills: string[]
+          updated_at: string
+          user_id: string
+          verification_date: string | null
+          verified: boolean
+        }
+        Insert: {
+          application_notes?: string | null
+          created_at?: string
+          id?: string
+          portfolio_links?: string[]
+          skills?: string[]
+          updated_at?: string
+          user_id: string
+          verification_date?: string | null
+          verified?: boolean
+        }
+        Update: {
+          application_notes?: string | null
+          created_at?: string
+          id?: string
+          portfolio_links?: string[]
+          skills?: string[]
+          updated_at?: string
+          user_id?: string
+          verification_date?: string | null
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_seller_profiles_user_id"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

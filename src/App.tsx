@@ -16,6 +16,7 @@ import SellerDashboard from "./pages/SellerDashboard";
 import BuyerDashboard from "./pages/BuyerDashboard";
 import Profile from "./pages/Profile";
 import OrderDetail from "./pages/OrderDetail";
+import BecomeSeller from "./pages/BecomeSeller";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/explore" element={<Explore />} />
               <Route path="/gigs/:id" element={<GigDetail />} />
               <Route path="/profile/:userId" element={<Profile />} />
+              <Route path="/become-seller" element={<ProtectedRoute><BecomeSeller /></ProtectedRoute>} />
               <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
               <Route path="/create-gig" element={<ProtectedRoute><CreateGig /></ProtectedRoute>} />
               <Route path="/edit-gig/:id" element={<ProtectedRoute><EditGig /></ProtectedRoute>} />

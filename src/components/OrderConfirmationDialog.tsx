@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -24,9 +25,11 @@ interface OrderConfirmationDialogProps {
 
 export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfirmationDialogProps) {
   const { user } = useAuth();
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, sendTransaction } = useWallet();
+  const { connection } = useConnection();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
+  const [transactionStatus, setTransactionStatus] = useState<'idle' | 'signing' | 'confirming' | 'complete'>('idle');
 
   const handleCreateOrder = async () => {
     if (!user) {
@@ -41,27 +44,86 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
 
     try {
       setCreating(true);
+      setTransactionStatus('idle');
 
-      // Create order in database (without blockchain transaction for now)
-      const { data: order, error } = await supabase
+      // Step 1: Fetch seller's wallet address
+      const { data: sellerProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('wallet_address')
+        .eq('id', gig.seller_id)
+        .single();
+
+      if (profileError) throw new Error('Failed to fetch seller information');
+      
+      if (!sellerProfile?.wallet_address) {
+        throw new Error('Seller has not configured their wallet address');
+      }
+
+      const sellerWalletAddress = new PublicKey(sellerProfile.wallet_address);
+
+      // Step 2: Create Solana transaction
+      setTransactionStatus('signing');
+      toast.info('Please approve the transaction in your wallet...');
+
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: sellerWalletAddress,
+          lamports: Math.floor(gig.price_sol * LAMPORTS_PER_SOL),
+        })
+      );
+
+      // Get recent blockhash
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = publicKey;
+
+      // Step 3: Send transaction
+      const signature = await sendTransaction(transaction, connection);
+      
+      setTransactionStatus('confirming');
+      toast.info('Transaction sent! Confirming on blockchain...');
+
+      // Step 4: Wait for confirmation (with timeout)
+      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+
+      if (confirmation.value.err) {
+        throw new Error('Transaction failed on blockchain');
+      }
+
+      toast.success('Payment confirmed on blockchain!');
+
+      // Step 5: Create order in database with transaction signature
+      const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           gig_id: gig.id,
           buyer_id: user.id,
           seller_id: gig.seller_id,
           amount_sol: gig.price_sol,
-          status: 'pending',
+          status: 'in_progress',
+          transaction_signature: signature,
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (orderError) throw orderError;
 
-      toast.success('Order created! You can now proceed with payment.');
+      setTransactionStatus('complete');
+      toast.success('Order created successfully!');
       onOpenChange(false);
       navigate(`/orders/${order.id}`);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create order');
+      setTransactionStatus('idle');
+      console.error('Order creation error:', error);
+      
+      if (error.message?.includes('User rejected')) {
+        toast.error('Transaction cancelled by user');
+      } else if (error.message?.includes('Insufficient funds')) {
+        toast.error('Insufficient SOL balance in your wallet');
+      } else {
+        toast.error(error.message || 'Failed to create order');
+      }
     } finally {
       setCreating(false);
     }
@@ -149,10 +211,13 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
             {creating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating...
+                {transactionStatus === 'signing' && 'Awaiting Signature...'}
+                {transactionStatus === 'confirming' && 'Confirming...'}
+                {transactionStatus === 'idle' && 'Processing...'}
+                {transactionStatus === 'complete' && 'Complete!'}
               </>
             ) : (
-              'Place Order'
+              'Place Order & Pay'
             )}
           </Button>
         </DialogFooter>

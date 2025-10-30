@@ -29,10 +29,10 @@ export const Navbar = () => {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <a href="#" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+              <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                 Explore
               </a>
-              <a href="#" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+              <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
                 Become a Seller
               </a>
             </div>
@@ -114,10 +114,10 @@ export const Navbar = () => {
                   className="w-full pl-10 pr-4 py-2 border border-input rounded-full bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
-              <a href="#" className="text-sm font-medium text-foreground hover:text-primary">
+              <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">
                 Explore
               </a>
-              <a href="#" className="text-sm font-medium text-foreground hover:text-primary">
+              <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary">
                 Become a Seller
               </a>
               {user ? (

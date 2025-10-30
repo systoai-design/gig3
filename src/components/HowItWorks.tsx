@@ -79,12 +79,18 @@ export const HowItWorks = () => {
         {/* CTA Section */}
         <div className="mt-16 text-center">
           <div className="inline-flex flex-col sm:flex-row gap-4">
-            <button className="px-8 py-4 bg-gradient-primary text-primary-foreground font-semibold rounded-full hover:opacity-90 transition-opacity shadow-medium">
+            <a 
+              href="/become-seller"
+              className="px-8 py-4 bg-gradient-primary text-primary-foreground font-semibold rounded-full hover:opacity-90 transition-opacity shadow-medium inline-block"
+            >
               Start Selling Today
-            </button>
-            <button className="px-8 py-4 border-2 border-primary text-primary font-semibold rounded-full hover:bg-primary/5 transition-colors">
-              Learn More About Escrow
-            </button>
+            </a>
+            <a
+              href="/explore"
+              className="px-8 py-4 border-2 border-primary text-primary font-semibold rounded-full hover:bg-primary/5 transition-colors inline-block"
+            >
+              Browse Services
+            </a>
           </div>
         </div>
       </div>

@@ -11,8 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageList } from '@/components/MessageList';
 import { ReviewDialog } from '@/components/ReviewDialog';
+import { OrderTimeline } from '@/components/OrderTimeline';
 import { toast } from 'sonner';
-import { ArrowLeft, ExternalLink, MessageSquare } from 'lucide-react';
+import { ArrowLeft, ExternalLink, MessageSquare, Clock as ClockIcon } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -23,6 +24,10 @@ interface Order {
   status: 'pending' | 'in_progress' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
   transaction_signature: string | null;
   created_at: string;
+  payment_confirmed_at?: string | null;
+  delivered_at?: string | null;
+  completed_at?: string | null;
+  disputed_at?: string | null;
   gig: {
     id: string;
     title: string;
@@ -230,6 +235,26 @@ export default function OrderDetail() {
                     </div>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Order Timeline */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ClockIcon className="h-5 w-5" />
+                  Order Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OrderTimeline
+                  currentStatus={order.status}
+                  createdAt={order.created_at}
+                  paymentConfirmedAt={order.payment_confirmed_at}
+                  deliveredAt={order.delivered_at}
+                  completedAt={order.completed_at}
+                  disputedAt={order.disputed_at}
+                />
               </CardContent>
             </Card>
 
