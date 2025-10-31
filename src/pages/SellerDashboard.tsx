@@ -26,22 +26,31 @@ export default function SellerDashboard() {
 
   const checkSellerRole = async () => {
     try {
-      const { data: roleData } = await supabase
+      const { data: roleData, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user?.id)
         .eq('role', 'seller')
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking seller role:', error);
+        toast.error('Failed to verify seller status');
+        navigate('/');
+        return;
+      }
 
       if (!roleData) {
         toast.error('You need to be a seller to access this page');
-        navigate('/');
+        navigate('/become-seller');
         return;
       }
 
       fetchDashboardData();
     } catch (error) {
       console.error('Error checking seller role:', error);
+      toast.error('Failed to load seller dashboard');
+      navigate('/');
     }
   };
 

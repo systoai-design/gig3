@@ -178,7 +178,11 @@ export default function BecomeSeller() {
       if (roleError) throw roleError;
 
       toast.success('Congratulations! You are now a seller on GIG3!');
-      navigate('/dashboard/seller');
+      
+      // Small delay to ensure database updates are complete
+      setTimeout(() => {
+        navigate('/dashboard/seller');
+      }, 500);
     } catch (error: any) {
       console.error('Become seller error:', error);
       toast.error(error.message || 'Failed to become a seller');
