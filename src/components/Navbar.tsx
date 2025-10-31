@@ -46,7 +46,7 @@ export const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center space-x-8">
             <a href="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              SolMarket
+              GIG3
             </a>
             
             {/* Desktop Navigation */}

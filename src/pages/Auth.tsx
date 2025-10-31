@@ -105,10 +105,10 @@ export default function Auth() {
       <Card className="w-full max-w-md shadow-elegant">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center bg-gradient-primary bg-clip-text text-transparent">
-            SolMarket
+            GIG3
           </CardTitle>
           <CardDescription className="text-center">
-            Your decentralized freelance marketplace
+            Gig Economy Web 3 Marketplace
           </CardDescription>
         </CardHeader>
         <CardContent>

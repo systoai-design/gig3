@@ -29,10 +29,10 @@ export const Footer = () => {
           {/* Brand */}
           <div>
             <a href="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4 inline-block">
-              SolMarket
+              GIG3
             </a>
             <p className="text-muted-foreground text-sm mb-4">
-              The decentralized freelance marketplace powered by Solana. Zero fees, instant payments, secure escrow.
+              Gig Economy Web 3 - The decentralized freelance marketplace powered by Solana blockchain. Secure payments, transparent escrow.
             </p>
             <div className="flex space-x-4">
               <a
@@ -110,7 +110,7 @@ export const Footer = () => {
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-muted-foreground">
-              © 2025 SolMarket. Built on Solana with ❤️
+              © 2025 GIG3. Built on Solana with ❤️
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">

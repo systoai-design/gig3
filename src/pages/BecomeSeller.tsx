@@ -164,7 +164,7 @@ export default function BecomeSeller() {
 
       if (roleError) throw roleError;
 
-      toast.success('Congratulations! You are now a seller on SolMarket');
+      toast.success('Congratulations! You are now a seller on GIG3!');
       navigate('/dashboard/seller');
     } catch (error: any) {
       console.error('Become seller error:', error);
@@ -197,7 +197,7 @@ export default function BecomeSeller() {
                 You're Already a Seller!
               </CardTitle>
               <CardDescription>
-                You already have seller access on SolMarket
+                You already have seller access on GIG3
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -228,10 +228,10 @@ export default function BecomeSeller() {
       <section className="py-12 bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Start Earning on <span className="bg-gradient-primary bg-clip-text text-transparent">SolMarket</span>
+            Start Earning on <span className="bg-gradient-primary bg-clip-text text-transparent">GIG3</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of freelancers earning cryptocurrency by offering their services
+            Join the future of freelancing - earn cryptocurrency by offering your services on Web3
           </p>
         </div>
       </section>
@@ -280,7 +280,7 @@ export default function BecomeSeller() {
             <CardHeader>
               <CardTitle>Seller Application</CardTitle>
               <CardDescription>
-                Complete your profile to start selling on SolMarket
+                Complete your profile to start selling on GIG3
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -383,7 +383,7 @@ export default function BecomeSeller() {
                     htmlFor="terms"
                     className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                   >
-                    I agree to the SolMarket seller terms and conditions, including the 5% platform fee on all sales
+                    I agree to the GIG3 seller terms and conditions
                   </label>
                 </div>
 
