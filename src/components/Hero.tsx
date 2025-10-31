@@ -106,17 +106,27 @@ export const Hero = () => {
           </div>
 
           {/* Trusted By Section */}
-          <div className="flex flex-wrap items-center gap-6 text-white/90">
-            <span className="text-sm font-medium text-white/70">Trusted by:</span>
-            <div className="flex flex-wrap items-center gap-8">
-              {trustedBrands.map((brand) => (
-                <div
-                  key={brand}
-                  className="text-lg font-semibold text-white/80 hover:text-white transition-colors cursor-default"
-                >
-                  {brand}
-                </div>
-              ))}
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-6 text-white/90">
+              <span className="text-sm font-medium text-white/70">Trusted by:</span>
+              <div className="flex flex-wrap items-center gap-8">
+                {trustedBrands.map((brand) => (
+                  <div
+                    key={brand}
+                    className="text-lg font-semibold text-white/80 hover:text-white transition-colors cursor-default"
+                  >
+                    {brand}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pt-2">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-purple-400/30 backdrop-blur-sm">
+                <span className="text-xs font-semibold text-purple-300">Powered by</span>
+                <span className="text-sm font-bold bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">x402 Protocol</span>
+              </div>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
             </div>
           </div>
         </div>

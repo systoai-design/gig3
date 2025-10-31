@@ -119,9 +119,15 @@ export const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">
-              © 2025 GIG3. Built on Solana with ❤️
-            </p>
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <p className="text-sm text-muted-foreground">
+                © 2025 GIG3. Built on Solana with ❤️
+              </p>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+                <span className="text-xs font-semibold text-purple-600">Secured by</span>
+                <span className="text-sm font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">x402 Protocol</span>
+              </div>
+            </div>
             <div className="flex flex-wrap justify-center gap-6">
               <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
