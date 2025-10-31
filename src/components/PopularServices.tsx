@@ -63,6 +63,7 @@ export const PopularServices = () => {
                       <img
                         src={service.image}
                         alt={service.title}
+                        loading="lazy"
                         className="w-full h-full object-cover rounded-tl-[60px]"
                       />
                     </div>

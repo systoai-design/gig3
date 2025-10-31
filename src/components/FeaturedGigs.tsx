@@ -87,7 +87,7 @@ export const FeaturedGigs = () => {
               Top-rated gigs from our community
             </p>
           </div>
-          <Button variant="ghost" className="hidden md:flex">
+          <Button variant="ghost" className="hidden md:flex" onClick={() => navigate('/explore')}>
             View All
           </Button>
         </div>
@@ -105,6 +105,7 @@ export const FeaturedGigs = () => {
                     <img
                       src={gig.images[0]}
                       alt={gig.title}
+                      loading="lazy"
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                     />
                   ) : (

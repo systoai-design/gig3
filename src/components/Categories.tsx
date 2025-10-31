@@ -1,4 +1,5 @@
 import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase, Users, Languages } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   { name: "Programming & Tech", icon: Code },
@@ -13,6 +14,8 @@ const categories = [
 ];
 
 export const Categories = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -23,6 +26,7 @@ export const Categories = () => {
               return (
                 <button
                   key={category.name}
+                  onClick={() => navigate('/explore')}
                   className="flex flex-col items-center gap-3 px-6 py-6 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 min-w-[140px]"
                 >
                   <div className="p-3 rounded-lg bg-gray-50">
