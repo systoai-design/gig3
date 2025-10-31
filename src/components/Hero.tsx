@@ -1,69 +1,109 @@
 import { Button } from "@/components/ui/button";
 import { Search, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+
+  const popularServices = [
+    { label: "Website Development", icon: "→" },
+    { label: "Logo Design", icon: "→" },
+    { label: "Video Editing", icon: "→" },
+    { label: "AI Services", icon: "→" },
+    { label: "Smart Contracts", badge: "NEW", icon: "→" },
+  ];
+
+  const trustedBrands = [
+    "Meta",
+    "Google", 
+    "Netflix",
+    "PayPal",
+    "Solana",
+    "Coinbase"
+  ];
+
   return (
-    <section className="relative overflow-hidden bg-gradient-hero py-20 md:py-32">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDEzNGg4djhIMzZ6bTAgMGg4djhIMzZ6bTAgMGg4djhIMzZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
+    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Background overlay with pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDh2OGgtOHptMCAwaDh2OGgtOHptMCAwaDh2OGgtOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50"></div>
       
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center space-x-2 bg-background/10 backdrop-blur-sm border border-primary-foreground/20 rounded-full px-4 py-2 mb-6">
-            <span className="text-xs font-semibold text-primary-foreground">🚀 Powered by Solana</span>
-            <span className="text-xs text-primary-foreground/80">Zero Platform Fees</span>
-          </div>
-          
-          <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
-            Freelance Services
+      {/* Gradient overlays for depth */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-blue-900/20"></div>
+      
+      {/* Content */}
+      <div className="container mx-auto px-4 relative z-10 py-20">
+        <div className="max-w-4xl">
+          {/* Main Heading */}
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight">
+            Our freelancers
             <br />
-            <span className="text-accent">On The Blockchain</span>
+            will take it from here
           </h1>
           
-          <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Connect with talented freelancers. Pay with crypto. Keep 100% of your earnings with secure escrow on Solana.
-          </p>
-
-          {/* Hero Search */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder='Try "logo design" or "web development"'
-                className="w-full pl-12 pr-32 py-4 rounded-full border-2 border-primary-foreground/20 bg-background/95 text-foreground text-base focus:outline-none focus:border-primary-foreground shadow-large"
-              />
-              <Button
-                size="lg"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-secondary hover:opacity-90 transition-opacity rounded-full"
-              >
-                Search
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+          {/* Search Bar */}
+          <div className="max-w-2xl mb-6">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-lg blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+              <div className="relative flex items-center bg-white rounded-lg shadow-2xl overflow-hidden">
+                <input
+                  type="text"
+                  placeholder="Search for any service..."
+                  className="flex-1 px-6 py-5 text-base text-gray-900 placeholder:text-gray-500 focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      navigate('/explore');
+                    }
+                  }}
+                />
+                <Button
+                  size="lg"
+                  onClick={() => navigate('/explore')}
+                  className="m-2 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 text-white px-8 rounded-md"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Popular searches */}
-          <div className="flex flex-wrap justify-center gap-2 text-sm">
-            <span className="text-primary-foreground/70">Popular:</span>
-            {["Logo Design", "WordPress", "AI Services", "Video Editing"].map((tag) => (
+          {/* Popular Services */}
+          <div className="flex flex-wrap gap-2 mb-12">
+            {popularServices.map((service) => (
               <button
-                key={tag}
-                className="px-3 py-1 rounded-full border border-primary-foreground/20 bg-background/10 text-primary-foreground hover:bg-background/20 transition-colors"
+                key={service.label}
+                onClick={() => navigate('/explore')}
+                className="group relative px-4 py-2.5 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm font-medium hover:bg-white/20 hover:border-white/50 transition-all duration-200 flex items-center gap-2"
               >
-                {tag}
+                <span>{service.label}</span>
+                {service.badge && (
+                  <span className="px-2 py-0.5 text-xs font-bold bg-yellow-400 text-gray-900 rounded-full">
+                    {service.badge}
+                  </span>
+                )}
+                <ArrowRight className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
+          </div>
+
+          {/* Trusted By Section */}
+          <div className="flex flex-wrap items-center gap-6 text-white/90">
+            <span className="text-sm font-medium text-white/70">Trusted by:</span>
+            <div className="flex flex-wrap items-center gap-8">
+              {trustedBrands.map((brand) => (
+                <div
+                  key={brand}
+                  className="text-lg font-semibold text-white/80 hover:text-white transition-colors cursor-default"
+                >
+                  {brand}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom wave decoration */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 80C1200 80 1320 70 1380 65L1440 60V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="hsl(var(--background))" />
-        </svg>
-      </div>
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
     </section>
   );
 };

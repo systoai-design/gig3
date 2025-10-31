@@ -40,25 +40,20 @@ export const Navbar = () => {
   }, [user]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-950 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <a href="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <a href="/" className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
               GIG3
             </a>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-6">
-              <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+            <div className="hidden lg:flex items-center space-x-6">
+              <a href="/explore" className="text-base text-gray-700 dark:text-gray-300 hover:text-primary font-medium transition-colors">
                 Explore
               </a>
-              {!isSeller && user && (
-                <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-                  Become a Seller
-                </a>
-              )}
             </div>
           </div>
 
@@ -75,7 +70,13 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-2">
+            {!isSeller && user && (
+              <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
+                Become a Seller
+              </Button>
+            )}
+            
             <WalletMultiButton />
             
             {user ? (
@@ -114,11 +115,11 @@ export const Navbar = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')}>
+                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
                   Sign In
                 </Button>
-                <Button size="sm" className="bg-gradient-primary hover:opacity-90 transition-opacity" onClick={() => navigate('/auth')}>
-                  Get Started
+                <Button size="sm" onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-white rounded-md border-2 border-primary">
+                  Join
                 </Button>
               </>
             )}
