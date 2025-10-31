@@ -13,12 +13,21 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { Loader2, Upload, X } from 'lucide-react';
 
+const packageSchema = z.object({
+  name: z.string().min(1, 'Package name required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  price_sol: z.number().min(0.01, 'Minimum price is 0.01 SOL'),
+  delivery_days: z.number().min(1, 'Minimum 1 day').max(90, 'Maximum 90 days'),
+  revisions: z.number().min(0, 'Minimum 0 revisions').max(10, 'Maximum 10 revisions'),
+  features: z.array(z.string()).min(1, 'Add at least one feature'),
+});
+
 const gigSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters').max(100, 'Title too long'),
   description: z.string().min(50, 'Description must be at least 50 characters').max(2000, 'Description too long'),
   category: z.string().min(1, 'Please select a category'),
-  price_sol: z.number().min(0.01, 'Minimum price is 0.01 SOL').max(1000, 'Maximum price is 1000 SOL'),
-  delivery_days: z.number().min(1, 'Minimum 1 day').max(90, 'Maximum 90 days'),
+  price_sol: z.number().optional(),
+  delivery_days: z.number().optional(),
 });
 
 const CATEGORIES = [
@@ -40,6 +49,7 @@ export default function CreateGig() {
   const [checkingRole, setCheckingRole] = useState(true);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [usePackages, setUsePackages] = useState(true);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -48,6 +58,33 @@ export default function CreateGig() {
     price_sol: '',
     delivery_days: '',
   });
+
+  const [packages, setPackages] = useState([
+    {
+      name: 'Basic',
+      description: '',
+      price_sol: '',
+      delivery_days: '',
+      revisions: '2',
+      features: [''],
+    },
+    {
+      name: 'Standard',
+      description: '',
+      price_sol: '',
+      delivery_days: '',
+      revisions: '3',
+      features: [''],
+    },
+    {
+      name: 'Premium',
+      description: '',
+      price_sol: '',
+      delivery_days: '',
+      revisions: '5',
+      features: [''],
+    },
+  ]);
 
   useEffect(() => {
     const checkSellerRole = async () => {
@@ -99,6 +136,24 @@ export default function CreateGig() {
     setImagePreviews(imagePreviews.filter((_, i) => i !== index));
   };
 
+  const updatePackageFeature = (pkgIdx: number, featIdx: number, value: string) => {
+    const newPackages = [...packages];
+    newPackages[pkgIdx].features[featIdx] = value;
+    setPackages(newPackages);
+  };
+
+  const addPackageFeature = (pkgIdx: number) => {
+    const newPackages = [...packages];
+    newPackages[pkgIdx].features.push('');
+    setPackages(newPackages);
+  };
+
+  const removePackageFeature = (pkgIdx: number, featIdx: number) => {
+    const newPackages = [...packages];
+    newPackages[pkgIdx].features = newPackages[pkgIdx].features.filter((_, i) => i !== featIdx);
+    setPackages(newPackages);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -118,9 +173,24 @@ export default function CreateGig() {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        price_sol: parseFloat(formData.price_sol),
-        delivery_days: parseInt(formData.delivery_days),
+        price_sol: usePackages ? undefined : parseFloat(formData.price_sol),
+        delivery_days: usePackages ? undefined : parseInt(formData.delivery_days),
       });
+
+      // Validate packages if using packages
+      let validatedPackages = null;
+      if (usePackages) {
+        validatedPackages = packages.map(pkg => 
+          packageSchema.parse({
+            name: pkg.name,
+            description: pkg.description,
+            price_sol: parseFloat(pkg.price_sol),
+            delivery_days: parseInt(pkg.delivery_days),
+            revisions: parseInt(pkg.revisions),
+            features: pkg.features.filter(f => f.trim() !== ''),
+          })
+        );
+      }
 
       setLoading(true);
 
@@ -151,10 +221,12 @@ export default function CreateGig() {
           title: validatedData.title,
           description: validatedData.description,
           category: validatedData.category,
-          price_sol: validatedData.price_sol,
-          delivery_days: validatedData.delivery_days,
+          price_sol: usePackages ? validatedPackages[0].price_sol : validatedData.price_sol,
+          delivery_days: usePackages ? validatedPackages[0].delivery_days : validatedData.delivery_days,
           images: imageUrls,
           status: 'active',
+          packages: validatedPackages || [],
+          has_packages: usePackages,
         })
         .select()
         .single();
@@ -230,31 +302,160 @@ export default function CreateGig() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="price">Price (SOL) *</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                placeholder="0.5"
-                value={formData.price_sol}
-                onChange={(e) => setFormData({ ...formData, price_sol: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="delivery">Delivery Time (days) *</Label>
-              <Input
-                id="delivery"
-                type="number"
-                placeholder="7"
-                value={formData.delivery_days}
-                onChange={(e) => setFormData({ ...formData, delivery_days: e.target.value })}
-                required
-              />
+          {/* Pricing Type Selection */}
+          <div className="space-y-4">
+            <Label>Pricing Model</Label>
+            <div className="flex gap-4">
+              <Button
+                type="button"
+                variant={usePackages ? 'default' : 'outline'}
+                onClick={() => setUsePackages(true)}
+                className="flex-1"
+              >
+                Tiered Packages (Recommended)
+              </Button>
+              <Button
+                type="button"
+                variant={!usePackages ? 'default' : 'outline'}
+                onClick={() => setUsePackages(false)}
+                className="flex-1"
+              >
+                Single Price
+              </Button>
             </div>
           </div>
+
+          {usePackages ? (
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold">Create Your Packages</h3>
+              {packages.map((pkg, pkgIdx) => (
+                <div key={pkgIdx} className="border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold">{pkg.name} Package</h4>
+                  
+                  <div>
+                    <Label>Package Description *</Label>
+                    <Textarea
+                      placeholder={`Describe what's included in the ${pkg.name} package...`}
+                      value={pkg.description}
+                      onChange={(e) => {
+                        const newPackages = [...packages];
+                        newPackages[pkgIdx].description = e.target.value;
+                        setPackages(newPackages);
+                      }}
+                      rows={2}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Price (SOL) *</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.5"
+                        value={pkg.price_sol}
+                        onChange={(e) => {
+                          const newPackages = [...packages];
+                          newPackages[pkgIdx].price_sol = e.target.value;
+                          setPackages(newPackages);
+                        }}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Delivery (days) *</Label>
+                      <Input
+                        type="number"
+                        placeholder="7"
+                        value={pkg.delivery_days}
+                        onChange={(e) => {
+                          const newPackages = [...packages];
+                          newPackages[pkgIdx].delivery_days = e.target.value;
+                          setPackages(newPackages);
+                        }}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label>Revisions *</Label>
+                      <Input
+                        type="number"
+                        placeholder="2"
+                        value={pkg.revisions}
+                        onChange={(e) => {
+                          const newPackages = [...packages];
+                          newPackages[pkgIdx].revisions = e.target.value;
+                          setPackages(newPackages);
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Features *</Label>
+                    <div className="space-y-2">
+                      {pkg.features.map((feature, featIdx) => (
+                        <div key={featIdx} className="flex gap-2">
+                          <Input
+                            placeholder="e.g., Responsive design"
+                            value={feature}
+                            onChange={(e) => updatePackageFeature(pkgIdx, featIdx, e.target.value)}
+                            required
+                          />
+                          {pkg.features.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removePackageFeature(pkgIdx, featIdx)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addPackageFeature(pkgIdx)}
+                      >
+                        + Add Feature
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="price">Price (SOL) *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.5"
+                  value={formData.price_sol}
+                  onChange={(e) => setFormData({ ...formData, price_sol: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="delivery">Delivery Time (days) *</Label>
+                <Input
+                  id="delivery"
+                  type="number"
+                  placeholder="7"
+                  value={formData.delivery_days}
+                  onChange={(e) => setFormData({ ...formData, delivery_days: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <Label>Gig Images * (Max 5)</Label>

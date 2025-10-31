@@ -19,15 +19,33 @@ interface OrderConfirmationDialogProps {
     delivery_days: number;
     seller_id: string;
     images: string[];
+    has_packages?: boolean;
+    packages?: Array<{
+      name: string;
+      description: string;
+      price_sol: number;
+      delivery_days: number;
+      revisions: number;
+      features: string[];
+    }>;
   };
+  selectedPackageIndex?: number;
 }
 
-export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfirmationDialogProps) {
+export function OrderConfirmationDialog({ open, onOpenChange, gig, selectedPackageIndex = 0 }: OrderConfirmationDialogProps) {
   const { user } = useAuth();
   const { publicKey, connected, signMessage } = useWallet();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [transactionStatus, setTransactionStatus] = useState<string>('');
+
+  // Get the selected package or use gig defaults
+  const selectedPackage = gig.has_packages && gig.packages?.[selectedPackageIndex] 
+    ? gig.packages[selectedPackageIndex]
+    : null;
+  
+  const orderPrice = selectedPackage ? selectedPackage.price_sol : gig.price_sol;
+  const orderDeliveryDays = selectedPackage ? selectedPackage.delivery_days : gig.delivery_days;
 
   const handleCreateOrder = async () => {
     if (!user) {
@@ -49,7 +67,8 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
         gigId: gig.id,
         buyerId: user.id,
         sellerId: gig.seller_id,
-        amount: gig.price_sol,
+        amount: orderPrice,
+        packageName: selectedPackage?.name,
       };
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -181,6 +200,9 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
             )}
             <div className="flex-1">
               <h3 className="font-semibold text-base line-clamp-2">{gig.title}</h3>
+              {selectedPackage && (
+                <Badge variant="outline" className="mt-1">{selectedPackage.name} Package</Badge>
+              )}
             </div>
           </div>
 
@@ -192,7 +214,7 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
                 <span>Price</span>
               </div>
               <Badge variant="secondary" className="text-base">
-                {gig.price_sol} SOL
+                {orderPrice} SOL
               </Badge>
             </div>
 
@@ -201,8 +223,26 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
                 <Clock className="h-4 w-4" />
                 <span>Delivery Time</span>
               </div>
-              <span className="text-sm font-medium">{gig.delivery_days} days</span>
+              <span className="text-sm font-medium">{orderDeliveryDays} days</span>
             </div>
+
+            {selectedPackage && (
+              <div className="border-t pt-3">
+                <p className="text-sm font-medium mb-2">Includes:</p>
+                <ul className="space-y-1">
+                  {selectedPackage.features.map((feature, idx) => (
+                    <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="text-primary mt-0.5">✓</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                  <li className="text-sm text-muted-foreground flex items-start gap-2">
+                    <span className="text-primary mt-0.5">✓</span>
+                    <span>{selectedPackage.revisions} revisions</span>
+                  </li>
+                </ul>
+              </div>
+            )}
 
             {connected && publicKey ? (
               <div className="flex items-center justify-between">
@@ -226,7 +266,7 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
           {/* Total */}
           <div className="flex items-center justify-between border-t pt-4">
             <span className="font-semibold">Total Amount</span>
-            <span className="text-2xl font-bold text-primary">{gig.price_sol} SOL</span>
+            <span className="text-2xl font-bold text-primary">{orderPrice} SOL</span>
           </div>
         </div>
 

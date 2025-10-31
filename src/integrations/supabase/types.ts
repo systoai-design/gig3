@@ -20,8 +20,10 @@ export type Database = {
           created_at: string
           delivery_days: number
           description: string
+          has_packages: boolean | null
           id: string
           images: string[] | null
+          packages: Json | null
           price_sol: number
           seller_id: string
           status: Database["public"]["Enums"]["gig_status"]
@@ -33,8 +35,10 @@ export type Database = {
           created_at?: string
           delivery_days: number
           description: string
+          has_packages?: boolean | null
           id?: string
           images?: string[] | null
+          packages?: Json | null
           price_sol: number
           seller_id: string
           status?: Database["public"]["Enums"]["gig_status"]
@@ -46,8 +50,10 @@ export type Database = {
           created_at?: string
           delivery_days?: number
           description?: string
+          has_packages?: boolean | null
           id?: string
           images?: string[] | null
+          packages?: Json | null
           price_sol?: number
           seller_id?: string
           status?: Database["public"]["Enums"]["gig_status"]

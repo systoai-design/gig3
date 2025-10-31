@@ -26,6 +26,7 @@ export default function GigDetail() {
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState(0);
 
   useEffect(() => {
     fetchGig();
@@ -212,23 +213,85 @@ export default function GigDetail() {
             {/* Pricing Card */}
             <Card>
               <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl font-bold">{gig.price_sol} SOL</span>
-                  {!isOwner && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleFavorite}
-                      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                    >
-                      <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-                    </Button>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{gig.delivery_days} day delivery</span>
-                </div>
+                {gig.has_packages && gig.packages?.length > 0 ? (
+                  <>
+                    {/* Package Tabs */}
+                    <div className="flex gap-2 mb-4">
+                      {gig.packages.map((pkg: any, idx: number) => (
+                        <Button
+                          key={idx}
+                          variant={selectedPackage === idx ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setSelectedPackage(idx)}
+                          className="flex-1"
+                        >
+                          {pkg.name}
+                        </Button>
+                      ))}
+                    </div>
+
+                    {/* Selected Package Details */}
+                    {(() => {
+                      const pkg = gig.packages[selectedPackage];
+                      return (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="text-3xl font-bold">{pkg.price_sol} SOL</span>
+                            {!isOwner && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={toggleFavorite}
+                                title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                              >
+                                <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                              </Button>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{pkg.description}</p>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              <span>{pkg.delivery_days} day delivery</span>
+                            </div>
+                            <div>
+                              <span className="font-medium">{pkg.revisions}</span> revisions
+                            </div>
+                          </div>
+                          
+                          <div className="border-t pt-4 space-y-2">
+                            {pkg.features?.map((feature: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-2 text-sm">
+                                <span className="text-primary mt-0.5">✓</span>
+                                <span>{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-3xl font-bold">{gig.price_sol} SOL</span>
+                      {!isOwner && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={toggleFavorite}
+                          title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                        >
+                          <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span>{gig.delivery_days} day delivery</span>
+                    </div>
+                  </>
+                )}
 
                 {isOwner ? (
                   <div className="space-y-2">
@@ -318,6 +381,7 @@ export default function GigDetail() {
           open={showOrderDialog}
           onOpenChange={setShowOrderDialog}
           gig={gig}
+          selectedPackageIndex={selectedPackage}
         />
       )}
     </div>
