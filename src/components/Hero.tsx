@@ -1,9 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Search, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const [showSpline, setShowSpline] = useState(false);
+
+  useEffect(() => {
+    // Delay loading Spline to improve initial page load
+    const timer = setTimeout(() => setShowSpline(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const popularServices = [
     { label: "Website Development", icon: "→" },
@@ -24,17 +32,20 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Spline 3D Background Animation */}
-      <div className="absolute inset-0 w-full h-full">
-        <iframe 
-          src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
-          frameBorder="0" 
-          width="100%" 
-          height="100%"
-          className="w-full h-full"
-          title="3D Background Animation"
-        />
-      </div>
+      {/* Spline 3D Background Animation - Lazy Loaded */}
+      {showSpline && (
+        <div className="absolute inset-0 w-full h-full">
+          <iframe 
+            src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
+            frameBorder="0" 
+            width="100%" 
+            height="100%"
+            className="w-full h-full"
+            title="3D Background Animation"
+            loading="lazy"
+          />
+        </div>
+      )}
       
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900/90"></div>
