@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -25,11 +24,10 @@ interface OrderConfirmationDialogProps {
 
 export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfirmationDialogProps) {
   const { user } = useAuth();
-  const { publicKey, connected, sendTransaction } = useWallet();
-  const { connection } = useConnection();
+  const { publicKey, connected, signMessage } = useWallet();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
-  const [transactionStatus, setTransactionStatus] = useState<'idle' | 'signing' | 'confirming' | 'complete'>('idle');
+  const [transactionStatus, setTransactionStatus] = useState<string>('');
 
   const handleCreateOrder = async () => {
     if (!user) {
@@ -37,95 +35,127 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
       return;
     }
 
-    if (!connected || !publicKey) {
+    if (!connected || !publicKey || !signMessage) {
       toast.error('Please connect your wallet first');
       return;
     }
 
     try {
       setCreating(true);
-      setTransactionStatus('idle');
+      setTransactionStatus('Initiating x402 payment flow...');
 
-      // Step 1: Fetch seller's wallet address
-      const { data: sellerProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('wallet_address')
-        .eq('id', gig.seller_id)
-        .single();
+      // Step 1: Request order creation (server responds with 402)
+      const orderRequest = {
+        gigId: gig.id,
+        buyerId: user.id,
+        sellerId: gig.seller_id,
+        amount: gig.price_sol,
+      };
 
-      if (profileError) throw new Error('Failed to fetch seller information');
-      
-      if (!sellerProfile?.wallet_address) {
-        throw new Error('Seller has not configured their wallet address');
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      const sellerWalletAddress = new PublicKey(sellerProfile.wallet_address);
-
-      // Step 2: Create Solana transaction
-      setTransactionStatus('signing');
-      toast.info('Please approve the transaction in your wallet...');
-
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: sellerWalletAddress,
-          lamports: Math.floor(gig.price_sol * LAMPORTS_PER_SOL),
-        })
+      const initialResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-order`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify(orderRequest),
+        }
       );
 
-      // Get recent blockhash
-      const { blockhash } = await connection.getLatestBlockhash();
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = publicKey;
+      // Step 2: Handle HTTP 402 Payment Required
+      if (initialResponse.status === 402) {
+        const paymentInstructions = await initialResponse.json();
+        console.log('x402 payment instructions received:', paymentInstructions);
 
-      // Step 3: Send transaction
-      const signature = await sendTransaction(transaction, connection);
-      
-      setTransactionStatus('confirming');
-      toast.info('Transaction sent! Confirming on blockchain...');
+        setTransactionStatus('Preparing payment...');
 
-      // Step 4: Wait for confirmation (with timeout)
-      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+        // Create x402 payment message
+        const paymentMessage = JSON.stringify({
+          protocol: 'x402',
+          version: '1.0',
+          blockchain: paymentInstructions.blockchain,
+          network: paymentInstructions.network,
+          token: paymentInstructions.token,
+          amount: paymentInstructions.amount,
+          recipients: paymentInstructions.recipients,
+          metadata: paymentInstructions.metadata,
+          timestamp: Date.now(),
+          payer: publicKey.toBase58(),
+        });
 
-      if (confirmation.value.err) {
-        throw new Error('Transaction failed on blockchain');
+        setTransactionStatus('Waiting for wallet signature...');
+        toast.info('Please sign the payment message in your wallet');
+
+        // Sign the payment message (x402 signature proof)
+        const messageBytes = new TextEncoder().encode(paymentMessage);
+        const signature = await signMessage(messageBytes);
+        
+        // Convert signature to base64
+        const signatureBase64 = btoa(String.fromCharCode(...signature));
+
+        setTransactionStatus('Verifying payment...');
+
+        // Step 3: Submit payment proof back to server
+        const paymentProof = {
+          signature: signatureBase64,
+          publicKey: publicKey.toBase58(),
+          message: paymentMessage,
+          protocol: 'x402-solana',
+          timestamp: Date.now(),
+        };
+
+        const finalResponse = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-order`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+              'X-Payment': JSON.stringify(paymentProof),
+            },
+            body: JSON.stringify(orderRequest),
+          }
+        );
+
+        if (!finalResponse.ok) {
+          const error = await finalResponse.json();
+          throw new Error(error.error || 'Payment verification failed');
+        }
+
+        const result = await finalResponse.json();
+        console.log('x402 payment verified, order created:', result);
+
+        toast.success('Payment verified! Order placed successfully.');
+        onOpenChange(false);
+        navigate(`/orders/${result.order.id}`);
+        
+      } else if (initialResponse.ok) {
+        // Unexpected success without payment
+        const result = await initialResponse.json();
+        toast.success('Order created successfully!');
+        onOpenChange(false);
+        navigate(`/orders/${result.order.id}`);
+      } else {
+        const error = await initialResponse.json();
+        throw new Error(error.error || 'Failed to initiate payment');
       }
-
-      toast.success('Payment confirmed on blockchain!');
-
-      // Step 5: Create order in database with transaction signature
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          gig_id: gig.id,
-          buyer_id: user.id,
-          seller_id: gig.seller_id,
-          amount_sol: gig.price_sol,
-          status: 'in_progress',
-          transaction_signature: signature,
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      setTransactionStatus('complete');
-      toast.success('Order created successfully!');
-      onOpenChange(false);
-      navigate(`/orders/${order.id}`);
+      
     } catch (error: any) {
-      setTransactionStatus('idle');
-      console.error('Order creation error:', error);
+      console.error('x402 payment error:', error);
       
       if (error.message?.includes('User rejected')) {
-        toast.error('Transaction cancelled by user');
-      } else if (error.message?.includes('Insufficient funds')) {
-        toast.error('Insufficient SOL balance in your wallet');
+        toast.error('Payment signature cancelled by user');
       } else {
-        toast.error(error.message || 'Failed to create order');
+        toast.error(error.message || 'Failed to process payment');
       }
     } finally {
       setCreating(false);
+      setTransactionStatus('');
     }
   };
 
@@ -211,13 +241,10 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig }: OrderConfir
             {creating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {transactionStatus === 'signing' && 'Awaiting Signature...'}
-                {transactionStatus === 'confirming' && 'Confirming...'}
-                {transactionStatus === 'idle' && 'Processing...'}
-                {transactionStatus === 'complete' && 'Complete!'}
+                {transactionStatus || 'Processing...'}
               </>
             ) : (
-              'Place Order & Pay'
+              'Place Order & Pay with x402'
             )}
           </Button>
         </DialogFooter>
