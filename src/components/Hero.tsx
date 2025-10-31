@@ -23,12 +23,21 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Background overlay with pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDh2OGgtOHptMCAwaDh2OGgtOHptMCAwaDh2OGgtOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50"></div>
+    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900">
+      {/* Spline 3D Background Animation */}
+      <div className="absolute inset-0 w-full h-full">
+        <iframe 
+          src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
+          frameBorder="0" 
+          width="100%" 
+          height="100%"
+          className="w-full h-full"
+          title="3D Background Animation"
+        />
+      </div>
       
-      {/* Gradient overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-blue-900/20"></div>
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900/90"></div>
       
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10 py-20">
