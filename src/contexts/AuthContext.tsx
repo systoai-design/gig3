@@ -8,8 +8,10 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, username: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, username: string, name: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithWallet: (walletAddress: string, signature: string, message: string) => Promise<{ error: any }>;
+  signUpWithWallet: (walletAddress: string, signature: string, message: string, name: string, username: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -46,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const signUp = async (email: string, password: string, username: string) => {
+  const signUp = async (email: string, password: string, username: string, name: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -55,7 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          username
+          username,
+          name
         }
       }
     });
@@ -67,6 +70,82 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     return { error };
+  };
+
+  const signInWithWallet = async (walletAddress: string, signature: string, message: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('wallet-auth', {
+        body: { walletAddress, signature, message, isSignup: false }
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        return { error };
+      }
+
+      if (data.error) {
+        toast.error(data.error);
+        return { error: { message: data.error } };
+      }
+      
+      // Set session using the access token
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token
+      });
+
+      if (sessionError) {
+        toast.error(sessionError.message);
+        return { error: sessionError };
+      }
+
+      toast.success('Signed in with wallet!');
+      return { error: null };
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign in with wallet');
+      return { error };
+    }
+  };
+
+  const signUpWithWallet = async (
+    walletAddress: string,
+    signature: string,
+    message: string,
+    name: string,
+    username: string
+  ) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('wallet-auth', {
+        body: { walletAddress, signature, message, name, username, isSignup: true }
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        return { error };
+      }
+
+      if (data.error) {
+        toast.error(data.error);
+        return { error: { message: data.error } };
+      }
+      
+      // Set session using the access token
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token
+      });
+
+      if (sessionError) {
+        toast.error(sessionError.message);
+        return { error: sessionError };
+      }
+
+      toast.success('Account created with wallet!');
+      return { error: null };
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign up with wallet');
+      return { error };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
@@ -95,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithWallet, signUpWithWallet, signOut }}>
       {children}
     </AuthContext.Provider>
   );

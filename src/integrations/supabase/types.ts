@@ -156,6 +156,7 @@ export type Database = {
           bio: string | null
           created_at: string
           id: string
+          name: string
           updated_at: string
           username: string
           wallet_address: string | null
@@ -165,6 +166,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id: string
+          name: string
           updated_at?: string
           username: string
           wallet_address?: string | null
@@ -174,6 +176,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id?: string
+          name?: string
           updated_at?: string
           username?: string
           wallet_address?: string | null
