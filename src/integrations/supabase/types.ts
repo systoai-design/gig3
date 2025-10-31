@@ -153,30 +153,45 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           created_at: string
           id: string
+          languages: string[] | null
+          location: string | null
           name: string
+          social_links: Json | null
+          tagline: string | null
           updated_at: string
           username: string
           wallet_address: string | null
         }
         Insert: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           id: string
+          languages?: string[] | null
+          location?: string | null
           name: string
+          social_links?: Json | null
+          tagline?: string | null
           updated_at?: string
           username: string
           wallet_address?: string | null
         }
         Update: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           id?: string
+          languages?: string[] | null
+          location?: string | null
           name?: string
+          social_links?: Json | null
+          tagline?: string | null
           updated_at?: string
           username?: string
           wallet_address?: string | null
@@ -224,9 +239,15 @@ export type Database = {
       seller_profiles: {
         Row: {
           application_notes: string | null
+          certifications: Json | null
+          completion_rate: number | null
           created_at: string
+          education: Json | null
           id: string
+          languages_proficiency: Json | null
+          portfolio_items: Json | null
           portfolio_links: string[]
+          response_time_hours: number | null
           skills: string[]
           updated_at: string
           user_id: string
@@ -235,9 +256,15 @@ export type Database = {
         }
         Insert: {
           application_notes?: string | null
+          certifications?: Json | null
+          completion_rate?: number | null
           created_at?: string
+          education?: Json | null
           id?: string
+          languages_proficiency?: Json | null
+          portfolio_items?: Json | null
           portfolio_links?: string[]
+          response_time_hours?: number | null
           skills?: string[]
           updated_at?: string
           user_id: string
@@ -246,9 +273,15 @@ export type Database = {
         }
         Update: {
           application_notes?: string | null
+          certifications?: Json | null
+          completion_rate?: number | null
           created_at?: string
+          education?: Json | null
           id?: string
+          languages_proficiency?: Json | null
+          portfolio_items?: Json | null
           portfolio_links?: string[]
+          response_time_hours?: number | null
           skills?: string[]
           updated_at?: string
           user_id?: string

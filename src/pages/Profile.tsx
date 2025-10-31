@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { User, Star, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+import { ProfileBanner } from '@/components/profile/ProfileBanner';
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { ProfileStats } from '@/components/profile/ProfileStats';
+import { PortfolioGallery } from '@/components/profile/PortfolioGallery';
+import { EducationSection } from '@/components/profile/EducationSection';
+import { LanguagesCard } from '@/components/profile/LanguagesCard';
+import { SkillsSection } from '@/components/profile/SkillsSection';
 
 export default function Profile() {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [roles, setRoles] = useState<string[]>([]);
   const [gigs, setGigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [totalOrders, setTotalOrders] = useState(0);
 
   useEffect(() => {
     if (userId) {
@@ -45,8 +54,16 @@ export default function Profile() {
       if (rolesError) throw rolesError;
       setRoles(rolesData?.map(r => r.role) || []);
 
-      // Fetch gigs if user is a seller
+      // Fetch seller profile and gigs if user is a seller
       if (rolesData?.some(r => r.role === 'seller')) {
+        const { data: sellerData } = await supabase
+          .from('seller_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        setSellerProfile(sellerData);
+
         const { data: gigsData, error: gigsError } = await supabase
           .from('gigs')
           .select('*')
@@ -56,6 +73,14 @@ export default function Profile() {
 
         if (gigsError) throw gigsError;
         setGigs(gigsData || []);
+
+        // Fetch total orders for stats
+        const { count } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('seller_id', userId);
+
+        setTotalOrders(count || 0);
       }
     } catch (error: any) {
       toast.error('Failed to load profile');
@@ -82,102 +107,117 @@ export default function Profile() {
   if (!profile) return null;
 
   const isSeller = roles.includes('seller');
+  const isOwnProfile = user?.id === userId;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Profile Header */}
-          <Card>
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                <Avatar className="h-32 w-32">
-                  <AvatarImage src={profile.avatar_url} />
-                  <AvatarFallback className="text-4xl">
-                    <User className="h-16 w-16" />
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 space-y-4">
-                  <div>
-                    <h1 className="text-3xl font-bold mb-2">{profile.username}</h1>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {roles.map(role => (
-                        <Badge key={role} variant="secondary">
-                          {role}
-                        </Badge>
+      
+      {/* Profile Banner */}
+      <ProfileBanner
+        bannerUrl={profile.banner_url}
+        isOwnProfile={isOwnProfile}
+        onEditClick={() => navigate('/settings?tab=media')}
+      />
+
+      {/* Profile Header */}
+      <ProfileHeader
+        profile={profile}
+        roles={roles}
+        isOwnProfile={isOwnProfile}
+        onEditClick={() => navigate('/settings')}
+      />
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* About Section */}
+              {profile.bio && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-bold mb-4">About</h2>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{profile.bio}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Skills Section */}
+              {isSeller && sellerProfile?.skills && (
+                <SkillsSection skills={sellerProfile.skills} />
+              )}
+
+              {/* Portfolio Section */}
+              {isSeller && sellerProfile?.portfolio_items && sellerProfile.portfolio_items.length > 0 && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-bold mb-6">Portfolio</h2>
+                    <PortfolioGallery items={sellerProfile.portfolio_items as any[]} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Education & Certifications */}
+              {isSeller && (
+                <EducationSection
+                  education={(sellerProfile?.education as any[]) || []}
+                  certifications={(sellerProfile?.certifications as any[]) || []}
+                />
+              )}
+
+              {/* Active Gigs */}
+              {isSeller && gigs.length > 0 && (
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-xl font-bold mb-6">Active Services</h2>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {gigs.map((gig) => (
+                        <Card 
+                          key={gig.id}
+                          className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                          onClick={() => navigate(`/gigs/${gig.id}`)}
+                        >
+                          <div className="relative h-48 overflow-hidden">
+                            <img 
+                              src={gig.images?.[0] || '/placeholder.svg'} 
+                              alt={gig.title}
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            />
+                            <Badge className="absolute top-2 left-2">{gig.category}</Badge>
+                          </div>
+                          <CardContent className="p-4">
+                            <h3 className="font-semibold line-clamp-2 mb-2">{gig.title}</h3>
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-muted-foreground">{gig.delivery_days}d delivery</span>
+                              <span className="font-bold">{gig.price_sol} SOL</span>
+                            </div>
+                          </CardContent>
+                        </Card>
                       ))}
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
 
-                  {profile.bio && (
-                    <p className="text-muted-foreground">{profile.bio}</p>
-                  )}
+            {/* Right Column - Sidebar */}
+            <div className="space-y-6">
+              {/* Stats Card (Sellers) */}
+              {isSeller && (
+                <ProfileStats sellerProfile={sellerProfile} totalOrders={totalOrders} />
+              )}
 
-                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span>5.0 (0 reviews)</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>Member since {new Date(profile.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-
-                  {profile.wallet_address && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Wallet: </span>
-                      <code className="text-xs bg-muted px-2 py-1 rounded">
-                        {profile.wallet_address.slice(0, 8)}...{profile.wallet_address.slice(-8)}
-                      </code>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Seller Gigs */}
-          {isSeller && (
-            <Card>
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-6">Active Services</h2>
-                {gigs.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    No active services at the moment
-                  </p>
-                ) : (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {gigs.map((gig) => (
-                      <Card 
-                        key={gig.id}
-                        className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                        onClick={() => navigate(`/gigs/${gig.id}`)}
-                      >
-                        <div className="relative h-48 overflow-hidden">
-                          <img 
-                            src={gig.images?.[0] || '/placeholder.svg'} 
-                            alt={gig.title}
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                          <Badge className="absolute top-2 left-2">{gig.category}</Badge>
-                        </div>
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold line-clamp-2 mb-2">{gig.title}</h3>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">{gig.delivery_days}d delivery</span>
-                            <span className="font-bold">{gig.price_sol} SOL</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+              {/* Languages Card */}
+              {profile.languages && profile.languages.length > 0 && (
+                <LanguagesCard
+                  languages={profile.languages}
+                  proficiency={sellerProfile?.languages_proficiency as Record<string, string>}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </main>
       <Footer />

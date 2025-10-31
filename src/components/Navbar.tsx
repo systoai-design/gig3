@@ -90,6 +90,9 @@ export const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
                     My Profile
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
                     My Orders
                   </DropdownMenuItem>
