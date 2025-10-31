@@ -5,3 +5,15 @@ verify_jwt = false
 
 [functions.create-order]
 verify_jwt = true
+
+[functions.release-escrow]
+verify_jwt = true
+
+[functions.handle-dispute]
+verify_jwt = true
+
+[functions.auto-complete-orders]
+verify_jwt = false
+
+[functions.check-delivery-deadlines]
+verify_jwt = false

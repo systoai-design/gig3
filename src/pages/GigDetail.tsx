@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { OrderConfirmationDialog } from '@/components/OrderConfirmationDialog';
 import { ReviewList } from '@/components/ReviewList';
 import { toast } from 'sonner';
-import { Star, Clock, Edit, Trash2, User } from 'lucide-react';
+import { Star, Clock, Edit, Trash2, User, Heart } from 'lucide-react';
 
 export default function GigDetail() {
   const { id } = useParams();
@@ -24,10 +24,15 @@ export default function GigDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchGig();
-  }, [id]);
+    if (user) {
+      checkFavorite();
+    }
+  }, [id, user]);
 
   const fetchGig = async () => {
     try {
@@ -69,6 +74,67 @@ export default function GigDetail() {
       navigate('/dashboard/seller');
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete gig');
+    }
+  };
+
+  const checkFavorite = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await (supabase as any)
+        .from('favorites')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('gig_id', id)
+        .single();
+
+      if (data) {
+        setIsFavorite(true);
+        setFavoriteId(data.id);
+      }
+    } catch (error) {
+      // Not favorited
+      setIsFavorite(false);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast.error('Please login to save gigs');
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      if (isFavorite && favoriteId) {
+        // Remove favorite
+        const { error } = await (supabase as any)
+          .from('favorites')
+          .delete()
+          .eq('id', favoriteId);
+
+        if (error) throw error;
+        setIsFavorite(false);
+        setFavoriteId(null);
+        toast.success('Removed from favorites');
+      } else {
+        // Add favorite
+        const { data, error } = await (supabase as any)
+          .from('favorites')
+          .insert({
+            user_id: user.id,
+            gig_id: id
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        setIsFavorite(true);
+        setFavoriteId(data.id);
+        toast.success('Added to favorites');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update favorites');
     }
   };
 
@@ -146,8 +212,18 @@ export default function GigDetail() {
             {/* Pricing Card */}
             <Card>
               <CardContent className="p-6 space-y-4">
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-center justify-between">
                   <span className="text-3xl font-bold">{gig.price_sol} SOL</span>
+                  {!isOwner && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleFavorite}
+                      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                      <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                    </Button>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
