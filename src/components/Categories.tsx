@@ -1,49 +1,40 @@
-import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase } from "lucide-react";
+import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase, Users, Languages } from "lucide-react";
 
 const categories = [
-  { name: "Programming & Tech", icon: Code, color: "from-blue-500 to-cyan-500" },
-  { name: "Graphics & Design", icon: Palette, color: "from-pink-500 to-rose-500" },
-  { name: "Video & Animation", icon: Video, color: "from-purple-500 to-indigo-500" },
-  { name: "Digital Marketing", icon: Megaphone, color: "from-orange-500 to-amber-500" },
-  { name: "Music & Audio", icon: Music, color: "from-green-500 to-emerald-500" },
-  { name: "Writing & Translation", icon: PenTool, color: "from-teal-500 to-cyan-500" },
-  { name: "AI Services", icon: Sparkles, color: "from-violet-500 to-purple-500" },
-  { name: "Business", icon: Briefcase, color: "from-slate-600 to-slate-800" },
+  { name: "Programming & Tech", icon: Code },
+  { name: "Graphics & Design", icon: Palette },
+  { name: "Digital Marketing", icon: Megaphone },
+  { name: "Writing & Translation", icon: Languages },
+  { name: "Video & Animation", icon: Video },
+  { name: "AI Services", icon: Sparkles },
+  { name: "Music & Audio", icon: Music },
+  { name: "Business", icon: Users },
+  { name: "Consulting", icon: Briefcase },
 ];
 
 export const Categories = () => {
   return (
-    <section className="py-16 bg-background">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Explore by Category
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            Find the perfect service for your needs
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <button
-                key={category.name}
-                className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 text-left transition-all duration-300 hover:shadow-large hover:-translate-y-1"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                <div className="relative z-10">
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${category.color} mb-4 transform group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="h-6 w-6 text-white" />
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex gap-6 pb-4 min-w-max">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <button
+                  key={category.name}
+                  className="flex flex-col items-center gap-3 px-6 py-6 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 min-w-[140px]"
+                >
+                  <div className="p-3 rounded-lg bg-gray-50">
+                    <Icon className="h-8 w-8 text-gray-700" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <span className="text-sm font-medium text-gray-900 text-center whitespace-normal">
                     {category.name}
-                  </h3>
-                </div>
-              </button>
-            );
-          })}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

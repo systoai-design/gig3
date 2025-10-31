@@ -1,97 +1,67 @@
-import { Search, ShoppingCart, Shield, Zap } from "lucide-react";
+import { Grid3x3, CheckCircle, Zap, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
-const steps = [
+const benefits = [
   {
-    icon: Search,
-    title: "Browse & Discover",
-    description: "Explore thousands of services from talented freelancers across the blockchain",
-    color: "from-primary to-primary-light",
+    icon: Grid3x3,
+    title: "Access a pool of top talent",
+    description: "across 700 categories",
   },
   {
-    icon: ShoppingCart,
-    title: "Place Your Order",
-    description: "Choose your gig and pay securely with SOL or USDC via your crypto wallet",
-    color: "from-secondary to-accent",
-  },
-  {
-    icon: Shield,
-    title: "Secure Escrow",
-    description: "Funds are held safely in a Solana smart contract until work is completed",
-    color: "from-purple-500 to-indigo-500",
+    icon: CheckCircle,
+    title: "Enjoy a simple, easy-to-use",
+    description: "matching experience",
   },
   {
     icon: Zap,
-    title: "Get Your Delivery",
-    description: "Receive your completed work and release funds instantly on the blockchain",
-    color: "from-emerald-500 to-teal-500",
+    title: "Get quality work done quickly",
+    description: "and within budget",
+  },
+  {
+    icon: MessageCircle,
+    title: "Only pay when you're happy",
+    description: "",
   },
 ];
 
 export const HowItWorks = () => {
-  return (
-    <section className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            How It Works
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Simple, secure, and transparent. Experience the future of freelancing with blockchain technology.
-          </p>
-        </div>
+  const navigate = useNavigate();
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
+  return (
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">
+          Make it all happen with freelancers
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          {benefits.map((benefit, index) => {
+            const Icon = benefit.icon;
             return (
-              <div
-                key={index}
-                className="relative group"
-              >
-                {/* Connection line (hidden on mobile and last item) */}
-                {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-16 left-[60%] w-full h-0.5 bg-gradient-to-r from-border to-transparent"></div>
-                )}
-                
-                <div className="relative bg-card border border-border rounded-2xl p-6 text-center hover:shadow-medium transition-all duration-300 hover:-translate-y-1">
-                  {/* Step number */}
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm shadow-medium">
-                    {index + 1}
-                  </div>
-                  
-                  <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${step.color} mb-4 mt-4`}>
-                    <Icon className="h-8 w-8 text-white" />
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-foreground mb-3">
-                    {step.title}
-                  </h3>
-                  
-                  <p className="text-muted-foreground">
-                    {step.description}
-                  </p>
+              <div key={index} className="text-center">
+                <div className="flex justify-center mb-4">
+                  <Icon className="h-12 w-12 text-gray-400" strokeWidth={1.5} />
                 </div>
+                <p className="text-gray-900 font-medium mb-1">
+                  {benefit.title}
+                </p>
+                <p className="text-gray-600 text-sm">
+                  {benefit.description}
+                </p>
               </div>
             );
           })}
         </div>
 
-        {/* CTA Section */}
-        <div className="mt-16 text-center">
-          <div className="inline-flex flex-col sm:flex-row gap-4">
-            <a 
-              href="/become-seller"
-              className="px-8 py-4 bg-gradient-primary text-primary-foreground font-semibold rounded-full hover:opacity-90 transition-opacity shadow-medium inline-block"
-            >
-              Start Selling Today
-            </a>
-            <a
-              href="/explore"
-              className="px-8 py-4 border-2 border-primary text-primary font-semibold rounded-full hover:bg-primary/5 transition-colors inline-block"
-            >
-              Browse Services
-            </a>
-          </div>
+        <div className="text-center">
+          <Button
+            onClick={() => navigate('/auth')}
+            size="lg"
+            className="bg-gray-900 text-white hover:bg-gray-800 font-semibold px-8"
+          >
+            Join now
+          </Button>
         </div>
       </div>
     </section>
