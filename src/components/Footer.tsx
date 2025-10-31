@@ -1,105 +1,115 @@
 import { Github, Twitter, MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const footerLinks = {
     platform: [
-      { label: "About", href: "#" },
-      { label: "How It Works", href: "#" },
-      { label: "Trust & Safety", href: "#" },
-      { label: "Help & Support", href: "#" },
+      { label: "About", href: "/about" },
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Trust & Safety", href: "/trust-safety" },
+      { label: "Help & Support", href: "/support" },
     ],
     freelancers: [
-      { label: "Become a Seller", href: "#" },
-      { label: "Seller Guidelines", href: "#" },
-      { label: "Community Standards", href: "#" },
-      { label: "Success Stories", href: "#" },
+      { label: "Become a Seller", href: "/become-seller" },
+      { label: "Seller Guidelines", href: "/seller-guidelines" },
+      { label: "Community Standards", href: "/community-standards" },
+      { label: "Success Stories", href: "/success-stories" },
     ],
     resources: [
-      { label: "Documentation", href: "#" },
-      { label: "API", href: "#" },
-      { label: "Smart Contracts", href: "#" },
-      { label: "Blog", href: "#" },
+      { label: "Documentation", href: "/docs" },
+      { label: "API", href: "/api" },
+      { label: "Smart Contracts", href: "/contracts" },
+      { label: "Blog", href: "/blog" },
     ],
   };
 
   return (
-    <footer className="bg-muted/50 border-t border-border">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div>
-            <a href="/" className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-4 inline-block">
-              GIG3
-            </a>
-            <p className="text-muted-foreground text-sm mb-4">
+    <footer className="bg-card border-t">
+      <div className="container mx-auto px-4 py-12 lg:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-12">
+          {/* Brand Column */}
+          <div className="col-span-2 md:col-span-2">
+            <Link to="/" className="inline-block mb-6">
+              <span className="text-3xl font-bold text-primary">GIG3</span>
+            </Link>
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
               Gig Economy Web 3 - The decentralized freelance marketplace powered by Solana blockchain. Secure payments, transparent escrow.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex gap-3">
               <a
-                href="#"
-                className="p-2 rounded-full bg-background border border-border hover:border-primary transition-colors"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
+                aria-label="Twitter"
               >
-                <Twitter className="h-4 w-4 text-foreground" />
+                <Twitter className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
+                aria-label="GitHub"
+              >
+                <Github className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </a>
               <a
                 href="#"
-                className="p-2 rounded-full bg-background border border-border hover:border-primary transition-colors"
+                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
+                aria-label="Discord"
               >
-                <Github className="h-4 w-4 text-foreground" />
-              </a>
-              <a
-                href="#"
-                className="p-2 rounded-full bg-background border border-border hover:border-primary transition-colors"
-              >
-                <MessageCircle className="h-4 w-4 text-foreground" />
+                <MessageCircle className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </a>
             </div>
           </div>
 
-          {/* Links */}
+          {/* Platform Column */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Platform</h4>
-            <ul className="space-y-2">
+            <h3 className="font-semibold text-foreground mb-4 text-base">Platform</h3>
+            <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  <Link
+                    to={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* For Freelancers Column */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">For Freelancers</h4>
-            <ul className="space-y-2">
+            <h3 className="font-semibold text-foreground mb-4 text-base">For Freelancers</h3>
+            <ul className="space-y-3">
               {footerLinks.freelancers.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  <Link
+                    to={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* Resources Column */}
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Resources</h4>
-            <ul className="space-y-2">
+            <h3 className="font-semibold text-foreground mb-4 text-base">Resources</h3>
+            <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                  <Link
+                    to={link.href}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -107,21 +117,21 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className="pt-8 border-t">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
               © 2025 GIG3. Built on Solana with ❤️
             </p>
-            <div className="flex space-x-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <div className="flex flex-wrap justify-center gap-6">
+              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              </Link>
+              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              </Link>
+              <Link to="/cookies" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>
