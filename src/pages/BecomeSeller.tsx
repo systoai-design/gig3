@@ -56,14 +56,22 @@ export default function BecomeSeller() {
     if (!user) return;
 
     try {
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'seller')
-        .maybeSingle();
+      // Check both user_roles and seller_profiles to prevent duplicate submissions
+      const [roleData, profileData] = await Promise.all([
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'seller')
+          .maybeSingle(),
+        supabase
+          .from('seller_profiles')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle()
+      ]);
 
-      if (data) {
+      if (roleData.data || profileData.data) {
         setIsAlreadySeller(true);
         toast.info('You are already a seller!');
       }
@@ -143,23 +151,28 @@ export default function BecomeSeller() {
 
       if (profileError) throw profileError;
 
-      // Create seller profile
+      // Create or update seller profile using upsert to handle edge cases
       const { error: sellerProfileError } = await supabase
         .from('seller_profiles')
-        .insert({
+        .upsert({
           user_id: user.id,
           skills: formData.skills,
           portfolio_links: validPortfolioLinks,
+        }, {
+          onConflict: 'user_id'
         });
 
       if (sellerProfileError) throw sellerProfileError;
 
-      // Grant seller role
+      // Grant seller role (use upsert to handle duplicates gracefully)
       const { error: roleError } = await supabase
         .from('user_roles')
-        .insert({
+        .upsert({
           user_id: user.id,
           role: 'seller',
+        }, {
+          onConflict: 'user_id,role',
+          ignoreDuplicates: true
         });
 
       if (roleError) throw roleError;
