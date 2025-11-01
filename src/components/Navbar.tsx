@@ -123,40 +123,17 @@ export const Navbar = () => {
                 </DropdownMenu>
               </div>
             ) : (
-              <>
-                <Button 
-                  size="sm" 
-                  onClick={() => {
-                    setAuthDialogTab('wallet');
-                    setAuthDialogOpen(true);
-                  }}
-                  className="bg-gradient-primary hover:opacity-90 text-white border-0"
-                >
-                  <Wallet className="h-4 w-4 mr-2" />
-                  Connect Wallet
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => {
-                    setAuthDialogTab('signin');
-                    setAuthDialogOpen(true);
-                  }}
-                  className="text-gray-700 dark:text-gray-300 hover:text-primary"
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={() => {
-                    setAuthDialogTab('signup');
-                    setAuthDialogOpen(true);
-                  }}
-                  className="bg-primary hover:bg-primary/90 text-white rounded-md border-2 border-primary"
-                >
-                  Join
-                </Button>
-              </>
+              <Button 
+                size="sm" 
+                onClick={() => {
+                  setAuthDialogTab('wallet');
+                  setAuthDialogOpen(true);
+                }}
+                className="bg-gradient-primary hover:opacity-90 text-white border-0"
+              >
+                <Wallet className="h-4 w-4 mr-2" />
+                Connect Wallet
+              </Button>
             )}
           </div>
 
@@ -199,41 +176,18 @@ export const Navbar = () => {
                   </Button>
                 </>
               ) : (
-                <>
-                  <Button 
-                    size="sm" 
-                    className="w-full bg-gradient-primary hover:opacity-90 text-white border-0"
-                    onClick={() => {
-                      setAuthDialogTab('wallet');
-                      setAuthDialogOpen(true);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    <Wallet className="h-4 w-4 mr-2" />
-                    Connect Wallet
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="justify-start"
-                    onClick={() => {
-                      setAuthDialogTab('signin');
-                      setAuthDialogOpen(true);
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    className="bg-gradient-primary"
-                    onClick={() => {
-                      setAuthDialogTab('signup');
-                      setAuthDialogOpen(true);
-                    }}
-                  >
-                    Get Started
-                  </Button>
-                </>
+                <Button 
+                  size="sm" 
+                  className="w-full bg-gradient-primary hover:opacity-90 text-white border-0"
+                  onClick={() => {
+                    setAuthDialogTab('wallet');
+                    setAuthDialogOpen(true);
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Connect Wallet
+                </Button>
               )}
             </div>
           </div>

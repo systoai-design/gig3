@@ -273,120 +273,11 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
             GIG3
           </DialogTitle>
           <DialogDescription className="text-center">
-            Sign in to access your account or create a new one
+            Connect your wallet to sign in or create an account
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            <TabsTrigger value="wallet">Wallet</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="signin" className="space-y-4">
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signin-email">Email</Label>
-                <Input
-                  id="signin-email"
-                  name="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="signin-password">Password</Label>
-                <Input
-                  id="signin-password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-gradient-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="signup" className="space-y-4">
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
-                <Input
-                  id="signup-name"
-                  name="name"
-                  type="text"
-                  placeholder="John Doe"
-                  required
-                />
-                {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="signup-username">Username</Label>
-                <Input
-                  id="signup-username"
-                  name="username"
-                  type="text"
-                  placeholder="johndoe"
-                  required
-                />
-                {errors.username && (
-                  <p className="text-sm text-destructive">{errors.username}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
-                <Input
-                  id="signup-email"
-                  name="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  required
-                />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
-                <Input
-                  id="signup-password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                />
-                {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
-                )}
-              </div>
-              <Button
-                type="submit"
-                className="w-full bg-gradient-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Creating account...' : 'Sign Up'}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="wallet" className="space-y-4">
+        <div className="space-y-4">
             {!connected ? (
               <div className="text-center space-y-4">
                 <p className="text-sm text-muted-foreground">
@@ -452,8 +343,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                 <WalletMultiButton className="!bg-gradient-primary" />
               </div>
             )}
-          </TabsContent>
-        </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );
