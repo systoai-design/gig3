@@ -45,18 +45,18 @@ export const Navbar = () => {
   }, [user]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-950 shadow-sm">
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/10 dark:bg-gray-950/10 border-b border-white/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <a href="/" className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
+            <a href="/" className="text-3xl font-bold text-white hover:opacity-80 transition-opacity">
               GIG3
             </a>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
-              <a href="/explore" className="text-base text-gray-700 dark:text-gray-300 hover:text-primary font-medium transition-colors">
+              <a href="/explore" className="text-base text-white/90 hover:text-white font-medium transition-colors">
                 Explore
               </a>
             </div>
@@ -65,11 +65,11 @@ export const Navbar = () => {
           {/* Search Bar (Desktop) */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
               <input
                 type="text"
                 placeholder="Search for services..."
-                className="w-full pl-10 pr-4 py-2 border border-input rounded-full bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                className="w-full pl-10 pr-4 py-2 border border-white/20 rounded-full bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
               />
             </div>
           </div>
@@ -77,7 +77,7 @@ export const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
             {!isSeller && user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')} className="text-white/90 hover:text-white hover:bg-white/10">
                 Become a Seller
               </Button>
             )}
@@ -89,7 +89,7 @@ export const Navbar = () => {
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-white/90 hover:text-white hover:bg-white/10">
                       <User className="h-4 w-4" />
                       Account
                     </Button>
@@ -128,7 +128,7 @@ export const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden p-2 text-white"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <Menu className="h-6 w-6" />
@@ -137,21 +137,21 @@ export const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
+          <div className="md:hidden py-4 border-t border-white/10">
             <div className="flex flex-col space-y-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
                 <input
                   type="text"
                   placeholder="Search for services..."
-                  className="w-full pl-10 pr-4 py-2 border border-input rounded-full bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full pl-10 pr-4 py-2 border border-white/20 rounded-full bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
                 />
               </div>
-              <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">
+              <a href="/explore" className="text-sm font-medium text-white/90 hover:text-white">
                 Explore
               </a>
               {!isSeller && user && (
-                <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary">
+                <a href="/become-seller" className="text-sm font-medium text-white/90 hover:text-white">
                   Become a Seller
                 </a>
               )}
