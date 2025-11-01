@@ -91,7 +91,7 @@ export const Hero = () => {
             {popularServices.map((service) => (
               <button
                 key={service.label}
-                onClick={() => navigate('/explore')}
+                onClick={() => navigate(`/explore?q=${encodeURIComponent(service.label)}`)}
                 className="group relative px-4 py-2.5 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm text-white text-sm font-medium hover:bg-white/20 hover:border-white/50 transition-all duration-200 flex items-center gap-2"
               >
                 <span>{service.label}</span>
