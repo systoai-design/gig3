@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     }
     
     if (existingProfile && !isSignup) {
-      // User exists - generate session token
+      // User exists - sign in to create session
       console.log('Existing wallet user logging in');
       
       const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(
@@ -80,24 +80,30 @@ Deno.serve(async (req) => {
         throw userError || new Error('User not found');
       }
 
-      // Generate access token for existing user
-      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'magiclink',
-        email: user.email || `${walletAddress}@wallet.gig3.io`
+      // Update password to a known value temporarily
+      const tempPassword = crypto.randomUUID();
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: tempPassword
       });
 
-      if (linkError) {
-        console.error('Error generating link:', linkError);
-        throw linkError;
+      // Sign in with the temporary password to get valid tokens
+      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+        email: user.email || `${walletAddress}@wallet.gig3.io`,
+        password: tempPassword
+      });
+
+      if (signInError || !signInData.session) {
+        console.error('Error signing in:', signInError);
+        throw signInError || new Error('Failed to create session');
       }
 
-      console.log('Access token generated successfully');
+      console.log('Session created successfully');
       
       return new Response(
         JSON.stringify({ 
-          access_token: linkData.properties.hashed_token,
-          refresh_token: linkData.properties.hashed_token,
-          user: user,
+          access_token: signInData.session.access_token,
+          refresh_token: signInData.session.refresh_token,
+          user: signInData.user,
           is_new_account: false
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -137,24 +143,24 @@ Deno.serve(async (req) => {
 
       console.log('User created successfully:', authData.user.id);
 
-      // Generate access token for new user
-      const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'magiclink',
-        email: dummyEmail
+      // Sign in immediately to get valid tokens
+      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+        email: dummyEmail,
+        password: randomPassword
       });
 
-      if (linkError) {
-        console.error('Error generating link:', linkError);
-        throw linkError;
+      if (signInError || !signInData.session) {
+        console.error('Error signing in new user:', signInError);
+        throw signInError || new Error('Failed to create session');
       }
 
-      console.log('Access token generated for new user');
+      console.log('Session created for new user');
       
       return new Response(
         JSON.stringify({ 
-          access_token: linkData.properties.hashed_token,
-          refresh_token: linkData.properties.hashed_token,
-          user: authData.user,
+          access_token: signInData.session.access_token,
+          refresh_token: signInData.session.refresh_token,
+          user: signInData.user,
           is_new_account: true
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
