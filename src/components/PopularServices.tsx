@@ -1,5 +1,5 @@
-import { ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 
 const services = [
   { 
@@ -44,35 +44,43 @@ export const PopularServices = () => {
           Popular services
         </h2>
 
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-6 pb-4">
+        <Carousel
+          opts={{
+            dragFree: true,
+            containScroll: "trimSnaps",
+            align: "start",
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-6">
             {services.map((service, index) => (
-              <button
-                key={index}
-                onClick={() => navigate('/explore')}
-                className="flex-shrink-0 w-[300px] md:w-[360px] group"
-              >
-                <div className={`${service.bgColor} rounded-xl overflow-hidden h-[280px] relative transition-transform duration-300 hover:scale-105`}>
-                  <div className="absolute inset-0 p-6 flex flex-col justify-between">
-                    <h3 className="text-white text-2xl font-bold">
-                      {service.title}
-                    </h3>
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-2/3 h-2/3">
-                    <div className="relative w-full h-full rounded-tl-[80px] overflow-hidden bg-gradient-to-br from-white/20 to-white/10 p-4">
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover rounded-tl-[60px]"
-                      />
+              <CarouselItem key={index} className="pl-6 basis-[300px] md:basis-[360px]">
+                <button
+                  onClick={() => navigate('/explore')}
+                  className="w-full group"
+                >
+                  <div className={`${service.bgColor} rounded-xl overflow-hidden h-[280px] relative transition-transform duration-300 hover:scale-105`}>
+                    <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                      <h3 className="text-white text-2xl font-bold">
+                        {service.title}
+                      </h3>
+                    </div>
+                    <div className="absolute bottom-0 right-0 w-2/3 h-2/3">
+                      <div className="relative w-full h-full rounded-tl-[80px] overflow-hidden bg-gradient-to-br from-white/20 to-white/10 p-4">
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover rounded-tl-[60px]"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+              </CarouselItem>
             ))}
-          </div>
-        </div>
+          </CarouselContent>
+        </Carousel>
       </div>
     </section>
   );
