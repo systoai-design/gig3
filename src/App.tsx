@@ -7,7 +7,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
 import CreateGig from "./pages/CreateGig";
 import EditGig from "./pages/EditGig";
 import GigDetail from "./pages/GigDetail";
@@ -33,7 +32,6 @@ const App = () => (
           <WalletProvider>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/gig/:id" element={<GigDetail />} />
               <Route path="/profile/:userId" element={<Profile />} />

@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.77.0';
 import * as nacl from 'https://esm.sh/tweetnacl@1.0.3';
-import * as bs58 from 'https://esm.sh/bs58@5.0.0';
+import bs58 from 'https://esm.sh/bs58@5.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

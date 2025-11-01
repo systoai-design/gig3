@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       toast.error(error.message);
     } else {
       toast.success('Signed out successfully');
-      navigate('/auth');
+      navigate('/');
     }
   };
 

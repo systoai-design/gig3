@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu, User, LogOut } from "lucide-react";
+import { Search, Menu, User, LogOut, Wallet } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { supabase } from "@/integrations/supabase/client";
 import { useWalletMonitor } from "@/hooks/useWalletMonitor";
+import { AuthDialog } from "@/components/AuthDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,8 @@ import {
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [authDialogTab, setAuthDialogTab] = useState<'signin' | 'signup' | 'wallet'>('signin');
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
@@ -118,10 +121,37 @@ export const Navbar = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/auth')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    setAuthDialogTab('wallet');
+                    setAuthDialogOpen(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Connect
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setAuthDialogTab('signin');
+                    setAuthDialogOpen(true);
+                  }}
+                  className="text-gray-700 dark:text-gray-300 hover:text-primary"
+                >
                   Sign In
                 </Button>
-                <Button size="sm" onClick={() => navigate('/auth')} className="bg-primary hover:bg-primary/90 text-white rounded-md border-2 border-primary">
+                <Button 
+                  size="sm" 
+                  onClick={() => {
+                    setAuthDialogTab('signup');
+                    setAuthDialogOpen(true);
+                  }}
+                  className="bg-primary hover:bg-primary/90 text-white rounded-md border-2 border-primary"
+                >
                   Join
                 </Button>
               </>
@@ -168,10 +198,37 @@ export const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/auth')}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="justify-start"
+                    onClick={() => {
+                      setAuthDialogTab('wallet');
+                      setAuthDialogOpen(true);
+                    }}
+                  >
+                    <Wallet className="h-4 w-4 mr-2" />
+                    Connect Wallet
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="justify-start"
+                    onClick={() => {
+                      setAuthDialogTab('signin');
+                      setAuthDialogOpen(true);
+                    }}
+                  >
                     Sign In
                   </Button>
-                  <Button size="sm" className="bg-gradient-primary" onClick={() => navigate('/auth')}>
+                  <Button 
+                    size="sm" 
+                    className="bg-gradient-primary"
+                    onClick={() => {
+                      setAuthDialogTab('signup');
+                      setAuthDialogOpen(true);
+                    }}
+                  >
                     Get Started
                   </Button>
                 </>
@@ -180,6 +237,12 @@ export const Navbar = () => {
           </div>
         )}
       </div>
+
+      <AuthDialog 
+        open={authDialogOpen} 
+        onOpenChange={setAuthDialogOpen}
+        defaultTab={authDialogTab}
+      />
     </nav>
   );
 };
