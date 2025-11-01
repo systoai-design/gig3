@@ -83,55 +83,57 @@ export const Navbar = () => {
               </Button>
             )}
             
-            <WalletMultiButton />
-            
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Account
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
-                    My Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/settings')}>
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
-                    My Orders
-                  </DropdownMenuItem>
-                  {isSeller && (
-                    <>
-                      <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
-                        Seller Dashboard
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/create-gig')}>
-                        Create Gig
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuItem onClick={signOut} className="text-destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                {user?.user_metadata?.wallet_address && (
+                  <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90" />
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Account
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
+                      My Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/settings')}>
+                      Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
+                      My Orders
+                    </DropdownMenuItem>
+                    {isSeller && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
+                          Seller Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/create-gig')}>
+                          Create Gig
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuItem onClick={signOut} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               <>
                 <Button 
-                  variant="outline" 
                   size="sm" 
                   onClick={() => {
                     setAuthDialogTab('wallet');
                     setAuthDialogOpen(true);
                   }}
-                  className="flex items-center gap-2"
+                  className="bg-gradient-primary hover:opacity-90 text-white border-0"
                 >
-                  <Wallet className="h-4 w-4" />
-                  Connect
+                  <Wallet className="h-4 w-4 mr-2" />
+                  Connect Wallet
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -199,12 +201,12 @@ export const Navbar = () => {
               ) : (
                 <>
                   <Button 
-                    variant="outline" 
                     size="sm" 
-                    className="justify-start"
+                    className="w-full bg-gradient-primary hover:opacity-90 text-white border-0"
                     onClick={() => {
                       setAuthDialogTab('wallet');
                       setAuthDialogOpen(true);
+                      setIsMenuOpen(false);
                     }}
                   >
                     <Wallet className="h-4 w-4 mr-2" />

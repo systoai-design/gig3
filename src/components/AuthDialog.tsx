@@ -80,16 +80,29 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
 
       if (connected && publicKey && !user && open && activeTab === 'wallet') {
         setCheckingWallet(true);
+        toast.info('Checking wallet...', { id: 'wallet-check' });
+        
         try {
           const message = `Sign this message to authenticate with GIG3: ${Date.now()}`;
           const encodedMessage = new TextEncoder().encode(message);
           
           if (!signMessage) {
-            throw new Error('Wallet does not support message signing');
+            toast.dismiss('wallet-check');
+            toast.error('Wallet does not support message signing');
+            setCheckingWallet(false);
+            return;
           }
+
+          // Show prompt to user
+          toast.info('Please approve the signature request in your wallet', { 
+            id: 'wallet-sign',
+            duration: 10000 
+          });
 
           const signature = await signMessage(encodedMessage);
           const signatureBase58 = bs58.encode(signature);
+
+          toast.dismiss('wallet-sign');
 
           // Try to sign in to check if wallet is registered
           const { error } = await signInWithWallet(
@@ -99,15 +112,30 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
           );
 
           if (error && error.message.includes('not registered')) {
+            toast.dismiss('wallet-check');
+            toast.info('New wallet detected. Please complete registration.');
             setWalletRegistered(false);
           } else if (!error) {
-            // Successfully signed in
-            setWalletRegistered(true);
+            toast.dismiss('wallet-check');
             toast.success('Welcome back!');
+            setWalletRegistered(true);
           } else {
+            toast.dismiss('wallet-check');
+            toast.error('Authentication failed. Please try again.');
             setWalletRegistered(false);
           }
-        } catch (error) {
+        } catch (error: any) {
+          toast.dismiss('wallet-check');
+          toast.dismiss('wallet-sign');
+          
+          if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
+            toast.error('Signature rejected. Please try again.');
+          } else if (error.message?.includes('Wallet locked')) {
+            toast.error('Please unlock your wallet and try again.');
+          } else {
+            toast.error(`Authentication error: ${error.message || 'Unknown error'}`);
+          }
+          
           console.error('Error checking wallet:', error);
           setWalletRegistered(false);
         } finally {
@@ -115,11 +143,12 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
         }
       } else if (!connected) {
         setWalletRegistered(null);
+        setCheckingWallet(false);
       }
     };
 
     checkWalletRegistration();
-  }, [connected, publicKey, user, signOut, open, activeTab]);
+  }, [connected, publicKey, user, signOut, open, activeTab, signInWithWallet, signMessage]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -363,11 +392,15 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
                 <p className="text-sm text-muted-foreground">
                   Connect your Solana wallet to sign up or sign in
                 </p>
-                <WalletMultiButton className="!bg-gradient-primary" />
+                <WalletMultiButton className="!bg-gradient-primary hover:!opacity-90 !text-white !border-0 mx-auto" />
               </div>
             ) : checkingWallet ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-muted-foreground">Checking wallet...</p>
+              <div className="text-center py-8 space-y-3">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                  <p className="text-sm text-muted-foreground">Checking wallet status...</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Please approve the signature request in Phantom</p>
               </div>
             ) : walletRegistered === false ? (
               <form onSubmit={handleWalletSignup} className="space-y-4">
