@@ -227,8 +227,9 @@ export default function Settings() {
           </Card>
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="account">Account</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
               {isSeller && <TabsTrigger value="professional">Professional</TabsTrigger>}
               <TabsTrigger value="social">Social</TabsTrigger>
@@ -331,6 +332,76 @@ export default function Settings() {
                     <Save className="h-4 w-4 mr-2" />
                     {saving ? 'Saving...' : 'Save Changes'}
                   </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Account Tab */}
+            <TabsContent value="account">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account Information</CardTitle>
+                  <CardDescription>View your account details and authentication method</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input
+                      value={user?.email || 'N/A'}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Authentication Method</Label>
+                    <Input
+                      value={profile?.wallet_address ? 'Solana Wallet' : 'Email & Password'}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+
+                  {profile?.wallet_address && (
+                    <div className="space-y-2">
+                      <Label>Connected Wallet</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={profile.wallet_address}
+                          disabled
+                          className="bg-muted font-mono text-sm"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            navigator.clipboard.writeText(profile.wallet_address);
+                            toast.success('Wallet address copied!');
+                          }}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                      <div className="rounded-md bg-muted p-4 mt-4 space-y-2">
+                        <p className="text-sm font-medium">Important Information:</p>
+                        <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                          <li>Your account is permanently linked to this wallet address</li>
+                          <li>Each wallet creates a separate account</li>
+                          <li>Switching wallets will require signing in with the new wallet</li>
+                          <li>The system will automatically sign you out if you change wallets</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {!profile?.wallet_address && (
+                    <div className="rounded-md bg-muted p-4 space-y-2">
+                      <p className="text-sm font-medium">Email Account</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your account uses email and password authentication. You can optionally connect a wallet for Web3 features.
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

@@ -3,9 +3,9 @@ import { Search, Menu, User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { supabase } from "@/integrations/supabase/client";
+import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,9 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
+  
+  // Monitor wallet changes and auto-signout if needed
+  useWalletMonitor();
 
   useEffect(() => {
     const checkSellerRole = async () => {

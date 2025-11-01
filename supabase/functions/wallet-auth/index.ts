@@ -16,7 +16,11 @@ Deno.serve(async (req) => {
   try {
     const { walletAddress, signature, message, name, username, isSignup } = await req.json();
 
-    console.log('Wallet auth request:', { walletAddress, isSignup });
+    console.log('Wallet auth request:', { 
+      walletAddress: walletAddress.substring(0, 8) + '...', 
+      isSignup,
+      timestamp: new Date().toISOString()
+    });
 
     // Verify signature
     const messageBytes = new TextEncoder().encode(message);
@@ -30,7 +34,7 @@ Deno.serve(async (req) => {
     );
     
     if (!verified) {
-      console.error('Signature verification failed');
+      console.error('Signature verification failed for wallet:', walletAddress.substring(0, 8) + '...');
       return new Response(
         JSON.stringify({ error: 'Invalid signature' }), 
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -65,7 +69,7 @@ Deno.serve(async (req) => {
     
     if (existingProfile && !isSignup) {
       // User exists - generate session token
-      console.log('Existing user found, creating session');
+      console.log('Existing wallet user logging in');
       
       const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(
         existingProfile.id
@@ -93,7 +97,8 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           access_token: linkData.properties.hashed_token,
           refresh_token: linkData.properties.hashed_token,
-          user: user
+          user: user,
+          is_new_account: false
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -101,14 +106,15 @@ Deno.serve(async (req) => {
     
     if (isSignup) {
       if (existingProfile) {
+        console.log('Wallet already registered, rejecting duplicate signup');
         return new Response(
-          JSON.stringify({ error: 'Wallet already registered' }), 
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ error: 'Wallet already registered. Please sign in.' }), 
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       // New user - create auth account
-      console.log('Creating new user account');
+      console.log('Creating new wallet account');
       
       const dummyEmail = `${walletAddress}@wallet.gig3.io`;
       const randomPassword = crypto.randomUUID();
@@ -148,13 +154,15 @@ Deno.serve(async (req) => {
         JSON.stringify({ 
           access_token: linkData.properties.hashed_token,
           refresh_token: linkData.properties.hashed_token,
-          user: authData.user
+          user: authData.user,
+          is_new_account: true
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Wallet not found and not signup request
+    console.log('Wallet not registered, rejecting login attempt');
     return new Response(
       JSON.stringify({ error: 'Wallet not registered. Please sign up first.' }), 
       { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

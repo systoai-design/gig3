@@ -13,6 +13,7 @@ interface AuthContextType {
   signInWithWallet: (walletAddress: string, signature: string, message: string) => Promise<{ error: any }>;
   signUpWithWallet: (walletAddress: string, signature: string, message: string, name: string, username: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  checkWalletMatch: (walletAddress: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -173,8 +174,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const checkWalletMatch = (walletAddress: string): boolean => {
+    if (!user) return false;
+    const userWalletAddress = user.user_metadata?.wallet_address;
+    return userWalletAddress === walletAddress;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithWallet, signUpWithWallet, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signInWithWallet, signUpWithWallet, signOut, checkWalletMatch }}>
       {children}
     </AuthContext.Provider>
   );

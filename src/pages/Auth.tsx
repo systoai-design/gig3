@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { toast } from 'sonner';
 import * as bs58 from 'bs58';
 
 const signUpSchema = z.object({
@@ -30,7 +31,7 @@ const walletSignupSchema = z.object({
 });
 
 export default function Auth() {
-  const { signUp, signIn, signInWithWallet, signUpWithWallet, user, loading } = useAuth();
+  const { signUp, signIn, signInWithWallet, signUpWithWallet, signOut, user, loading } = useAuth();
   const navigate = useNavigate();
   const { publicKey, signMessage, connected } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +49,21 @@ export default function Auth() {
   // Check if wallet is registered when connected
   useEffect(() => {
     const checkWalletRegistration = async () => {
-      if (connected && publicKey) {
+      // If user is already logged in, check if wallet matches
+      if (user && connected && publicKey) {
+        const userWalletAddress = user.user_metadata?.wallet_address;
+        const currentWalletAddress = publicKey.toBase58();
+        
+        if (userWalletAddress && userWalletAddress !== currentWalletAddress) {
+          // Different wallet - sign out current user
+          toast.info('Different wallet detected. Please authenticate with this wallet.');
+          await signOut();
+          setWalletRegistered(null);
+          return;
+        }
+      }
+
+      if (connected && publicKey && !user) {
         setCheckingWallet(true);
         try {
           const message = `Sign this message to authenticate with GIG3: ${Date.now()}`;
@@ -88,7 +103,7 @@ export default function Auth() {
     };
 
     checkWalletRegistration();
-  }, [connected, publicKey]);
+  }, [connected, publicKey, user, signOut]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
