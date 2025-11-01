@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu, User, LogOut, Wallet } from "lucide-react";
+import { Search, Menu, User, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +17,6 @@ import {
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [authDialogTab, setAuthDialogTab] = useState<'signin' | 'signup' | 'wallet'>('signin');
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
@@ -123,17 +122,7 @@ export const Navbar = () => {
                 </DropdownMenu>
               </div>
             ) : (
-              <Button 
-                size="sm" 
-                onClick={() => {
-                  setAuthDialogTab('wallet');
-                  setAuthDialogOpen(true);
-                }}
-                className="bg-gradient-primary hover:opacity-90 text-white border-0"
-              >
-                <Wallet className="h-4 w-4 mr-2" />
-                Connect Wallet
-              </Button>
+              <WalletMultiButton className="!bg-gradient-primary hover:!opacity-90 !text-white !border-0" />
             )}
           </div>
 
@@ -176,18 +165,9 @@ export const Navbar = () => {
                   </Button>
                 </>
               ) : (
-                <Button 
-                  size="sm" 
-                  className="w-full bg-gradient-primary hover:opacity-90 text-white border-0"
-                  onClick={() => {
-                    setAuthDialogTab('wallet');
-                    setAuthDialogOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  <Wallet className="h-4 w-4 mr-2" />
-                  Connect Wallet
-                </Button>
+                <div className="w-full">
+                  <WalletMultiButton className="!bg-gradient-primary hover:!opacity-90 !text-white !border-0 !w-full" />
+                </div>
               )}
             </div>
           </div>
@@ -197,7 +177,6 @@ export const Navbar = () => {
       <AuthDialog 
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen}
-        defaultTab={authDialogTab}
       />
     </nav>
   );

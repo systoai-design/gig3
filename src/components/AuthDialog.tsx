@@ -37,22 +37,15 @@ const walletSignupSchema = z.object({
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultTab?: 'signin' | 'signup' | 'wallet';
 }
 
-export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDialogProps) {
+export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const { signUp, signIn, signInWithWallet, signUpWithWallet, signOut, user } = useAuth();
   const { publicKey, signMessage, connected } = useWallet();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [walletRegistered, setWalletRegistered] = useState<boolean | null>(null);
   const [checkingWallet, setCheckingWallet] = useState(false);
-  const [activeTab, setActiveTab] = useState(defaultTab);
-
-  // Update active tab when defaultTab changes
-  useEffect(() => {
-    setActiveTab(defaultTab);
-  }, [defaultTab]);
 
   // Close dialog when user successfully authenticates
   useEffect(() => {
@@ -78,8 +71,9 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
         }
       }
 
-      if (connected && publicKey && !user && open && activeTab === 'wallet') {
+      if (connected && publicKey && !user) {
         setCheckingWallet(true);
+        onOpenChange(true); // Open dialog while checking
         toast.info('Checking wallet...', { id: 'wallet-check' });
         
         try {
@@ -119,6 +113,7 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
             toast.dismiss('wallet-check');
             toast.success('Welcome back!');
             setWalletRegistered(true);
+            onOpenChange(false); // Close dialog on successful login
           } else {
             toast.dismiss('wallet-check');
             toast.error('Authentication failed. Please try again.');
@@ -144,11 +139,12 @@ export function AuthDialog({ open, onOpenChange, defaultTab = 'signin' }: AuthDi
       } else if (!connected) {
         setWalletRegistered(null);
         setCheckingWallet(false);
+        onOpenChange(false); // Close dialog when wallet disconnects
       }
     };
 
     checkWalletRegistration();
-  }, [connected, publicKey, user, signOut, open, activeTab, signInWithWallet, signMessage]);
+  }, [connected, publicKey, user, signOut, onOpenChange, signInWithWallet, signMessage]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
