@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import gig3Logo from "@/assets/gig3_logo_transparent.png";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -50,8 +51,8 @@ export const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <a href="/" className="text-3xl font-bold text-primary hover:opacity-80 transition-opacity">
-              GIG3
+            <a href="/" className="flex items-center hover:opacity-80 transition-opacity">
+              <img src={gig3Logo} alt="GIG3" className="h-10 w-auto" />
             </a>
             
             {/* Desktop Navigation */}
@@ -69,7 +70,7 @@ export const Navbar = () => {
               <input
                 type="text"
                 placeholder="Search for services..."
-                className="w-full pl-10 pr-4 py-2 border border-input rounded-full bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                className="w-full pl-10 pr-4 py-2 border border-input rounded-[35px] bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
               />
             </div>
           </div>
@@ -144,7 +145,7 @@ export const Navbar = () => {
                 <input
                   type="text"
                   placeholder="Search for services..."
-                  className="w-full pl-10 pr-4 py-2 border border-input rounded-full bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full pl-10 pr-4 py-2 border border-input rounded-[35px] bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
               <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">

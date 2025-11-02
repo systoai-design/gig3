@@ -31,18 +31,19 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900">
-      {/* Spline 3D Background Animation - Lazy Loaded */}
+    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900 will-change-transform">
+      {/* Spline 3D Background Animation - Lazy Loaded with Performance Optimizations */}
       {showSpline && (
-        <div className="absolute inset-0 w-full h-full">
+        <div className="absolute inset-0 w-full h-full" style={{ contain: 'layout paint', transform: 'translateZ(0)' }}>
           <iframe 
             src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
             frameBorder="0" 
             width="100%" 
             height="100%"
-            className="w-full h-full"
+            className="w-full h-full pointer-events-none"
             title="3D Background Animation"
             loading="lazy"
+            style={{ willChange: 'transform' }}
           />
         </div>
       )}

@@ -11,88 +11,77 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 160 10% 10%;
-
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 160 10% 10%;
-
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 160 10% 10%;
-
-    --primary: 160 84% 30%;
-    --primary-foreground: 0 0% 100%;
-    
-    --primary-light: 160 70% 45%;
-    --primary-dark: 160 95% 20%;
-
-    --secondary: 20 95% 65%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 160 10% 95%;
-    --muted-foreground: 160 10% 45%;
-
-    --accent: 20 100% 70%;
-    --accent-foreground: 160 10% 10%;
-
+    --popover-foreground: 0 0% 0%;
+    --primary: 0 99% 59%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 20%;
+    --accent: 0 100% 69%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 99% 59%;
+    --chart-1: 0 99% 59%;
+    --chart-2: 0 68% 46%;
+    --chart-3: 0 100% 69%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 0 0% 0%;
+    --radius: 2.188rem;
 
-    --border: 160 15% 90%;
-    --input: 160 15% 90%;
-    --ring: 160 84% 30%;
+    /* GIG3 Brand colors */
+    --gig3-red: 0 99% 59%;
+    --dark-red: 0 68% 46%;
+    --bright-coral: 0 100% 69%;
+    --gig3-black: 0 0% 0%;
+    --dark-gray: 0 0% 20%;
+    --light-gray: 0 0% 96%;
+    --primary-glow: 0 100% 69%;
 
-    --radius: 0.75rem;
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
 
-    --gradient-primary: linear-gradient(135deg, hsl(160 84% 30%), hsl(160 70% 45%));
-    --gradient-secondary: linear-gradient(135deg, hsl(20 95% 65%), hsl(30 100% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(160 84% 30%), hsl(160 70% 40%), hsl(170 60% 50%));
-    
-    --shadow-subtle: 0 2px 8px -2px hsl(160 84% 30% / 0.08);
-    --shadow-medium: 0 8px 24px -4px hsl(160 84% 30% / 0.12);
-    --shadow-large: 0 16px 48px -8px hsl(160 84% 30% / 0.16);
-    
+    /* Custom shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+
+    /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 160 15% 8%;
-    --foreground: 160 5% 95%;
-
-    --card: 160 20% 12%;
-    --card-foreground: 160 5% 95%;
-
-    --popover: 160 20% 12%;
-    --popover-foreground: 160 5% 95%;
-
-    --primary: 160 70% 45%;
-    --primary-foreground: 0 0% 100%;
-    
-    --primary-light: 160 60% 55%;
-    --primary-dark: 160 80% 35%;
-
-    --secondary: 20 85% 60%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 160 15% 18%;
-    --muted-foreground: 160 10% 60%;
-
-    --accent: 20 90% 65%;
-    --accent-foreground: 160 5% 95%;
-
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 160 15% 20%;
-    --input: 160 15% 20%;
-    --ring: 160 70% 45%;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(160 70% 35%), hsl(160 60% 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(20 85% 55%), hsl(30 90% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(160 70% 35%), hsl(160 60% 45%), hsl(170 50% 55%));
-    
-    --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
-    --shadow-medium: 0 8px 24px -4px hsl(0 0% 0% / 0.4);
-    --shadow-large: 0 16px 48px -8px hsl(0 0% 0% / 0.5);
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 99% 59%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 0 100% 69%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 99% 59%;
+    --chart-1: 0 99% 59%;
+    --chart-2: 0 68% 46%;
+    --chart-3: 0 100% 69%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 0 0% 8%;
   }
 }
 
