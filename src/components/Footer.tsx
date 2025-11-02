@@ -1,5 +1,8 @@
 import { Github, Twitter, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
+import { motion } from "framer-motion";
+import { NoiseTexture } from "@/components/ui/noise-texture";
 
 export const Footer = () => {
   const footerLinks = {
@@ -9,9 +12,9 @@ export const Footer = () => {
       { label: "Trust & Safety", href: "/trust-safety" },
       { label: "Help & Support", href: "/support" },
     ],
-    freelancers: [
-      { label: "Become a Seller", href: "/become-seller" },
-      { label: "Seller Guidelines", href: "/seller-guidelines" },
+    creators: [
+      { label: "Become a Creator", href: "/become-creator" },
+      { label: "Creator Guidelines", href: "/creator-guidelines" },
       { label: "Community Standards", href: "/community-standards" },
       { label: "Success Stories", href: "/success-stories" },
     ],
@@ -24,120 +27,65 @@ export const Footer = () => {
   };
 
   return (
-    <footer className="bg-card border-t">
-      <div className="container mx-auto px-4 py-12 lg:py-16">
+    <footer className="relative bg-gradient-to-b from-muted/30 to-background border-t overflow-hidden">
+      <NoiseTexture opacity={0.03} />
+      
+      <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Brand Column */}
           <div className="col-span-2 md:col-span-2">
             <Link to="/" className="inline-block mb-6">
-              <span className="text-3xl font-bold text-primary">GIG3</span>
+              <span className="text-4xl font-black gradient-text">GIG3</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
-              Gig Economy Web 3 - The decentralized freelance marketplace powered by Solana blockchain. Secure payments, transparent escrow.
+              The decentralized freelance marketplace. Secure payments, transparent escrow, powered by Solana.
             </p>
             <div className="flex gap-3">
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
-                aria-label="GitHub"
-              >
-                <Github className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
-                aria-label="Discord"
-              >
-                <MessageCircle className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </a>
+              {[
+                { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+                { icon: Github, href: "https://github.com", label: "GitHub" },
+                { icon: MessageCircle, href: "#", label: "Discord" }
+              ].map((social) => (
+                <motion.a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors group"
+                  aria-label={social.label}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                >
+                  <social.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </motion.a>
+              ))}
             </div>
           </div>
 
-          {/* Platform Column */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4 text-base">Platform</h3>
-            <ul className="space-y-3">
-              {footerLinks.platform.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* For Freelancers Column */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4 text-base">For Freelancers</h3>
-            <ul className="space-y-3">
-              {footerLinks.freelancers.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources Column */}
-          <div>
-            <h3 className="font-semibold text-foreground mb-4 text-base">Resources</h3>
-            <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {Object.entries({ Platform: footerLinks.platform, Creators: footerLinks.creators, Resources: footerLinks.resources }).map(([title, links]) => (
+            <div key={title}>
+              <h3 className="font-semibold text-foreground mb-4 text-base">{title}</h3>
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors inline-block relative group">
+                      {link.label}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom Bar */}
         <div className="pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <p className="text-sm text-muted-foreground">
-                © 2025 GIG3. Built on Solana with ❤️
-              </p>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
-                <span className="text-xs font-semibold text-purple-600">Secured by</span>
-                <span className="text-sm font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">x402 Protocol</span>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground">© 2025 GIG3. Built on Solana with ❤️</p>
             <div className="flex flex-wrap justify-center gap-6">
-              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </Link>
-              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </Link>
-              <Link to="/cookies" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Cookie Policy
-              </Link>
+              {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((text) => (
+                <Link key={text} to={`/${text.toLowerCase().replace(/ /g, '-')}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  {text}
+                </Link>
+              ))}
             </div>
           </div>
         </div>

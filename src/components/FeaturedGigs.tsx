@@ -1,11 +1,14 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Heart, PackageOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Star, PackageOpen, ArrowRight } from "lucide-react";
+import { MagneticButton } from "@/components/animations/MagneticButton";
+import { HoverTilt } from "@/components/animations/HoverTilt";
+import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
+import { AnimatedBadge } from "@/components/ui/animated-badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProBadge } from "@/components/ProBadge";
+import { motion } from "framer-motion";
 
 interface Gig {
   id: string;
@@ -40,7 +43,6 @@ export const FeaturedGigs = () => {
 
       if (error) throw error;
       
-      // Fetch seller profiles separately
       const gigsWithProfiles = await Promise.all(
         (data || []).map(async (gig) => {
           const { data: sellerProfile } = await supabase
@@ -66,10 +68,10 @@ export const FeaturedGigs = () => {
 
   if (loading) {
     return (
-      <section className="py-16 bg-muted/30">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <p className="text-muted-foreground">Loading gigs...</p>
+            <p className="text-muted-foreground">Loading services...</p>
           </div>
         </div>
       </section>
@@ -78,97 +80,160 @@ export const FeaturedGigs = () => {
 
   if (gigs.length === 0) {
     return (
-      <section className="py-16 bg-muted/30">
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto">
             <PackageOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              No Gigs Available Yet
+              No Services Available Yet
             </h2>
             <p className="text-muted-foreground mb-6">
-              Be the first to create a gig and start offering your services on our Web3 marketplace!
+              Be the first to create a service and start offering your expertise!
             </p>
-            <Button onClick={() => navigate('/become-seller')} size="lg">
-              Become a Seller
-            </Button>
+            <MagneticButton 
+              onClick={() => navigate('/become-creator')}
+              className="bg-gradient-to-r from-primary to-accent-pink text-white px-8 py-4 rounded-full font-semibold"
+            >
+              Become a Creator
+            </MagneticButton>
           </div>
         </div>
       </section>
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
+
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex items-end justify-between mb-16"
+        >
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            <h2 className="text-display-md gradient-text mb-3">
               Featured Services
             </h2>
             <p className="text-muted-foreground text-lg">
-              Top-rated gigs from our community
+              Top-rated services from our talented creator community
             </p>
           </div>
-          <Button variant="ghost" className="hidden md:flex" onClick={() => navigate('/explore')}>
+          <motion.button
+            whileHover={{ x: 5 }}
+            onClick={() => navigate('/explore')}
+            className="hidden md:flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all duration-300"
+          >
             View All
-          </Button>
-        </div>
+            <ArrowRight className="h-5 w-5" />
+          </motion.button>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Masonry-style Grid */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {gigs.map((gig) => (
-            <Card
-              key={gig.id}
-              className="group overflow-hidden border-border hover:shadow-large transition-all duration-300 hover:-translate-y-2 cursor-pointer"
-              onClick={() => navigate(`/gig/${gig.id}`)}
-            >
-              <CardHeader className="p-0 relative overflow-hidden">
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
-                  {gig.images && gig.images.length > 0 ? (
-                    <img
-                      src={gig.images[0]}
-                      alt={gig.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <PackageOpen className="h-12 w-12 text-muted-foreground" />
+            <motion.div key={gig.id} variants={item}>
+              <HoverTilt intensity={8} scale={1.03}>
+                <GlassmorphicCard
+                  blur="sm"
+                  opacity={0.03}
+                  hover={false}
+                  className="overflow-hidden cursor-pointer group h-full"
+                >
+                  <div onClick={() => navigate(`/gig/${gig.id}`)}>
+                    {/* Image */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                      {gig.images && gig.images.length > 0 ? (
+                        <img
+                          src={gig.images[0]}
+                          alt={gig.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <PackageOpen className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                      )}
+                      
+                      {/* Floating Category Badge */}
+                      <div className="absolute top-3 left-3">
+                        <AnimatedBadge className="glass-dark text-white text-xs backdrop-blur-md">
+                          {gig.category}
+                        </AnimatedBadge>
+                      </div>
                     </div>
-                  )}
-                </div>
-                <Badge className="absolute bottom-3 left-3 bg-background/90 text-foreground border-border">
-                  {gig.category}
-                </Badge>
-              </CardHeader>
-              
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-primary"></div>
-                  <span className="text-sm font-medium text-foreground">
-                    Seller
-                  </span>
-                  {gig.seller_profiles?.pro_member && (
-                    <ProBadge size="sm" proSince={gig.seller_profiles.pro_since} />
-                  )}
-                </div>
-                
-                <h3 className="font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
-                  {gig.title}
-                </h3>
-              </CardContent>
-              
-              <CardFooter className="p-4 pt-0 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Starting at</p>
-                  <p className="text-lg font-bold text-foreground">{gig.price_sol} SOL</p>
-                </div>
-                <Button size="sm" className="bg-gradient-primary hover:opacity-90">
-                  View Details
-                </Button>
-              </CardFooter>
-            </Card>
+                    
+                    {/* Content */}
+                    <div className="p-5">
+                      {/* Creator Info */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-pink"></div>
+                        <span className="text-sm font-medium text-foreground">Creator</span>
+                        {gig.seller_profiles?.pro_member && (
+                          <AnimatedBadge glow pulse className="bg-gradient-to-r from-accent-amber to-accent-pink text-white text-xs">
+                            PRO
+                          </AnimatedBadge>
+                        )}
+                      </div>
+                      
+                      {/* Title */}
+                      <h3 className="font-bold text-foreground mb-4 line-clamp-2 group-hover:gradient-text transition-all duration-300 text-lg">
+                        {gig.title}
+                      </h3>
+                      
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Starting at</p>
+                          <p className="text-xl font-bold gradient-text">{gig.price_sol} SOL</p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/gig/${gig.id}`);
+                          }}
+                          className="bg-gradient-to-r from-primary to-accent-pink text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:scale-105 transition-transform"
+                        >
+                          View
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </GlassmorphicCard>
+              </HoverTilt>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

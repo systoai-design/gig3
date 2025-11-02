@@ -1,54 +1,122 @@
 import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase, Users, Languages } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { HoverTilt } from "@/components/animations/HoverTilt";
+import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
+import { motion } from "framer-motion";
 
 const categories = [
-  { name: "Programming & Tech", icon: Code },
-  { name: "Graphics & Design", icon: Palette },
-  { name: "Digital Marketing", icon: Megaphone },
-  { name: "Writing & Translation", icon: Languages },
-  { name: "Video & Animation", icon: Video },
-  { name: "AI Services", icon: Sparkles },
-  { name: "Music & Audio", icon: Music },
-  { name: "Business", icon: Users },
-  { name: "Consulting", icon: Briefcase },
+  { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan", size: "large" },
+  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-pink to-accent-purple", size: "medium" },
+  { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary", size: "medium" },
+  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-pink", size: "large" },
+  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-pink", size: "medium" },
+  { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue", size: "medium" },
+  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-pink", size: "small" },
+  { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple", size: "small" },
+  { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue", size: "small" },
 ];
 
 export const Categories = () => {
   const navigate = useNavigate();
 
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: [0.25, 0.1, 0.25, 1] as const
+      }
+    }
+  };
+
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <Carousel
-          opts={{
-            dragFree: true,
-            containScroll: "trimSnaps",
-            align: "start",
-          }}
-          className="w-full"
+    <section className="py-24 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
         >
-          <CarouselContent className="-ml-6">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <CarouselItem key={category.name} className="pl-6 basis-[140px]">
-                  <button
-                    onClick={() => navigate('/explore')}
-                    className="flex flex-col items-center gap-3 px-6 py-6 bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 w-full"
+          <h2 className="text-display-md gradient-text mb-4">
+            Explore Categories
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Discover talented creators across every category imaginable
+          </p>
+        </motion.div>
+
+        {/* Bento Grid Layout */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-6xl mx-auto"
+        >
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const colSpan = category.size === "large" ? "md:col-span-2" : category.size === "medium" ? "md:col-span-2 lg:col-span-2" : "";
+            const rowSpan = category.size === "large" ? "md:row-span-2" : "";
+            
+            return (
+              <motion.div
+                key={category.name}
+                variants={item}
+                className={`${colSpan} ${rowSpan}`}
+              >
+                <HoverTilt intensity={10} scale={1.03}>
+                  <GlassmorphicCard
+                    blur="sm"
+                    opacity={0.05}
+                    variant="light"
+                    className="h-full min-h-[160px] cursor-pointer overflow-hidden group"
                   >
-                    <div className="p-3 rounded-lg bg-gray-50">
-                      <Icon className="h-8 w-8 text-gray-700" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-900 text-center whitespace-normal">
-                      {category.name}
-                    </span>
-                  </button>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
-        </Carousel>
+                    <button
+                      onClick={() => navigate('/explore')}
+                      className="w-full h-full p-6 flex flex-col justify-between relative"
+                    >
+                      {/* Gradient Background */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                      
+                      {/* Icon */}
+                      <div className="relative">
+                        <motion.div
+                          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                          transition={{ duration: 0.5 }}
+                          className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg`}
+                        >
+                          <Icon className="w-full h-full text-white" />
+                        </motion.div>
+                      </div>
+                      
+                      {/* Title */}
+                      <h3 className="text-sm md:text-base font-bold text-foreground text-left mt-auto group-hover:gradient-text transition-all duration-300">
+                        {category.name}
+                      </h3>
+                    </button>
+                  </GlassmorphicCard>
+                </HoverTilt>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
