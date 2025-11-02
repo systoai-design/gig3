@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ProBadge } from "@/components/ProBadge";
 
 interface Gig {
   id: string;
@@ -13,6 +14,10 @@ interface Gig {
   category: string;
   images: string[];
   seller_id: string;
+  seller_profiles?: {
+    pro_member: boolean;
+    pro_since: string | null;
+  };
 }
 
 export const FeaturedGigs = () => {
@@ -34,7 +39,24 @@ export const FeaturedGigs = () => {
         .limit(8);
 
       if (error) throw error;
-      setGigs(data || []);
+      
+      // Fetch seller profiles separately
+      const gigsWithProfiles = await Promise.all(
+        (data || []).map(async (gig) => {
+          const { data: sellerProfile } = await supabase
+            .from('seller_profiles')
+            .select('pro_member, pro_since')
+            .eq('user_id', gig.seller_id)
+            .maybeSingle();
+          
+          return {
+            ...gig,
+            seller_profiles: sellerProfile || undefined
+          };
+        })
+      );
+      
+      setGigs(gigsWithProfiles as Gig[]);
     } catch (error) {
       console.error('Error fetching gigs:', error);
     } finally {
@@ -125,6 +147,9 @@ export const FeaturedGigs = () => {
                   <span className="text-sm font-medium text-foreground">
                     Seller
                   </span>
+                  {gig.seller_profiles?.pro_member && (
+                    <ProBadge size="sm" proSince={gig.seller_profiles.pro_since} />
+                  )}
                 </div>
                 
                 <h3 className="font-semibold text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">

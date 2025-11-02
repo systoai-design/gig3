@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Star, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ProBadge } from '@/components/ProBadge';
 
 const CATEGORIES = [
   'Web Development',
@@ -36,10 +37,11 @@ export default function Explore() {
     searchParams.get('category')?.split(',').filter(Boolean) || []
   );
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
+  const [proOnly, setProOnly] = useState(searchParams.get('pro') === 'true');
 
   useEffect(() => {
     fetchGigs();
-  }, [searchQuery, selectedCategories, sortBy]);
+  }, [searchQuery, selectedCategories, sortBy, proOnly]);
 
   const fetchGigs = async () => {
     setLoading(true);
@@ -48,9 +50,15 @@ export default function Explore() {
         .from('gigs')
         .select(`
           *,
-          profiles:seller_id (username, avatar_url)
+          profiles:seller_id (username, avatar_url),
+          seller_profiles!inner (pro_member, pro_since)
         `)
         .eq('status', 'active');
+
+      // Pro filter
+      if (proOnly) {
+        query = query.eq('seller_profiles.pro_member', true);
+      }
 
       // Search filter
       if (searchQuery) {
@@ -107,12 +115,13 @@ export default function Explore() {
     if (searchQuery) params.set('q', searchQuery);
     if (selectedCategories.length > 0) params.set('category', selectedCategories.join(','));
     if (sortBy !== 'newest') params.set('sort', sortBy);
+    if (proOnly) params.set('pro', 'true');
     setSearchParams(params);
   };
 
   useEffect(() => {
     updateURLParams();
-  }, [selectedCategories, sortBy]);
+  }, [selectedCategories, sortBy, proOnly]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,6 +134,22 @@ export default function Explore() {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Sidebar Filters */}
           <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold mb-3">Filters</h3>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="pro-only"
+                    checked={proOnly}
+                    onCheckedChange={(checked) => setProOnly(checked as boolean)}
+                  />
+                  <Label htmlFor="pro-only" className="text-sm cursor-pointer font-medium">
+                    Show Pro Freelancers Only
+                  </Label>
+                </div>
+              </div>
+            </div>
+
             <div>
               <h3 className="font-semibold mb-3">Categories</h3>
               <div className="space-y-2">
@@ -150,6 +175,7 @@ export default function Explore() {
                 setSelectedCategories([]);
                 setSearchQuery('');
                 setSortBy('newest');
+                setProOnly(false);
               }}
             >
               Clear Filters
@@ -229,6 +255,9 @@ export default function Explore() {
                           {gig.profiles?.username?.[0]?.toUpperCase() || 'U'}
                         </div>
                         <span className="text-sm text-muted-foreground">{gig.profiles?.username || 'Anonymous'}</span>
+                        {gig.seller_profiles?.pro_member && (
+                          <ProBadge size="sm" proSince={gig.seller_profiles.pro_since} />
+                        )}
                       </div>
                       <h3 className="font-semibold line-clamp-2 min-h-[48px]">{gig.title}</h3>
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">

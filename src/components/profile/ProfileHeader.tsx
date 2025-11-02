@@ -3,15 +3,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Calendar, Edit, Globe } from 'lucide-react';
 import { formatWalletAddress } from '@/lib/profileUtils';
+import { ProBadge } from '@/components/ProBadge';
 
 interface ProfileHeaderProps {
   profile: any;
   roles: string[];
   isOwnProfile: boolean;
   onEditClick?: () => void;
+  proMember?: boolean;
+  proSince?: string | null;
 }
 
-export function ProfileHeader({ profile, roles, isOwnProfile, onEditClick }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, roles, isOwnProfile, onEditClick, proMember, proSince }: ProfileHeaderProps) {
   const socialLinks = profile.social_links || {};
 
   return (
@@ -31,6 +34,7 @@ export function ProfileHeader({ profile, roles, isOwnProfile, onEditClick }: Pro
             <div>
               <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-3xl font-bold">{profile.name}</h1>
+                {proMember && <ProBadge size="lg" proSince={proSince} />}
                 {isOwnProfile && (
                   <Button variant="outline" size="sm" onClick={onEditClick}>
                     <Edit className="h-4 w-4 mr-2" />

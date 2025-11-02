@@ -126,6 +126,8 @@ export default function Profile() {
         roles={roles}
         isOwnProfile={isOwnProfile}
         onEditClick={() => navigate('/settings')}
+        proMember={sellerProfile?.pro_member}
+        proSince={sellerProfile?.pro_since}
       />
 
       {/* Main Content */}

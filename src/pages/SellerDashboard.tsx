@@ -10,6 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Plus, Package, DollarSign, Star, Edit, Eye, Trash2 } from 'lucide-react';
+import { ProSubscriptionBanner } from '@/components/ProSubscriptionBanner';
+import { ProBadge } from '@/components/ProBadge';
+import { useProStatus } from '@/hooks/useProStatus';
 
 export default function SellerDashboard() {
   const { user } = useAuth();
@@ -17,6 +20,7 @@ export default function SellerDashboard() {
   const [gigs, setGigs] = useState<any[]>([]);
   const [stats, setStats] = useState({ totalGigs: 0, activeGigs: 0, totalOrders: 0 });
   const [loading, setLoading] = useState(true);
+  const { data: proStatus } = useProStatus(user?.id);
 
   useEffect(() => {
     if (user) {
@@ -126,11 +130,21 @@ export default function SellerDashboard() {
       <Navbar />
       <main className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold">Seller Dashboard</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-4xl font-bold">Seller Dashboard</h1>
+            {proStatus?.isPro && (
+              <ProBadge size="lg" proSince={proStatus.proSince} />
+            )}
+          </div>
           <Button onClick={() => navigate('/create-gig')}>
             <Plus className="mr-2 h-4 w-4" />
             Create New Gig
           </Button>
+        </div>
+
+        {/* Pro Subscription Banner */}
+        <div className="mb-8">
+          <ProSubscriptionBanner />
         </div>
 
         {/* Stats Cards */}

@@ -23,6 +23,7 @@ export type Database = {
           has_packages: boolean | null
           id: string
           images: string[] | null
+          is_pro_only: boolean | null
           packages: Json | null
           price_sol: number
           seller_id: string
@@ -38,6 +39,7 @@ export type Database = {
           has_packages?: boolean | null
           id?: string
           images?: string[] | null
+          is_pro_only?: boolean | null
           packages?: Json | null
           price_sol: number
           seller_id: string
@@ -53,6 +55,7 @@ export type Database = {
           has_packages?: boolean | null
           id?: string
           images?: string[] | null
+          is_pro_only?: boolean | null
           packages?: Json | null
           price_sol?: number
           seller_id?: string
@@ -264,6 +267,8 @@ export type Database = {
           languages_proficiency: Json | null
           portfolio_items: Json | null
           portfolio_links: string[]
+          pro_member: boolean | null
+          pro_since: string | null
           response_time_hours: number | null
           skills: string[]
           updated_at: string
@@ -281,6 +286,8 @@ export type Database = {
           languages_proficiency?: Json | null
           portfolio_items?: Json | null
           portfolio_links?: string[]
+          pro_member?: boolean | null
+          pro_since?: string | null
           response_time_hours?: number | null
           skills?: string[]
           updated_at?: string
@@ -298,6 +305,8 @@ export type Database = {
           languages_proficiency?: Json | null
           portfolio_items?: Json | null
           portfolio_links?: string[]
+          pro_member?: boolean | null
+          pro_since?: string | null
           response_time_hours?: number | null
           skills?: string[]
           updated_at?: string
@@ -314,6 +323,83 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_payments: {
+        Row: {
+          amount_sol: number
+          id: string
+          payment_date: string
+          period_end: string
+          period_start: string
+          subscription_id: string
+          transaction_signature: string
+        }
+        Insert: {
+          amount_sol: number
+          id?: string
+          payment_date?: string
+          period_end: string
+          period_start: string
+          subscription_id: string
+          transaction_signature: string
+        }
+        Update: {
+          amount_sol?: number
+          id?: string
+          payment_date?: string
+          period_end?: string
+          period_start?: string
+          subscription_id?: string
+          transaction_signature?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_payments_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          amount_sol: number
+          created_at: string
+          end_date: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          start_date: string | null
+          status: Database["public"]["Enums"]["subscription_status"]
+          transaction_signature: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_sol: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          transaction_signature?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_sol?: number
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["subscription_status"]
+          transaction_signature?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -359,6 +445,8 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "disputed"
+      subscription_plan: "free" | "pro"
+      subscription_status: "active" | "cancelled" | "expired" | "pending"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -496,6 +584,8 @@ export const Constants = {
         "cancelled",
         "disputed",
       ],
+      subscription_plan: ["free", "pro"],
+      subscription_status: ["active", "cancelled", "expired", "pending"],
     },
   },
 } as const
