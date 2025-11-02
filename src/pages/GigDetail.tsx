@@ -12,8 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { OrderConfirmationDialog } from '@/components/OrderConfirmationDialog';
 import { ReviewList } from '@/components/ReviewList';
+import { MessageList } from '@/components/MessageList';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Star, Clock, Edit, Trash2, User, Heart } from 'lucide-react';
+import { Star, Clock, Edit, Trash2, User, Heart, MessageCircle } from 'lucide-react';
 
 export default function GigDetail() {
   const { id } = useParams();
@@ -368,10 +370,33 @@ export default function GigDetail() {
           </div>
         </div>
 
-        {/* Reviews Section */}
+        {/* Reviews & Chat Section */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Reviews</h2>
-          <ReviewList sellerId={gig.seller_id} />
+          <Tabs defaultValue="reviews" className="w-full">
+            <TabsList>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              {user && !isOwner && (
+                <TabsTrigger value="chat">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Contact Seller
+                </TabsTrigger>
+              )}
+            </TabsList>
+            <TabsContent value="reviews" className="mt-6">
+              <ReviewList sellerId={gig.seller_id} />
+            </TabsContent>
+            {user && !isOwner && (
+              <TabsContent value="chat" className="mt-6">
+                <Card>
+                  <CardContent className="p-0">
+                    <div className="h-[500px]">
+                      <MessageList orderId={null as any} otherUserId={gig.seller_id} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+          </Tabs>
         </div>
       </main>
       <Footer />

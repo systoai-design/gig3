@@ -75,7 +75,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
-          order_id: string
+          order_id: string | null
           receiver_id: string
           sender_id: string
         }
@@ -83,7 +83,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
-          order_id: string
+          order_id?: string | null
           receiver_id: string
           sender_id: string
         }
@@ -91,7 +91,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
-          order_id?: string
+          order_id?: string | null
           receiver_id?: string
           sender_id?: string
         }
@@ -218,6 +218,7 @@ export type Database = {
           created_at: string
           id: string
           order_id: string
+          proof_urls: string[] | null
           rating: number
           reviewee_id: string
           reviewer_id: string
@@ -227,6 +228,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_id: string
+          proof_urls?: string[] | null
           rating: number
           reviewee_id: string
           reviewer_id: string
@@ -236,6 +238,7 @@ export type Database = {
           created_at?: string
           id?: string
           order_id?: string
+          proof_urls?: string[] | null
           rating?: number
           reviewee_id?: string
           reviewer_id?: string

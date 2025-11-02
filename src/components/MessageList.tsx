@@ -21,7 +21,7 @@ interface Message {
 }
 
 interface MessageListProps {
-  orderId: string;
+  orderId: string | null;
   otherUserId: string;
 }
 
@@ -36,15 +36,15 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
     fetchMessages();
     
     // Subscribe to real-time messages
+    const channelName = orderId ? `messages:${orderId}` : `messages:${user?.id}-${otherUserId}`;
     const channel = supabase
-      .channel(`messages:${orderId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `order_id=eq.${orderId}`,
         },
         (payload) => {
           fetchMessages();
@@ -55,22 +55,34 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [orderId]);
+  }, [orderId, otherUserId, user]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   const fetchMessages = async () => {
+    if (!user) return;
+    
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('messages')
         .select(`
           *,
           sender_profile:profiles!messages_sender_id_fkey(username, avatar_url)
         `)
-        .eq('order_id', orderId)
         .order('created_at', { ascending: true });
+
+      if (orderId) {
+        query = query.eq('order_id', orderId);
+      } else {
+        // For pre-order chat, get messages between current user and other user
+        query = query
+          .is('order_id', null)
+          .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       

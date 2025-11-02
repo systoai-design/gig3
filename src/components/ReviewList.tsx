@@ -10,6 +10,7 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
+  proof_urls: string[] | null;
   profiles?: {
     username: string;
     avatar_url: string | null;
@@ -141,6 +142,36 @@ export const ReviewList = ({ sellerId }: ReviewListProps) => {
                   </div>
                   {review.comment && (
                     <p className="text-sm text-muted-foreground">{review.comment}</p>
+                  )}
+                  
+                  {/* Proof of Work Gallery */}
+                  {review.proof_urls && review.proof_urls.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Proof of Work:</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {review.proof_urls.map((url, idx) => (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative aspect-square rounded-lg overflow-hidden border hover:border-primary transition-colors"
+                          >
+                            {url.endsWith('.pdf') ? (
+                              <div className="w-full h-full flex items-center justify-center bg-muted">
+                                <span className="text-xs">PDF</span>
+                              </div>
+                            ) : (
+                              <img 
+                                src={url} 
+                                alt={`Proof ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>

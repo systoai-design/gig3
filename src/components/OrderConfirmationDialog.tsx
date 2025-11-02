@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -38,6 +38,7 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig, selectedPacka
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const [transactionStatus, setTransactionStatus] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Get the selected package or use gig defaults
   const selectedPackage = gig.has_packages && gig.packages?.[selectedPackageIndex] 
@@ -46,6 +47,64 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig, selectedPacka
   
   const orderPrice = selectedPackage ? selectedPackage.price_sol : gig.price_sol;
   const orderDeliveryDays = selectedPackage ? selectedPackage.delivery_days : gig.delivery_days;
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!!data);
+    } catch (error) {
+      setIsAdmin(false);
+    }
+  };
+
+  const handleTestOrder = async () => {
+    if (!user || !isAdmin) {
+      toast.error('Admin access required');
+      return;
+    }
+
+    try {
+      setCreating(true);
+      setTransactionStatus('Creating test order...');
+
+      const { data, error } = await supabase
+        .from('orders')
+        .insert({
+          gig_id: gig.id,
+          buyer_id: user.id,
+          seller_id: gig.seller_id,
+          amount_sol: orderPrice,
+          status: 'in_progress',
+          transaction_signature: 'TEST_ORDER_' + Date.now(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success('Test order created successfully!');
+      onOpenChange(false);
+      navigate(`/orders/${data.id}`);
+    } catch (error: any) {
+      console.error('Test order error:', error);
+      toast.error(error.message || 'Failed to create test order');
+    } finally {
+      setCreating(false);
+      setTransactionStatus('');
+    }
+  };
 
   const handleCreateOrder = async () => {
     if (!user) {
@@ -274,6 +333,22 @@ export function OrderConfirmationDialog({ open, onOpenChange, gig, selectedPacka
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={creating}>
             Cancel
           </Button>
+          {isAdmin && (
+            <Button 
+              onClick={handleTestOrder} 
+              disabled={creating}
+              variant="secondary"
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {transactionStatus || 'Processing...'}
+                </>
+              ) : (
+                '🧪 Create Test Order (Free)'
+              )}
+            </Button>
+          )}
           <Button 
             onClick={handleCreateOrder} 
             disabled={creating || !connected}
