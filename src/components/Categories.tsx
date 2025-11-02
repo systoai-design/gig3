@@ -5,15 +5,15 @@ import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
 import { motion } from "framer-motion";
 
 const categories = [
-  { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan", size: "large" },
-  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-pink to-accent-purple", size: "medium" },
-  { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary", size: "medium" },
-  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-pink", size: "large" },
-  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-pink", size: "medium" },
-  { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue", size: "medium" },
-  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-pink", size: "small" },
-  { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple", size: "small" },
-  { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue", size: "small" },
+  { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan" },
+  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-pink to-accent-purple" },
+  { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary" },
+  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-pink" },
+  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-pink" },
+  { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue" },
+  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-pink" },
+  { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple" },
+  { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue" },
 ];
 
 export const Categories = () => {
@@ -68,25 +68,23 @@ export const Categories = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-6xl mx-auto"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
         >
           {categories.map((category) => {
             const Icon = category.icon;
-            const colSpan = category.size === "large" ? "md:col-span-2" : category.size === "medium" ? "md:col-span-2 lg:col-span-2" : "";
-            const rowSpan = category.size === "large" ? "md:row-span-2" : "";
             
             return (
               <motion.div
                 key={category.name}
                 variants={item}
-                className={`${colSpan} ${rowSpan}`}
+                className="w-full"
               >
                 <HoverTilt intensity={10} scale={1.03}>
                   <GlassmorphicCard
                     blur="sm"
                     opacity={0.05}
                     variant="light"
-                    className="h-full min-h-[160px] cursor-pointer overflow-hidden group"
+                    className="h-[200px] cursor-pointer overflow-hidden group"
                   >
                     <button
                       onClick={() => navigate('/explore')}
