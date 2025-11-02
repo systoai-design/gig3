@@ -40,19 +40,20 @@ export const Hero = () => {
             className="w-full h-full pointer-events-none"
             title="3D Background Animation"
             loading="lazy"
+            sandbox="allow-scripts"
             style={{ willChange: 'transform' }}
           />
         </div>
       )}
       
       {/* Gradient Mesh Overlay */}
-      <GradientMesh colors={['hsl(0, 99%, 59%)', 'hsl(280, 68%, 62%)', 'hsl(212, 100%, 48%)']} />
+      <GradientMesh colors={['hsl(0, 99%, 59%)', 'hsl(280, 68%, 62%)', 'hsl(212, 100%, 48%)']} className="opacity-30" />
       
       {/* Floating Shapes */}
-      <FloatingShapes count={6} className="opacity-30" />
+      <FloatingShapes count={6} className="opacity-20" />
       
       {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900/90"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/50 to-gray-900/70"></div>
       
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10 py-20 md:py-32">
