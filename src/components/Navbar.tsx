@@ -78,8 +78,8 @@ export const Navbar = () => {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
             {!isSeller && user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/become-seller')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
-                Become a Seller
+              <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
+                Become a Creator
               </Button>
             )}
             
@@ -108,7 +108,7 @@ export const Navbar = () => {
                     {isSeller && (
                       <>
                         <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
-                          Seller Dashboard
+                          Creator Dashboard
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/create-gig')}>
                           Create Gig
@@ -152,8 +152,8 @@ export const Navbar = () => {
                 Explore
               </a>
               {!isSeller && user && (
-                <a href="/become-seller" className="text-sm font-medium text-foreground hover:text-primary">
-                  Become a Seller
+                <a href="/become-creator" className="text-sm font-medium text-foreground hover:text-primary">
+                  Become a Creator
                 </a>
               )}
               {user ? (

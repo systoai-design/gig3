@@ -29,7 +29,7 @@ const SKILL_OPTIONS = [
   'Other',
 ];
 
-export default function BecomeSeller() {
+export default function BecomeCreator() {
   const { user } = useAuth();
   const { publicKey, connected } = useWallet();
   const navigate = useNavigate();
@@ -73,10 +73,10 @@ export default function BecomeSeller() {
 
       if (roleData.data || profileData.data) {
         setIsAlreadySeller(true);
-        toast.info('You are already a seller!');
+        toast.info('You are already a creator!');
       }
     } catch (error) {
-      console.error('Error checking seller role:', error);
+      console.error('Error checking creator role:', error);
     } finally {
       setCheckingRole(false);
     }
@@ -177,7 +177,7 @@ export default function BecomeSeller() {
 
       if (roleError) throw roleError;
 
-      toast.success('Congratulations! You are now a seller on GIG3!');
+      toast.success('Congratulations! You are now a creator on GIG3!');
       
       // Small delay to ensure database updates are complete
       setTimeout(() => {
@@ -211,19 +211,19 @@ export default function BecomeSeller() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle2 className="h-6 w-6 text-primary" />
-                You're Already a Seller!
+                You're Already a Creator!
               </CardTitle>
               <CardDescription>
-                You already have seller access on GIG3
+                You already have creator access on GIG3
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Head to your seller dashboard to create gigs and manage your orders.
+                Head to your creator dashboard to create gigs and manage your orders.
               </p>
               <div className="flex gap-4">
                 <Button onClick={() => navigate('/dashboard/seller')}>
-                  Go to Seller Dashboard
+                  Go to Creator Dashboard
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/create-gig')}>
                   Create a Gig
@@ -245,10 +245,10 @@ export default function BecomeSeller() {
       <section className="py-12 bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Start Earning on <span className="bg-gradient-primary bg-clip-text text-transparent">GIG3</span>
+            Join the Builder Economy on <span className="bg-gradient-primary bg-clip-text text-transparent">GIG3</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Join the future of freelancing - earn cryptocurrency by offering your services on Web3
+            Turn your skills into SOL - earn cryptocurrency by offering your services on Web3
           </p>
         </div>
       </section>
@@ -295,9 +295,9 @@ export default function BecomeSeller() {
           {/* Application Form */}
           <Card className="max-w-3xl mx-auto">
             <CardHeader>
-              <CardTitle>Seller Application</CardTitle>
+              <CardTitle>Creator Application</CardTitle>
               <CardDescription>
-                Complete your profile to start selling on GIG3
+                Complete your profile to start offering services on GIG3
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -400,7 +400,7 @@ export default function BecomeSeller() {
                     htmlFor="terms"
                     className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                   >
-                    I agree to the GIG3 seller terms and conditions
+                    I agree to the GIG3 creator terms and conditions
                   </label>
                 </div>
 
@@ -419,7 +419,7 @@ export default function BecomeSeller() {
                   ) : (
                     <>
                       <Zap className="mr-2 h-4 w-4" />
-                      Become a Seller
+                      Become a Creator
                     </>
                   )}
                 </Button>

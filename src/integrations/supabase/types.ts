@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      escrow_transactions: {
+        Row: {
+          amount_sol: number
+          approved_by: string | null
+          created_at: string | null
+          id: string
+          order_id: string
+          transaction_signature: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount_sol: number
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          order_id: string
+          transaction_signature?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount_sol?: number
+          approved_by?: string | null
+          created_at?: string | null
+          id?: string
+          order_id?: string
+          transaction_signature?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gigs: {
         Row: {
           category: string
@@ -110,6 +148,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          admin_notes: string | null
           amount_sol: number
           buyer_id: string
           completed_at: string | null
@@ -117,15 +156,19 @@ export type Database = {
           delivered_at: string | null
           disputed_at: string | null
           escrow_account: string | null
+          escrow_released: boolean | null
           gig_id: string
           id: string
           payment_confirmed_at: string | null
+          proof_description: string | null
+          proof_files: string[] | null
           seller_id: string
           status: Database["public"]["Enums"]["order_status"]
           transaction_signature: string | null
           updated_at: string
         }
         Insert: {
+          admin_notes?: string | null
           amount_sol: number
           buyer_id: string
           completed_at?: string | null
@@ -133,15 +176,19 @@ export type Database = {
           delivered_at?: string | null
           disputed_at?: string | null
           escrow_account?: string | null
+          escrow_released?: boolean | null
           gig_id: string
           id?: string
           payment_confirmed_at?: string | null
+          proof_description?: string | null
+          proof_files?: string[] | null
           seller_id: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null
           updated_at?: string
         }
         Update: {
+          admin_notes?: string | null
           amount_sol?: number
           buyer_id?: string
           completed_at?: string | null
@@ -149,9 +196,12 @@ export type Database = {
           delivered_at?: string | null
           disputed_at?: string | null
           escrow_account?: string | null
+          escrow_released?: boolean | null
           gig_id?: string
           id?: string
           payment_confirmed_at?: string | null
+          proof_description?: string | null
+          proof_files?: string[] | null
           seller_id?: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null
@@ -445,6 +495,9 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "disputed"
+        | "awaiting_proof"
+        | "proof_submitted"
+        | "approved_for_release"
       subscription_plan: "free" | "pro"
       subscription_status: "active" | "cancelled" | "expired" | "pending"
     }
@@ -583,6 +636,9 @@ export const Constants = {
         "completed",
         "cancelled",
         "disputed",
+        "awaiting_proof",
+        "proof_submitted",
+        "approved_for_release",
       ],
       subscription_plan: ["free", "pro"],
       subscription_status: ["active", "cancelled", "expired", "pending"],

@@ -48,11 +48,10 @@ serve(async (req) => {
         throw new Error('Seller wallet not configured');
       }
 
-      // Platform fee (5%)
-      const platformFee = orderData.amount * 0.05;
-      const sellerAmount = orderData.amount - platformFee;
-
-      // x402 payment instructions
+      // Updated escrow system - all funds go to escrow wallet
+      const escrowWallet = 'BBRKYbrTZc1toK1R7E4WeZWiiAhY4vNJSaW4Bd3uiPgR';
+      
+      // x402 payment instructions - payment goes to escrow
       const paymentInstructions = {
         protocol: 'x402',
         version: '1.0',
@@ -62,14 +61,9 @@ serve(async (req) => {
         amount: orderData.amount.toString(),
         recipients: [
           {
-            address: sellerWallet,
-            amount: sellerAmount.toString(),
-            label: 'Freelancer Payment'
-          },
-          {
-            address: Deno.env.get('PLATFORM_WALLET_ADDRESS') || '11111111111111111111111111111111',
-            amount: platformFee.toString(),
-            label: 'Platform Fee (5%)'
+            address: escrowWallet,
+            amount: orderData.amount.toString(),
+            label: 'GIG3 Escrow - Secure Payment Holding'
           }
         ],
         metadata: {
@@ -114,7 +108,7 @@ serve(async (req) => {
       );
     }
 
-    // Create order in database
+    // Create order in database with escrow tracking
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -122,8 +116,9 @@ serve(async (req) => {
         buyer_id: orderData.buyerId,
         seller_id: orderData.sellerId,
         amount_sol: orderData.amount,
-        status: 'pending',
+        status: 'in_progress',
         transaction_signature: paymentProof.signature,
+        escrow_account: 'BBRKYbrTZc1toK1R7E4WeZWiiAhY4vNJSaW4Bd3uiPgR',
       })
       .select()
       .single();
@@ -132,6 +127,16 @@ serve(async (req) => {
       console.error('Order creation error:', orderError);
       throw new Error('Failed to create order');
     }
+
+    // Log escrow transaction
+    await supabaseAdmin
+      .from('escrow_transactions')
+      .insert({
+        order_id: order.id,
+        amount_sol: orderData.amount,
+        transaction_type: 'deposit',
+        transaction_signature: paymentProof.signature,
+      });
 
     console.log('Order created successfully:', order.id);
 

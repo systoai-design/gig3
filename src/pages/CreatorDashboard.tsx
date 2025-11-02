@@ -14,7 +14,7 @@ import { ProSubscriptionBanner } from '@/components/ProSubscriptionBanner';
 import { ProBadge } from '@/components/ProBadge';
 import { useProStatus } from '@/hooks/useProStatus';
 
-export default function SellerDashboard() {
+export default function CreatorDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [gigs, setGigs] = useState<any[]>([]);
@@ -45,15 +45,15 @@ export default function SellerDashboard() {
       }
 
       if (!roleData) {
-        toast.error('You need to be a seller to access this page');
-        navigate('/become-seller');
+        toast.error('You need to be a creator to access this page');
+        navigate('/become-creator');
         return;
       }
 
       fetchDashboardData();
     } catch (error) {
-      console.error('Error checking seller role:', error);
-      toast.error('Failed to load seller dashboard');
+      console.error('Error checking creator role:', error);
+      toast.error('Failed to load creator dashboard');
       navigate('/');
     }
   };
@@ -131,7 +131,7 @@ export default function SellerDashboard() {
       <main className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-bold">Seller Dashboard</h1>
+            <h1 className="text-4xl font-bold">Creator Dashboard</h1>
             {proStatus?.isPro && (
               <ProBadge size="lg" proSince={proStatus.proSince} />
             )}
