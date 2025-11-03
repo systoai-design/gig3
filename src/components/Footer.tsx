@@ -95,7 +95,7 @@ export const Footer = () => {
 
         <div className="pt-8 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© 2025 GIG3. Built on Solana with ❤️</p>
+            <p className="text-sm text-muted-foreground">© 2025 GIG3. Built on Solana. Powered by x402 Protocol</p>
             <div className="flex flex-wrap justify-center gap-6">
               {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((text) => (
                 <Link key={text} to={`/${text.toLowerCase().replace(/ /g, '-')}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">
