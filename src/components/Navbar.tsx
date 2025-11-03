@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import gig3Logo from "@/assets/gig3_logo_transparent.png";
+import gig3LogoLight from "@/assets/gig3_logo_light.png";
 import gig3LogoDark from "@/assets/gig3_logo_dark.png";
 
 export const Navbar = () => {
@@ -78,7 +78,7 @@ export const Navbar = () => {
               transition={{ duration: 0.2 }}
             >
               <img 
-                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3Logo} 
+                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3LogoLight} 
                 alt="GIG3" 
                 className="h-8 w-auto transition-opacity duration-300" 
               />

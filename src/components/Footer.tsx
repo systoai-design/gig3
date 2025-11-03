@@ -3,8 +3,13 @@ import { Link } from "react-router-dom";
 import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
 import { motion } from "framer-motion";
 import { NoiseTexture } from "@/components/ui/noise-texture";
+import { useTheme } from "next-themes";
+import gig3LogoLight from "@/assets/gig3_logo_light.png";
+import gig3LogoDark from "@/assets/gig3_logo_dark.png";
 
 export const Footer = () => {
+  const { resolvedTheme } = useTheme();
+  
   const footerLinks = {
     platform: [
       { label: "About", href: "/about" },
@@ -34,7 +39,11 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-12">
           <div className="col-span-2 md:col-span-2">
             <Link to="/" className="inline-block mb-6">
-              <span className="text-4xl font-black gradient-text">GIG3</span>
+              <img 
+                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3LogoLight} 
+                alt="GIG3" 
+                className="h-12 w-auto transition-opacity duration-300" 
+              />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
               The decentralized freelance marketplace. Secure payments, transparent escrow, powered by Solana.
