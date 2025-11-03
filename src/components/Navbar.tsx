@@ -25,7 +25,7 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -78,7 +78,7 @@ export const Navbar = () => {
               transition={{ duration: 0.2 }}
             >
               <img 
-                src={theme === 'dark' ? gig3LogoDark : gig3Logo} 
+                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3Logo} 
                 alt="GIG3" 
                 className="h-8 w-auto transition-opacity duration-300" 
               />
