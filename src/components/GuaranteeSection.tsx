@@ -12,20 +12,20 @@ export const GuaranteeSection = () => {
           <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
             <div>
               <div className="mb-4">
-                <span className="text-2xl font-bold text-foreground">gig3.</span>
+                <span className="text-2xl font-bold text-gray-900">gig3.</span>
                 <span className="text-2xl font-bold text-primary">pro</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 High-quality work,<br />
                 or your <span className="font-black text-primary">money back</span>
               </h2>
-              <p className="text-foreground/80 text-lg mb-6 max-w-lg">
+              <p className="text-gray-700 text-lg mb-6 max-w-lg">
                 On GIG3 Pro, you can bring your vision to life risk-free. Every project with vetted Pro freelancers is backed by our money-back guarantee, so you can accomplish any high-stakes project with total confidence.
               </p>
               <Button
                 onClick={() => navigate('/explore')}
                 size="lg"
-                className="bg-foreground text-background hover:bg-foreground/90 font-semibold rounded-[35px]"
+                className="bg-gray-900 text-white hover:bg-gray-800 font-semibold rounded-[35px]"
               >
                 Try now
               </Button>
