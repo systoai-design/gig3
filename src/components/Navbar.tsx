@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import gig3LogoLight from "@/assets/gig3_logo_light.png";
-import gig3LogoDark from "@/assets/gig3_logo_dark.png";
+import gig3LogoDark from "@/assets/gig3_logo_dark_v2.png";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { NoiseTexture } from "@/components/ui/noise-texture";
 import { useTheme } from "next-themes";
 import gig3LogoLight from "@/assets/gig3_logo_light.png";
-import gig3LogoDark from "@/assets/gig3_logo_dark.png";
+import gig3LogoDark from "@/assets/gig3_logo_dark_v2.png";
 
 export const Footer = () => {
   const { resolvedTheme } = useTheme();
