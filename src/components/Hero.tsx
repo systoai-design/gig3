@@ -8,9 +8,11 @@ import { FloatingShapes } from "@/components/animations/FloatingShapes";
 import { MagneticButton } from "@/components/animations/MagneticButton";
 import { GradientMesh } from "@/components/ui/gradient-mesh";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [showSpline, setShowSpline] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -105,15 +107,15 @@ export const Hero = () => {
             className="max-w-3xl mx-auto mb-8"
           >
             <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2">
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center gap-3 px-4">
-                  <Search className="h-5 w-5 text-white/50" />
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 flex items-center gap-3 px-4 min-w-0">
+                  <Search className="h-5 w-5 text-white/50 flex-shrink-0" />
                   <input
                     type="text"
                     placeholder="What service are you looking for?"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
-                    className="flex-1 py-4 text-lg bg-transparent text-white placeholder:text-white/40 focus:outline-none"
+                    className="flex-1 py-4 text-base sm:text-lg bg-transparent text-white placeholder:text-white/40 focus:outline-none min-w-0"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         navigate('/explore');
@@ -123,9 +125,16 @@ export const Hero = () => {
                 </div>
                 <MagneticButton
                   onClick={() => navigate('/explore')}
-                  className="bg-gradient-to-r from-primary to-accent-pink hover:from-primary/90 hover:to-accent-pink/90 text-white px-8 py-4 rounded-3xl font-semibold text-lg shadow-lg"
+                  className="bg-gradient-to-r from-primary to-accent-pink hover:from-primary/90 hover:to-accent-pink/90 text-white px-6 sm:px-8 py-4 rounded-3xl font-semibold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
                 >
-                  Search
+                  {isMobile ? (
+                    <>
+                      <Search className="h-5 w-5" />
+                      <span>Search</span>
+                    </>
+                  ) : (
+                    "Search"
+                  )}
                 </MagneticButton>
               </div>
             </GlassmorphicCard>

@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { MarqueeCarousel } from "@/components/animations/MarqueeCarousel";
 import { HoverTilt } from "@/components/animations/HoverTilt";
 import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const services = [
   { 
@@ -40,6 +41,7 @@ const services = [
 
 export const PopularServices = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   return (
     <section className="py-20 bg-gradient-to-b from-background via-muted/30 to-background relative overflow-hidden">
@@ -70,60 +72,77 @@ export const PopularServices = () => {
         </motion.div>
       </div>
 
-      {/* Marquee Carousel */}
-      <MarqueeCarousel speed={40} pauseOnHover>
-        {services.map((service, index) => (
-          <div key={index} className="w-[380px]">
-            <HoverTilt intensity={8} scale={1.05}>
-              <button
-                onClick={() => navigate('/explore')}
-                className="w-full group relative overflow-hidden rounded-3xl"
-              >
-                <GlassmorphicCard
-                  blur="md"
-                  opacity={0.05}
-                  hover={false}
-                  className="h-[320px] overflow-hidden"
-                >
-                  {/* Image with overlay */}
-                  <div className="relative h-full">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                    />
-                    
-                    {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-60 group-hover:opacity-70 transition-opacity duration-300`}></div>
-                    
-                    {/* Content */}
-                    <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                      <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1, duration: 0.5 }}
-                      >
-                        <h3 className="text-white text-3xl font-bold mb-2 drop-shadow-lg">
-                          {service.title}
-                        </h3>
-                        <div className="flex items-center gap-2 text-white/90 font-medium">
-                          <span className="text-sm">Explore services</span>
-                          <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+      {/* Swipeable Carousel */}
+      <div className="container mx-auto px-4">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+            dragFree: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-4">
+            {services.map((service, index) => (
+              <CarouselItem key={index} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                <HoverTilt intensity={8} scale={1.05}>
+                  <button
+                    onClick={() => navigate('/explore')}
+                    className="w-full group relative overflow-hidden rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.7)] transition-shadow duration-500"
+                  >
+                    <GlassmorphicCard
+                      blur="md"
+                      opacity={0.05}
+                      hover={false}
+                      className="h-[320px] overflow-hidden"
+                    >
+                      {/* Image with overlay */}
+                      <div className="relative h-full">
+                        <img
+                          src={service.image}
+                          alt={service.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                        />
+                        
+                        {/* Gradient Overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-60 group-hover:opacity-70 transition-opacity duration-300`}></div>
+                        
+                        {/* Content */}
+                        <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                          <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1, duration: 0.5 }}
+                          >
+                            <h3 className="text-white text-3xl font-bold mb-2 drop-shadow-lg">
+                              {service.title}
+                            </h3>
+                            <div className="flex items-center gap-2 text-white/90 font-medium">
+                              <span className="text-sm">Explore services</span>
+                              <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform duration-300" />
+                            </div>
+                          </motion.div>
                         </div>
-                      </motion.div>
-                    </div>
 
-                    {/* Shine effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
-                  </div>
-                </GlassmorphicCard>
-              </button>
-            </HoverTilt>
-          </div>
-        ))}
-      </MarqueeCarousel>
+                        {/* Shine effect on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 -translate-x-full group-hover:translate-x-full transition-all duration-1000"></div>
+                      </div>
+                    </GlassmorphicCard>
+                  </button>
+                </HoverTilt>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          {!isMobile && (
+            <>
+              <CarouselPrevious className="left-0 -translate-x-12" />
+              <CarouselNext className="right-0 translate-x-12" />
+            </>
+          )}
+        </Carousel>
+      </div>
     </section>
   );
 };
