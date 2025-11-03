@@ -6,7 +6,7 @@ export const PromoBanner = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-16 bg-muted">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="bg-gradient-to-br from-primary to-accent rounded-[35px] overflow-hidden shadow-2xl">
           <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
