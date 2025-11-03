@@ -9,6 +9,7 @@ import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import { AuthDialog } from "@/components/AuthDialog";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import gig3Logo from "@/assets/gig3_logo_transparent.png";
+import gig3LogoDark from "@/assets/gig3_logo_dark.png";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,6 +25,7 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
+  const { theme } = useTheme();
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -74,7 +77,11 @@ export const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <img src={gig3Logo} alt="GIG3" className="h-8 w-auto" />
+              <img 
+                src={theme === 'dark' ? gig3LogoDark : gig3Logo} 
+                alt="GIG3" 
+                className="h-8 w-auto transition-opacity duration-300" 
+              />
             </motion.a>
             
             {/* Desktop Navigation */}
