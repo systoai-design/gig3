@@ -20,7 +20,7 @@ export const PromoBanner = () => {
               <Button
                 onClick={() => navigate('/explore')}
                 size="lg"
-                className="bg-white text-foreground hover:bg-white/90 font-semibold rounded-[35px]"
+                className="bg-white text-gray-900 hover:bg-white/90 font-semibold rounded-[35px]"
               >
                 Find an expert
               </Button>
