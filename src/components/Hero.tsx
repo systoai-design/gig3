@@ -83,7 +83,7 @@ export const Hero = () => {
           {/* Massive Typography */}
           <div className="mb-12">
             <TextReveal className="text-display-xl text-white mb-4" delay={0.2}>
-              Our Creators
+              Our Freelancers
             </TextReveal>
             <TextReveal className="text-display-lg text-white/90 font-light" delay={0.4}>
               Will Take It From Here
