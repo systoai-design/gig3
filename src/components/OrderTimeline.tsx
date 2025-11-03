@@ -8,12 +8,13 @@ interface TimelineEvent {
 }
 
 interface OrderTimelineProps {
-  currentStatus: 'pending' | 'in_progress' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
+  currentStatus: 'pending' | 'in_progress' | 'proof_submitted' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
   paymentConfirmedAt?: string | null;
   deliveredAt?: string | null;
   completedAt?: string | null;
   disputedAt?: string | null;
   createdAt: string;
+  proofSubmittedAt?: string | null;
 }
 
 export function OrderTimeline({
@@ -23,6 +24,7 @@ export function OrderTimeline({
   completedAt,
   disputedAt,
   createdAt,
+  proofSubmittedAt,
 }: OrderTimelineProps) {
   const events: TimelineEvent[] = [
     {
@@ -34,6 +36,11 @@ export function OrderTimeline({
       status: 'in_progress',
       timestamp: paymentConfirmedAt,
       label: 'Payment Confirmed',
+    },
+    {
+      status: 'proof_submitted',
+      timestamp: proofSubmittedAt,
+      label: 'Proof Submitted',
     },
     {
       status: 'delivered',
@@ -48,7 +55,7 @@ export function OrderTimeline({
   ];
 
   const getStatusIndex = (status: string) => {
-    const statusOrder = ['pending', 'in_progress', 'delivered', 'completed', 'disputed'];
+    const statusOrder = ['pending', 'in_progress', 'proof_submitted', 'delivered', 'completed', 'disputed'];
     return statusOrder.indexOf(status);
   };
 

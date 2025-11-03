@@ -153,15 +153,22 @@ export type Database = {
           buyer_id: string
           completed_at: string | null
           created_at: string
+          deadline_notified: boolean | null
           delivered_at: string | null
+          dispute_resolved_at: string | null
           disputed_at: string | null
           escrow_account: string | null
           escrow_released: boolean | null
+          expected_delivery_date: string | null
           gig_id: string
           id: string
           payment_confirmed_at: string | null
+          platform_fee_sol: number | null
           proof_description: string | null
           proof_files: string[] | null
+          refund_amount_sol: number | null
+          revision_notes: string | null
+          revision_requested: boolean | null
           seller_id: string
           status: Database["public"]["Enums"]["order_status"]
           transaction_signature: string | null
@@ -173,15 +180,22 @@ export type Database = {
           buyer_id: string
           completed_at?: string | null
           created_at?: string
+          deadline_notified?: boolean | null
           delivered_at?: string | null
+          dispute_resolved_at?: string | null
           disputed_at?: string | null
           escrow_account?: string | null
           escrow_released?: boolean | null
+          expected_delivery_date?: string | null
           gig_id: string
           id?: string
           payment_confirmed_at?: string | null
+          platform_fee_sol?: number | null
           proof_description?: string | null
           proof_files?: string[] | null
+          refund_amount_sol?: number | null
+          revision_notes?: string | null
+          revision_requested?: boolean | null
           seller_id: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null
@@ -193,15 +207,22 @@ export type Database = {
           buyer_id?: string
           completed_at?: string | null
           created_at?: string
+          deadline_notified?: boolean | null
           delivered_at?: string | null
+          dispute_resolved_at?: string | null
           disputed_at?: string | null
           escrow_account?: string | null
           escrow_released?: boolean | null
+          expected_delivery_date?: string | null
           gig_id?: string
           id?: string
           payment_confirmed_at?: string | null
+          platform_fee_sol?: number | null
           proof_description?: string | null
           proof_files?: string[] | null
+          refund_amount_sol?: number | null
+          revision_notes?: string | null
+          revision_requested?: boolean | null
           seller_id?: string
           status?: Database["public"]["Enums"]["order_status"]
           transaction_signature?: string | null

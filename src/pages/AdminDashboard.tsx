@@ -239,6 +239,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="disputes" className="space-y-4">
           <TabsList>
             <TabsTrigger value="disputes">Disputes ({disputes.length})</TabsTrigger>
+            <TabsTrigger value="escrow">Escrow Management</TabsTrigger>
             <TabsTrigger value="gigs">Gigs Management</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
@@ -300,6 +301,20 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="escrow">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pending Escrow Releases</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Orders with proof_submitted status will appear here for admin review.
+                  Admins can manually release escrow or request changes.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

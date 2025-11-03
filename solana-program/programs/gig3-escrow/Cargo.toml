@@ -1,0 +1,19 @@
+[package]
+name = "gig3-escrow"
+version = "0.1.0"
+description = "GIG3 Escrow Program for secure freelance payments"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "gig3_escrow"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.29.0"

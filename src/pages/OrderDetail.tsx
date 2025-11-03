@@ -12,6 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageList } from '@/components/MessageList';
 import { ReviewDialog } from '@/components/ReviewDialog';
 import { OrderTimeline } from '@/components/OrderTimeline';
+import { ProofUpload } from '@/components/ProofUpload';
+import { ProofReview } from '@/components/ProofReview';
 import { toast } from 'sonner';
 import { ArrowLeft, ExternalLink, MessageSquare, Clock as ClockIcon } from 'lucide-react';
 
@@ -21,13 +23,18 @@ interface Order {
   buyer_id: string;
   seller_id: string;
   amount_sol: number;
-  status: 'pending' | 'in_progress' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
+  status: 'pending' | 'in_progress' | 'proof_submitted' | 'delivered' | 'completed' | 'cancelled' | 'disputed';
   transaction_signature: string | null;
   created_at: string;
   payment_confirmed_at?: string | null;
   delivered_at?: string | null;
   completed_at?: string | null;
   disputed_at?: string | null;
+  proof_description?: string | null;
+  proof_files?: string[];
+  revision_requested?: boolean;
+  revision_notes?: string | null;
+  expected_delivery_date?: string | null;
   gig: {
     id: string;
     title: string;
@@ -115,19 +122,54 @@ export default function OrderDetail() {
     }
   };
 
-  const handleStatusUpdate = async (newStatus: 'delivered' | 'completed' | 'disputed') => {
+  const handleApproveDelivery = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-delivery', {
+        body: { orderId: id }
+      });
+
+      if (error) throw error;
+
+      toast.success('Delivery approved! Escrow released to seller.');
+      fetchOrder();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to approve delivery');
+    }
+  };
+
+  const handleRequestRevision = async (notes: string) => {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: newStatus })
+        .update({ 
+          revision_requested: true,
+          revision_notes: notes,
+          status: 'in_progress'
+        })
         .eq('id', id);
 
       if (error) throw error;
 
-      toast.success(`Order marked as ${newStatus}`);
+      toast.success('Revision requested');
       fetchOrder();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update order status');
+      toast.error(error.message || 'Failed to request revision');
+    }
+  };
+
+  const handleDispute = async () => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'disputed' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Dispute filed. Admin will review.');
+      fetchOrder();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to file dispute');
     }
   };
 
@@ -135,6 +177,7 @@ export default function OrderDetail() {
     switch (status) {
       case 'pending': return 'default';
       case 'in_progress': return 'secondary';
+      case 'proof_submitted': return 'outline';
       case 'delivered': return 'outline';
       case 'completed': return 'default';
       case 'cancelled': return 'destructive';
@@ -258,6 +301,35 @@ export default function OrderDetail() {
               </CardContent>
             </Card>
 
+            {/* Proof Upload/Review Section */}
+            {isSeller && order.status === 'in_progress' && !order.revision_requested && (
+              <ProofUpload orderId={order.id} onSuccess={fetchOrder} />
+            )}
+
+            {order.revision_requested && isSeller && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-destructive">Revision Requested</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {order.revision_notes}
+                  </p>
+                  <ProofUpload orderId={order.id} onSuccess={fetchOrder} />
+                </CardContent>
+              </Card>
+            )}
+
+            {isBuyer && order.status === 'proof_submitted' && order.proof_description && (
+              <ProofReview
+                proofDescription={order.proof_description}
+                proofFiles={order.proof_files || []}
+                onApprove={handleApproveDelivery}
+                onRequestRevision={handleRequestRevision}
+                onDispute={handleDispute}
+              />
+            )}
+
             {/* Messaging Section */}
             <Card>
               <Tabs defaultValue="messages" className="w-full">
@@ -284,33 +356,14 @@ export default function OrderDetail() {
                 <CardTitle>Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {/* Seller Actions */}
-                {isSeller && order.status === 'in_progress' && (
-                  <Button 
-                    className="w-full"
-                    onClick={() => handleStatusUpdate('delivered')}
-                  >
-                    Mark as Delivered
-                  </Button>
-                )}
-
-                {/* Buyer Actions */}
-                {isBuyer && order.status === 'delivered' && (
-                  <>
-                    <Button 
-                      className="w-full"
-                      onClick={() => handleStatusUpdate('completed')}
-                    >
-                      Approve Delivery
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      className="w-full"
-                      onClick={() => handleStatusUpdate('disputed')}
-                    >
-                      Request Refund
-                    </Button>
-                  </>
+                {/* Expected Delivery Date */}
+                {order.expected_delivery_date && order.status === 'in_progress' && (
+                  <div className="pb-4 mb-4 border-b">
+                    <p className="text-sm text-muted-foreground">Expected Delivery</p>
+                    <p className="font-medium">
+                      {new Date(order.expected_delivery_date).toLocaleDateString()}
+                    </p>
+                  </div>
                 )}
 
                 {/* Review Button for Completed Orders */}
