@@ -142,30 +142,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 0 0% 0%;
+    --background: 0 0% 3%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 8%;
+    --card: 0 0% 6%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 8%;
+    --popover: 0 0% 6%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 99% 59%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 20%;
+    --secondary: 0 5% 12%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 20%;
+    --muted: 0 0% 12%;
     --muted-foreground: 0 0% 64%;
     --accent: 0 100% 69%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 0 10% 15%;
+    --input: 0 5% 15%;
     --ring: 0 99% 59%;
     --chart-1: 0 99% 59%;
     --chart-2: 0 68% 46%;
     --chart-3: 0 100% 69%;
     --chart-4: 0 0% 20%;
     --chart-5: 0 0% 8%;
+    
+    /* Dark mode specific - mysterious with red tints */
+    --card-accent: 0 20% 8%;
+    --shadow-glow: 0 0 60px hsl(var(--primary) / 0.3);
   }
 }
 
@@ -181,6 +185,7 @@ All colors MUST be HSL.
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   /* Card hover effects */
@@ -192,6 +197,12 @@ All colors MUST be HSL.
   .card-hover:hover {
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 12px 32px hsl(0 0% 0% / 0.12);
+  }
+  
+  /* Dark mode card glow */
+  .dark .card-hover:hover {
+    box-shadow: 0 12px 32px hsl(var(--primary) / 0.15),
+                0 0 30px hsl(var(--primary) / 0.1);
   }
 }
 
@@ -237,6 +248,12 @@ All colors MUST be HSL.
   transform: translateY(-12px) scale(1.02);
   box-shadow: 0 20px 60px rgba(254, 48, 48, 0.2),
               0 0 0 1px rgba(254, 48, 48, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 20px 60px rgba(254, 48, 48, 0.3),
+              0 0 40px rgba(254, 48, 48, 0.2),
+              0 0 0 1px rgba(254, 48, 48, 0.15);
 }
 
 /* Gradient borders */

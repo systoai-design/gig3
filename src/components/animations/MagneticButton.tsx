@@ -12,13 +12,13 @@ export const MagneticButton = ({
   children, 
   className = '', 
   onClick,
-  strength = 0.3 
+  strength = 0.4 
 }: MagneticButtonProps) => {
   const ref = useRef<HTMLButtonElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const springConfig = { damping: 20, stiffness: 300 };
+  const springConfig = { damping: 15, stiffness: 200 };
   const xSpring = useSpring(x, springConfig);
   const ySpring = useSpring(y, springConfig);
 
@@ -48,11 +48,18 @@ export const MagneticButton = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className={className}
+      className={`relative overflow-hidden ${className}`}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
-      {children}
+      <motion.div
+        className="absolute inset-0 bg-white/20 rounded-full"
+        initial={{ scale: 0, opacity: 0 }}
+        whileHover={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      />
+      <span className="relative z-10">{children}</span>
     </motion.button>
   );
 };

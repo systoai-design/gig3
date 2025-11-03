@@ -7,6 +7,8 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { supabase } from "@/integrations/supabase/client";
 import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import { AuthDialog } from "@/components/AuthDialog";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +26,19 @@ export const Navbar = () => {
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
+
+  // Scroll-based navbar styling
+  const { scrollY } = useScroll();
+  const navbarBg = useTransform(
+    scrollY,
+    [0, 100],
+    ['rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0.95)']
+  );
+  const navbarBgDark = useTransform(
+    scrollY,
+    [0, 100],
+    ['rgba(5, 5, 5, 0.8)', 'rgba(5, 5, 5, 0.95)']
+  );
 
   useEffect(() => {
     const checkSellerRole = async () => {
@@ -46,19 +61,27 @@ export const Navbar = () => {
   }, [user]);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-gray-950 shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <motion.nav 
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl backdrop-blur-xl rounded-full shadow-lg border border-border/50 dark:shadow-primary/10"
+    >
+      <div className="container mx-auto px-6 relative bg-background/80 dark:bg-card/80 rounded-full transition-colors duration-300">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <div className="flex items-center space-x-8">
-            <a href="/" className="flex items-center hover:opacity-80 transition-opacity">
-              <img src={gig3Logo} alt="GIG3" className="h-10 w-auto" />
-            </a>
+            <motion.a 
+              href="/" 
+              className="flex items-center"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <img src={gig3Logo} alt="GIG3" className="h-8 w-auto" />
+            </motion.a>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-6">
-              <a href="/explore" className="text-base text-gray-700 dark:text-gray-300 hover:text-primary font-medium transition-colors">
+              <a href="/explore" className="relative group text-sm text-foreground font-medium transition-colors">
                 Explore
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
               </a>
             </div>
           </div>
@@ -77,8 +100,10 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
+            
             {!isSeller && user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="text-gray-700 dark:text-gray-300 hover:text-primary">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="hover:text-primary">
                 Become a Creator
               </Button>
             )}
@@ -179,6 +204,6 @@ export const Navbar = () => {
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen}
       />
-    </nav>
+    </motion.nav>
   );
 };

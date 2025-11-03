@@ -26,17 +26,17 @@ export const GlassmorphicCard = ({
   hover = true
 }: GlassmorphicCardProps) => {
   const baseClass = variant === 'light' 
-    ? 'bg-white/[var(--opacity)] border-white/20' 
-    : 'bg-black/[var(--opacity)] border-white/10';
+    ? 'bg-white/[var(--opacity)] border-white/20 dark:bg-white/[calc(var(--opacity)*0.5)] dark:border-primary/20' 
+    : 'bg-black/[var(--opacity)] border-white/10 dark:border-primary/10';
 
   return (
     <motion.div
       style={{ '--opacity': opacity } as React.CSSProperties}
-      className={`${baseClass} ${blurValues[blur]} rounded-3xl border ${className}`}
+      className={`${baseClass} ${blurValues[blur]} rounded-3xl border transition-all duration-500 ${className}`}
       {...(hover && {
         whileHover: { 
           scale: 1.02,
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)'
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
         },
         transition: { duration: 0.3 }
       })}

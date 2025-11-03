@@ -28,10 +28,20 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[800px] flex items-center justify-center overflow-hidden bg-gray-900 will-change-transform">
-      {/* Enhanced 3D Background */}
+    <section className="relative min-h-[600px] md:min-h-[800px] flex items-center justify-center overflow-hidden bg-gray-900 dark:bg-black will-change-transform">
+      {/* Multi-layer Parallax Background - Slowest */}
       {showSpline && (
-        <div className="absolute inset-0 w-full h-full" style={{ contain: 'layout paint', transform: 'translateZ(0)' }}>
+        <motion.div 
+          className="absolute inset-0 w-full h-full" 
+          style={{ 
+            contain: 'layout paint', 
+            transform: 'translateZ(0)',
+            y: -20
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
           <iframe 
             src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
             frameBorder="0" 
@@ -43,17 +53,27 @@ export const Hero = () => {
             sandbox="allow-scripts"
             style={{ willChange: 'transform' }}
           />
-        </div>
+        </motion.div>
       )}
       
-      {/* Gradient Mesh Overlay */}
-      <GradientMesh colors={['hsl(0, 99%, 59%)', 'hsl(280, 68%, 62%)', 'hsl(212, 100%, 48%)']} className="opacity-30" />
+      {/* Mid-ground: Gradient Mesh - Medium Speed */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ y: -10 }}
+      >
+        <GradientMesh colors={['hsl(0, 99%, 59%)', 'hsl(280, 68%, 62%)', 'hsl(212, 100%, 48%)']} className="opacity-30 dark:opacity-20" />
+      </motion.div>
       
-      {/* Floating Shapes */}
-      <FloatingShapes count={6} className="opacity-20" />
+      {/* Mid-ground: Floating Shapes - Medium Speed */}
+      <motion.div
+        className="absolute inset-0"
+        style={{ y: -15 }}
+      >
+        <FloatingShapes count={6} className="opacity-20 dark:opacity-10" />
+      </motion.div>
       
       {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/50 to-gray-900/70"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/50 to-gray-900/70 dark:from-black/80 dark:via-black/70 dark:to-black/90"></div>
       
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10 py-20 md:py-32">

@@ -9,10 +9,12 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { ParallaxSection } from "@/components/animations/ParallaxSection";
+import { ScrollProgressBar } from "@/components/animations/ScrollProgressBar";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <ScrollProgressBar />
       <Navbar />
       <Hero />
       

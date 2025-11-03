@@ -79,12 +79,12 @@ export const Categories = () => {
                 variants={item}
                 className="w-full"
               >
-                <HoverTilt intensity={10} scale={1.03}>
+                 <HoverTilt intensity={10} scale={1.03}>
                   <GlassmorphicCard
                     blur="sm"
                     opacity={0.05}
                     variant="light"
-                    className="h-[200px] cursor-pointer overflow-hidden group"
+                    className="h-[200px] cursor-pointer overflow-hidden group relative border-2 hover:border-primary/30 dark:hover:border-primary/50 transition-all duration-500"
                   >
                     <button
                       onClick={() => navigate('/explore')}
@@ -96,9 +96,9 @@ export const Categories = () => {
                       {/* Icon */}
                       <div className="relative">
                         <motion.div
-                          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-                          transition={{ duration: 0.5 }}
-                          className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg`}
+                          whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 300 }}
+                          className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}
                         >
                           <Icon className="w-full h-full text-white" />
                         </motion.div>
