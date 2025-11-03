@@ -39,11 +39,18 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-12">
           <div className="col-span-2 md:col-span-2">
             <Link to="/" className="inline-block mb-6">
-              <img 
-                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3LogoLight} 
-                alt="GIG3" 
-                className="h-12 w-auto transition-opacity duration-300" 
-              />
+              <picture>
+                <img 
+                  src={gig3LogoLight}
+                  alt="GIG3 logo light"
+                  className="h-12 w-auto transition-opacity duration-300 dark:hidden" 
+                />
+                <img 
+                  src={gig3LogoDark}
+                  alt="GIG3 logo dark"
+                  className="h-12 w-auto transition-opacity duration-300 hidden dark:block" 
+                />
+              </picture>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mb-6">
               The decentralized freelance marketplace. Secure payments, transparent escrow, powered by Solana.
