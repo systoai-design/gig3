@@ -77,11 +77,18 @@ export const Navbar = () => {
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.2 }}
             >
-              <img 
-                src={resolvedTheme === 'dark' ? gig3LogoDark : gig3LogoLight} 
-                alt="GIG3" 
-                className="h-8 w-auto transition-opacity duration-300" 
-              />
+              <picture>
+                <img 
+                  src={gig3LogoLight}
+                  alt="GIG3 logo light"
+                  className="h-8 w-auto transition-opacity duration-300 dark:hidden" 
+                />
+                <img 
+                  src={gig3LogoDark}
+                  alt="GIG3 logo dark"
+                  className="h-8 w-auto transition-opacity duration-300 hidden dark:block" 
+                />
+              </picture>
             </motion.a>
             
             {/* Desktop Navigation */}
