@@ -6,7 +6,7 @@ export const GuaranteeSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-16 bg-muted">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="bg-gradient-to-br from-amber-100 to-yellow-50 rounded-[35px] overflow-hidden shadow-xl border border-amber-200">
           <div className="grid md:grid-cols-2 gap-8 items-center p-8 md:p-12">
