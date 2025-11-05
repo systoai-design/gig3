@@ -51,7 +51,7 @@ export default function Explore() {
         .select(`
           *,
           profiles:seller_id (username, avatar_url),
-          seller_profiles!inner (pro_member, pro_since)
+          seller_profiles (pro_member, pro_since)
         `)
         .eq('status', 'active');
 
