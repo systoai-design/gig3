@@ -170,8 +170,12 @@ Deno.serve(async (req) => {
     // Wallet not found and not signup request
     console.log('Wallet not registered, rejecting login attempt');
     return new Response(
-      JSON.stringify({ error: 'Wallet not registered. Please sign up first.' }), 
-      { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ 
+        error: 'Wallet not registered. Please sign up first.',
+        registered: false,
+        walletAddress: walletAddress
+      }), 
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
     
   } catch (error) {
