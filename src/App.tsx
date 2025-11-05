@@ -19,6 +19,8 @@ import OrderDetail from "./pages/OrderDetail";
 import BecomeSeller from "./pages/BecomeCreator";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Cart from "./pages/Cart";
+import Favorites from "./pages/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +37,8 @@ const App = () => (
               <Route path="/explore" element={<Explore />} />
               <Route path="/gig/:id" element={<GigDetail />} />
               <Route path="/profile/:userId" element={<Profile />} />
+              <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/become-creator" element={<ProtectedRoute><BecomeSeller /></ProtectedRoute>} />
               <Route path="/become-seller" element={<ProtectedRoute><BecomeSeller /></ProtectedRoute>} />

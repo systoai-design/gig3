@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      cart_items: {
+        Row: {
+          created_at: string | null
+          gig_id: string
+          id: string
+          package_index: number | null
+          quantity: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          gig_id: string
+          id?: string
+          package_index?: number | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          gig_id?: string
+          id?: string
+          package_index?: number | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_gig_id_fkey"
+            columns: ["gig_id"]
+            isOneToOne: false
+            referencedRelation: "gigs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       escrow_transactions: {
         Row: {
           amount_sol: number
@@ -52,6 +97,42 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          created_at: string | null
+          gig_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          gig_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          gig_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_gig_id_fkey"
+            columns: ["gig_id"]
+            isOneToOne: false
+            referencedRelation: "gigs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gigs: {
         Row: {
           category: string
@@ -62,12 +143,14 @@ export type Database = {
           id: string
           images: string[] | null
           is_pro_only: boolean | null
+          order_count: number | null
           packages: Json | null
           price_sol: number
           seller_id: string
           status: Database["public"]["Enums"]["gig_status"]
           title: string
           updated_at: string
+          view_count: number | null
         }
         Insert: {
           category: string
@@ -78,12 +161,14 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_pro_only?: boolean | null
+          order_count?: number | null
           packages?: Json | null
           price_sol: number
           seller_id: string
           status?: Database["public"]["Enums"]["gig_status"]
           title: string
           updated_at?: string
+          view_count?: number | null
         }
         Update: {
           category?: string
@@ -94,12 +179,14 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_pro_only?: boolean | null
+          order_count?: number | null
           packages?: Json | null
           price_sol?: number
           seller_id?: string
           status?: Database["public"]["Enums"]["gig_status"]
           title?: string
           updated_at?: string
+          view_count?: number | null
         }
         Relationships: [
           {
@@ -113,6 +200,7 @@ export type Database = {
       }
       messages: {
         Row: {
+          attachments: string[] | null
           content: string
           created_at: string
           id: string
@@ -121,6 +209,7 @@ export type Database = {
           sender_id: string
         }
         Insert: {
+          attachments?: string[] | null
           content: string
           created_at?: string
           id?: string
@@ -129,6 +218,7 @@ export type Database = {
           sender_id: string
         }
         Update: {
+          attachments?: string[] | null
           content?: string
           created_at?: string
           id?: string

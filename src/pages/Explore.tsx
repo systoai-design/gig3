@@ -12,9 +12,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Star, Clock, ShoppingCart, CheckCircle2 } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Search, Star, Clock, ShoppingCart, CheckCircle2, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ProBadge } from '@/components/ProBadge';
+import { useCart } from '@/hooks/useCart';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const CATEGORIES = [
   'Web Development',
@@ -28,6 +31,8 @@ const CATEGORIES = [
   'Other'
 ];
 
+const DELIVERY_OPTIONS = [1, 3, 7, 14, 30];
+
 export default function Explore() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,6 +44,12 @@ export default function Explore() {
   );
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [proOnly, setProOnly] = useState(searchParams.get('pro') === 'true');
+  const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
+  const [selectedDeliveryDays, setSelectedDeliveryDays] = useState<number[]>([]);
+  const [minRating, setMinRating] = useState<number>(0);
+  
+  const { addToCart } = useCart();
+  const { toggleFavorite, isFavorited } = useFavorites();
 
   // Update search query when URL params change
   useEffect(() => {
@@ -50,7 +61,7 @@ export default function Explore() {
 
   useEffect(() => {
     fetchGigs();
-  }, [searchQuery, selectedCategories, sortBy, proOnly]);
+  }, [searchQuery, selectedCategories, sortBy, proOnly, priceRange, selectedDeliveryDays, minRating]);
 
   const fetchGigs = async () => {
     setLoading(true);
@@ -60,7 +71,7 @@ export default function Explore() {
         .select(`
           *,
           profiles:seller_id (username, avatar_url),
-          seller_profiles (pro_member, pro_since)
+          seller_profiles!inner (pro_member, pro_since)
         `)
         .eq('status', 'active');
 
@@ -79,6 +90,14 @@ export default function Explore() {
         query = query.in('category', selectedCategories);
       }
 
+      // Price range filter
+      query = query.gte('price_sol', priceRange[0]).lte('price_sol', priceRange[1]);
+
+      // Delivery days filter
+      if (selectedDeliveryDays.length > 0) {
+        query = query.in('delivery_days', selectedDeliveryDays);
+      }
+
       // Sorting
       switch (sortBy) {
         case 'newest':
@@ -93,12 +112,57 @@ export default function Explore() {
         case 'delivery':
           query = query.order('delivery_days', { ascending: true });
           break;
+        case 'popular':
+          query = query.order('order_count', { ascending: false });
+          break;
+        case 'best-selling':
+          query = query.order('view_count', { ascending: false });
+          break;
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      setGigs(data || []);
+
+      // Fetch reviews for rating filter
+      if (minRating > 0 && data) {
+        const gigsWithReviews = await Promise.all(
+          data.map(async (gig) => {
+            const { data: reviews } = await supabase
+              .from('reviews')
+              .select('rating')
+              .eq('reviewee_id', gig.seller_id);
+
+            const avgRating = reviews && reviews.length > 0
+              ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+              : 0;
+
+            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0 };
+          })
+        );
+
+        const filtered = gigsWithReviews.filter((gig) => gig.avg_rating >= minRating);
+        setGigs(filtered);
+      } else if (data) {
+        // Fetch review counts without filtering
+        const gigsWithReviews = await Promise.all(
+          data.map(async (gig) => {
+            const { data: reviews } = await supabase
+              .from('reviews')
+              .select('rating')
+              .eq('reviewee_id', gig.seller_id);
+
+            const avgRating = reviews && reviews.length > 0
+              ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+              : 0;
+
+            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0 };
+          })
+        );
+        setGigs(gigsWithReviews);
+      } else {
+        setGigs([]);
+      }
     } catch (error: any) {
       console.error('Error fetching gigs:', error);
     } finally {
@@ -119,6 +183,14 @@ export default function Explore() {
     );
   };
 
+  const toggleDeliveryDay = (days: number) => {
+    setSelectedDeliveryDays(prev =>
+      prev.includes(days)
+        ? prev.filter(d => d !== days)
+        : [...prev, days]
+    );
+  };
+
   const updateURLParams = () => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
@@ -131,6 +203,16 @@ export default function Explore() {
   useEffect(() => {
     updateURLParams();
   }, [selectedCategories, sortBy, proOnly]);
+
+  const handleAddToCart = (gigId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart(gigId);
+  };
+
+  const handleToggleFavorite = (gigId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(gigId);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,6 +227,8 @@ export default function Explore() {
           <div className="space-y-6">
             <div>
               <h3 className="font-semibold mb-3">Filters</h3>
+              
+              {/* Pro Only */}
               <div className="space-y-3 mb-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -157,8 +241,62 @@ export default function Explore() {
                   </Label>
                 </div>
               </div>
+
+              {/* Price Range */}
+              <div className="mb-6">
+                <Label className="text-sm font-semibold mb-2 block">Price Range (SOL)</Label>
+                <Slider
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={priceRange}
+                  onValueChange={setPriceRange}
+                  className="mb-2"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{priceRange[0]} SOL</span>
+                  <span>{priceRange[1]} SOL</span>
+                </div>
+              </div>
+
+              {/* Delivery Time */}
+              <div className="mb-6">
+                <Label className="text-sm font-semibold mb-2 block">Delivery Time</Label>
+                <div className="space-y-2">
+                  {DELIVERY_OPTIONS.map(days => (
+                    <div key={days} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`delivery-${days}`}
+                        checked={selectedDeliveryDays.includes(days)}
+                        onCheckedChange={() => toggleDeliveryDay(days)}
+                      />
+                      <Label htmlFor={`delivery-${days}`} className="text-sm cursor-pointer">
+                        {days} {days === 1 ? 'day' : 'days'}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Minimum Rating */}
+              <div className="mb-6">
+                <Label className="text-sm font-semibold mb-2 block">Minimum Rating</Label>
+                <Select value={minRating.toString()} onValueChange={(value) => setMinRating(Number(value))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">All Ratings</SelectItem>
+                    <SelectItem value="3">3+ Stars</SelectItem>
+                    <SelectItem value="4">4+ Stars</SelectItem>
+                    <SelectItem value="4.5">4.5+ Stars</SelectItem>
+                    <SelectItem value="5">5 Stars Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
+            {/* Categories */}
             <div>
               <h3 className="font-semibold mb-3">Categories</h3>
               <div className="space-y-2">
@@ -185,9 +323,12 @@ export default function Explore() {
                 setSearchQuery('');
                 setSortBy('newest');
                 setProOnly(false);
+                setPriceRange([0, 100]);
+                setSelectedDeliveryDays([]);
+                setMinRating(0);
               }}
             >
-              Clear Filters
+              Clear All Filters
             </Button>
           </div>
 
@@ -216,6 +357,8 @@ export default function Explore() {
                   <SelectItem value="price-low">Price: Low to High</SelectItem>
                   <SelectItem value="price-high">Price: High to Low</SelectItem>
                   <SelectItem value="delivery">Fastest Delivery</SelectItem>
+                  <SelectItem value="popular">Most Popular</SelectItem>
+                  <SelectItem value="best-selling">Best Selling</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -229,7 +372,7 @@ export default function Explore() {
             {loading ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <Skeleton key={i} className="h-80" />
+                  <Skeleton key={i} className="h-96" />
                 ))}
               </div>
             ) : gigs.length === 0 ? (
@@ -238,102 +381,112 @@ export default function Explore() {
                 <Button onClick={() => {
                   setSelectedCategories([]);
                   setSearchQuery('');
+                  setPriceRange([0, 100]);
+                  setSelectedDeliveryDays([]);
+                  setMinRating(0);
                 }}>
                   Clear Filters
                 </Button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gigs.map((gig) => (
-                  <Card
-                    key={gig.id}
-                    className="overflow-hidden hover:shadow-xl transition-all cursor-pointer group border border-border/50"
-                    onClick={() => navigate(`/gigs/${gig.id}`)}
-                  >
-                    {/* Image Section - Larger, more prominent */}
-                    <div className="relative h-56 overflow-hidden bg-muted">
-                      <img
-                        src={gig.images?.[0] || '/placeholder.svg'}
-                        alt={gig.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      {gig.seller_profiles?.pro_member && (
-                        <div className="absolute top-3 left-3">
-                          <ProBadge size="sm" proSince={gig.seller_profiles.pro_since} />
-                        </div>
-                      )}
-                      <Badge className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm text-foreground border-0">
-                        {gig.category}
-                      </Badge>
-                    </div>
+                {gigs.map((gig) => {
+                  const seller = gig.profiles;
+                  const sellerProfile = gig.seller_profiles;
+                  const avgRating = gig.avg_rating || 0;
+                  const reviewCount = gig.review_count || 0;
 
-                    {/* Content Section - Amazon-style */}
-                    <CardContent className="p-4 space-y-3">
-                      {/* Title - Prominent */}
-                      <h3 className="font-semibold text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors min-h-[2.5rem]">
-                        {gig.title}
-                      </h3>
-
-                      {/* Seller Info */}
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={gig.profiles?.avatar_url} />
-                          <AvatarFallback className="text-xs">
-                            {gig.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm text-muted-foreground">
-                            {gig.profiles?.username || 'Anonymous'}
-                          </span>
-                          {gig.seller_profiles?.verified && (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Rating - More prominent */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm font-semibold">5.0</span>
-                        <span className="text-sm text-muted-foreground">(127)</span>
-                      </div>
-
-                      {/* Delivery Time Badge */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>{gig.delivery_days} day delivery</span>
-                      </div>
-
-                      {/* Price & CTA - Emphasized like Amazon */}
-                      <div className="pt-3 border-t flex items-center justify-between">
-                        <div>
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Price</p>
-                          <p className="text-2xl font-bold text-foreground">{gig.price_sol} <span className="text-base">SOL</span></p>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="gap-2 shadow-lg"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/gigs/${gig.id}`);
-                          }}
+                  return (
+                    <Card
+                      key={gig.id}
+                      className="overflow-hidden hover:shadow-2xl transition-all group border border-border/50 relative"
+                    >
+                      <div className="relative">
+                        <img
+                          src={gig.images?.[0] || '/placeholder.svg'}
+                          alt={gig.title}
+                          className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onClick={() => navigate(`/gig/${gig.id}`)}
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 bg-background/90 hover:bg-background shadow-md"
+                          onClick={(e) => handleToggleFavorite(gig.id, e)}
                         >
-                          <ShoppingCart className="h-4 w-4" />
-                          View
+                          <Heart
+                            className={`h-5 w-5 ${
+                              isFavorited(gig.id) ? 'fill-red-500 text-red-500' : ''
+                            }`}
+                          />
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      
+                      <CardContent className="p-5" onClick={() => navigate(`/gig/${gig.id}`)}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Avatar className="h-7 w-7">
+                            <AvatarImage src={seller?.avatar_url || ''} />
+                            <AvatarFallback>
+                              {seller?.username?.[0]?.toUpperCase() || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm text-muted-foreground">
+                            {seller?.username}
+                          </span>
+                          {sellerProfile?.pro_member && (
+                            <ProBadge />
+                          )}
+                        </div>
+
+                        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors cursor-pointer">
+                          {gig.title}
+                        </h3>
+
+                        <div className="flex items-center gap-4 mb-3 text-sm">
+                          {reviewCount > 0 && (
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              <span className="font-semibold">{avgRating.toFixed(1)}</span>
+                              <span className="text-muted-foreground">({reviewCount})</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>{gig.delivery_days} days</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-3 border-t">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Starting at</p>
+                            <p className="text-2xl font-bold text-primary">
+                              {gig.price_sol.toFixed(2)} <span className="text-sm">SOL</span>
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => handleAddToCart(gig.id, e)}
+                            >
+                              <ShoppingCart className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/gig/${gig.id}`);
+                              }}
+                            >
+                              View
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>

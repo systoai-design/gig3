@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase } from "lucide-react";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import { AuthDialog } from "@/components/AuthDialog";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useCart } from "@/hooks/useCart";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +27,7 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
+  const { cartCount } = useCart();
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -130,6 +133,25 @@ export const Navbar = () => {
               </Button>
             )}
             
+            {user && (
+              <>
+                <Button variant="ghost" size="icon" onClick={() => navigate('/favorites')}>
+                  <Heart className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" className="relative" onClick={() => navigate('/cart')}>
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    >
+                      {cartCount}
+                    </Badge>
+                  )}
+                </Button>
+              </>
+            )}
+            
             {user ? (
               <div className="flex items-center gap-2">
                 {user?.user_metadata?.wallet_address && (
@@ -148,8 +170,12 @@ export const Navbar = () => {
                       My Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/settings')}>
-                      <User className="h-4 w-4 mr-2" />
+                      <Settings className="h-4 w-4 mr-2" />
                       Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/favorites')}>
+                      <Heart className="h-4 w-4 mr-2" />
+                      Favorites
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
                       <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -210,9 +236,25 @@ export const Navbar = () => {
                   Become a Creator
                 </a>
               )}
+              {user && (
+                <>
+                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/favorites')}>
+                    <Heart className="h-4 w-4 mr-2" />
+                    Favorites
+                  </Button>
+                  <Button variant="ghost" size="sm" className="justify-start relative" onClick={() => navigate('/cart')}>
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Cart
+                    {cartCount > 0 && (
+                      <Badge variant="destructive" className="ml-2">{cartCount}</Badge>
+                    )}
+                  </Button>
+                </>
+              )}
               {user ? (
                 <>
-                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/dashboard')}>
+                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/dashboard/buyer')}>
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
                     Dashboard
                   </Button>
                   <Button variant="ghost" size="sm" className="justify-start text-destructive" onClick={signOut}>

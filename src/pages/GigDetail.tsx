@@ -15,7 +15,9 @@ import { ReviewList } from '@/components/ReviewList';
 import { MessageList } from '@/components/MessageList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Star, Clock, Edit, Trash2, User, Heart, MessageCircle } from 'lucide-react';
+import { Star, Clock, Edit, Trash2, User, Heart, MessageCircle, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
+import { useFavorites } from '@/hooks/useFavorites';
 
 export default function GigDetail() {
   const { id } = useParams();
@@ -26,9 +28,10 @@ export default function GigDetail() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favoriteId, setFavoriteId] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState(0);
+  
+  const { addToCart } = useCart();
+  const { toggleFavorite, isFavorited } = useFavorites();
 
   useEffect(() => {
     fetchGig();
