@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Shield, CheckCircle, Award } from "lucide-react";
 
 export const GuaranteeSection = () => {
-  const navigate = useNavigate();
 
   return (
     <section className="py-16 bg-background">
@@ -23,7 +22,11 @@ export const GuaranteeSection = () => {
                 On GIG3 Pro, you can bring your vision to life risk-free. Every project with vetted Pro freelancers is backed by our money-back guarantee, so you can accomplish any high-stakes project with total confidence.
               </p>
               <Button
-                onClick={() => navigate('/explore')}
+                onClick={() => {
+                  toast.info("GIG3 Pro Coming Soon!", {
+                    description: "This premium feature will activate once we reach our user threshold. Stay tuned for vetted Pro freelancers with money-back guarantees!"
+                  });
+                }}
                 size="lg"
                 className="bg-gray-900 text-white hover:bg-gray-800 font-semibold rounded-[35px]"
               >
