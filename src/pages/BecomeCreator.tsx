@@ -39,7 +39,6 @@ export default function BecomeCreator() {
   const [loading, setLoading] = useState(false);
   const [isAlreadySeller, setIsAlreadySeller] = useState(false);
   const [checkingRole, setCheckingRole] = useState(true);
-  const formContainerRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     bio: '',
@@ -244,9 +243,14 @@ export default function BecomeCreator() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <FormProgressBar containerRef={formContainerRef} />
+      <FormProgressBar 
+        walletConnected={connected && !!publicKey}
+        bioValid={formData.bio.length >= 50}
+        skillsValid={formData.skills.length > 0}
+        termsAgreed={formData.agreeToTerms}
+      />
       
-      <div ref={formContainerRef} className="overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
+      <main className="pb-12">
         {/* Hero Section */}
         <ScrollReveal>
           <section className="pt-32 pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
@@ -440,7 +444,7 @@ export default function BecomeCreator() {
         </ScrollReveal>
 
         <Footer />
-      </div>
+      </main>
     </div>
   );
 }

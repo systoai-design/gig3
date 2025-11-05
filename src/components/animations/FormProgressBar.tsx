@@ -1,76 +1,78 @@
-import { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FormStep {
   id: string;
   label: string;
-  percentage: number;
+  isComplete: boolean;
 }
-
-const FORM_STEPS: FormStep[] = [
-  { id: 'wallet-section', label: 'Wallet', percentage: 20 },
-  { id: 'bio-section', label: 'Bio', percentage: 40 },
-  { id: 'skills-section', label: 'Skills', percentage: 60 },
-  { id: 'portfolio-section', label: 'Portfolio', percentage: 80 },
-  { id: 'terms-section', label: 'Terms', percentage: 100 },
-];
 
 interface FormProgressBarProps {
-  containerRef: React.RefObject<HTMLElement>;
+  walletConnected: boolean;
+  bioValid: boolean;
+  skillsValid: boolean;
+  termsAgreed: boolean;
 }
 
-export const FormProgressBar = ({ containerRef }: FormProgressBarProps) => {
+export const FormProgressBar = ({ 
+  walletConnected, 
+  bioValid, 
+  skillsValid, 
+  termsAgreed 
+}: FormProgressBarProps) => {
   const [activeStep, setActiveStep] = useState(0);
-  const { scrollYProgress } = useScroll({
-    container: containerRef,
-  });
 
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
+  const formSteps: FormStep[] = [
+    { id: 'wallet-section', label: 'Wallet', isComplete: walletConnected },
+    { id: 'bio-section', label: 'Bio', isComplete: bioValid },
+    { id: 'skills-section', label: 'Skills', isComplete: skillsValid },
+    { id: 'portfolio-section', label: 'Portfolio', isComplete: true }, // Optional
+    { id: 'terms-section', label: 'Terms', isComplete: termsAgreed },
+  ];
 
+  // Calculate active step based on first incomplete step
   useEffect(() => {
-    const unsubscribe = scrollYProgress.on('change', (latest) => {
-      const percentage = latest * 100;
-      const currentStepIndex = FORM_STEPS.findIndex(
-        (step, index) => 
-          percentage < step.percentage || index === FORM_STEPS.length - 1
-      );
-      setActiveStep(currentStepIndex);
-    });
+    const firstIncompleteIndex = formSteps.findIndex(step => !step.isComplete);
+    setActiveStep(firstIncompleteIndex === -1 ? formSteps.length - 1 : firstIncompleteIndex);
+  }, [walletConnected, bioValid, skillsValid, termsAgreed]);
 
-    return () => unsubscribe();
-  }, [scrollYProgress]);
+  // Calculate progress percentage
+  const completedSteps = formSteps.filter(step => step.isComplete).length;
+  const progressPercentage = (completedSteps / formSteps.length) * 100;
 
   return (
-    <div className="fixed top-16 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
+    <div className="sticky top-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
       {/* Progress Bar */}
       <motion.div
         className="h-1 bg-gradient-to-r from-primary via-accent-pink to-accent-purple origin-left"
-        style={{ scaleX }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: progressPercentage / 100 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
       />
 
       {/* Step Indicators */}
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between max-w-3xl mx-auto">
-          {FORM_STEPS.map((step, index) => {
+          {formSteps.map((step, index) => {
             const isActive = index === activeStep;
-            const isCompleted = index < activeStep;
+            const isCompleted = step.isComplete;
 
             return (
               <div key={step.id} className="flex items-center gap-2">
                 <button
                   onClick={() => {
-                    const element = document.getElementById(step.id);
-                    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (isCompleted || isActive) {
+                      const element = document.getElementById(step.id);
+                      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                   }}
+                  disabled={!isCompleted && !isActive}
                   className={cn(
                     "flex items-center gap-2 transition-all duration-300",
-                    "hover:scale-105 cursor-pointer group"
+                    (isCompleted || isActive) && "hover:scale-105 cursor-pointer group",
+                    !isCompleted && !isActive && "opacity-50 cursor-not-allowed"
                   )}
                 >
                   {/* Circle */}
@@ -79,7 +81,7 @@ export const FormProgressBar = ({ containerRef }: FormProgressBarProps) => {
                       "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
                       "border-2",
                       isCompleted && "bg-primary border-primary text-primary-foreground",
-                      isActive && !isCompleted && "border-primary bg-primary/10 scale-110",
+                      isActive && !isCompleted && "border-primary bg-primary/10 scale-110 animate-pulse",
                       !isActive && !isCompleted && "border-muted bg-muted"
                     )}
                   >
@@ -104,7 +106,7 @@ export const FormProgressBar = ({ containerRef }: FormProgressBarProps) => {
                 </button>
 
                 {/* Connector Line */}
-                {index < FORM_STEPS.length - 1 && (
+                {index < formSteps.length - 1 && (
                   <div
                     className={cn(
                       "hidden md:block h-0.5 w-12 transition-all duration-300",
