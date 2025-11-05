@@ -7,9 +7,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { supabase } from "@/integrations/supabase/client";
 import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import { AuthDialog } from "@/components/AuthDialog";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +23,6 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
-  const { resolvedTheme } = useTheme();
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -114,8 +111,6 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
-            <ThemeToggle />
-            
             {!isSeller && user && (
               <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="hover:text-primary">
                 Become a Creator
