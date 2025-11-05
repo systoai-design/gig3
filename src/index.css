@@ -188,21 +188,27 @@ All colors MUST be HSL.
     scroll-padding-top: 6rem;
   }
 
-  /* Card hover effects */
+  /* Performance optimizations */
+  img {
+    will-change: transform;
+  }
+
+  /* Card hover effects - Optimized */
   .card-hover {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
-                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
 
   .card-hover:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 32px hsl(0 0% 0% / 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px hsl(0 0% 0% / 0.1);
   }
   
   /* Dark mode card glow */
   .dark .card-hover:hover {
-    box-shadow: 0 12px 32px hsl(var(--primary) / 0.15),
-                0 0 30px hsl(var(--primary) / 0.1);
+    box-shadow: 0 8px 24px hsl(var(--primary) / 0.12),
+                0 0 20px hsl(var(--primary) / 0.08);
   }
 }
 

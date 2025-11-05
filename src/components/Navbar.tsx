@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Search, Menu, User, LogOut } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +21,7 @@ import gig3LogoDark from "@/assets/gig3_logo_dark_v2.png";
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
@@ -60,6 +62,15 @@ export const Navbar = () => {
     checkSellerRole();
   }, [user]);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setIsMenuOpen(false);
+    }
+  };
+
   return (
     <motion.nav 
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl backdrop-blur-xl rounded-full shadow-lg border border-border/50 dark:shadow-primary/10"
@@ -99,14 +110,16 @@ export const Navbar = () => {
 
           {/* Search Bar (Desktop) */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
+              <Input
                 type="text"
                 placeholder="Search for services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-input rounded-[35px] bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all"
               />
-            </div>
+            </form>
           </div>
 
           {/* Desktop Actions */}
@@ -131,21 +144,26 @@ export const Navbar = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
+                      <User className="h-4 w-4 mr-2" />
                       My Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/settings')}>
+                      <User className="h-4 w-4 mr-2" />
                       Settings
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
                       My Orders
                     </DropdownMenuItem>
                     {isSeller && (
                       <>
                         <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
                           Creator Dashboard
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/create-gig')}>
-                          Create Gig
+                        <DropdownMenuItem onClick={() => navigate('/dashboard/seller?tab=gigs')}>
+                          <Briefcase className="h-4 w-4 mr-2" />
+                          My Gigs
                         </DropdownMenuItem>
                       </>
                     )}
@@ -174,14 +192,16 @@ export const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-4">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
+                <Input
                   type="text"
                   placeholder="Search for services..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-input rounded-[35px] bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-              </div>
+              </form>
               <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">
                 Explore
               </a>

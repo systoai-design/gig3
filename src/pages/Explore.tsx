@@ -7,11 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Star, Clock } from 'lucide-react';
+import { Search, Star, Clock, ShoppingCart, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ProBadge } from '@/components/ProBadge';
 
@@ -38,6 +39,14 @@ export default function Explore() {
   );
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest');
   const [proOnly, setProOnly] = useState(searchParams.get('pro') === 'true');
+
+  // Update search query when URL params change
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchGigs();
@@ -236,40 +245,91 @@ export default function Explore() {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {gigs.map((gig) => (
-                  <Card 
-                    key={gig.id} 
-                    className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  <Card
+                    key={gig.id}
+                    className="overflow-hidden hover:shadow-xl transition-all cursor-pointer group border border-border/50"
                     onClick={() => navigate(`/gigs/${gig.id}`)}
                   >
-                    <div className="relative h-48 overflow-hidden">
-                      <img 
-                        src={gig.images?.[0] || '/placeholder.svg'} 
+                    {/* Image Section - Larger, more prominent */}
+                    <div className="relative h-56 overflow-hidden bg-muted">
+                      <img
+                        src={gig.images?.[0] || '/placeholder.svg'}
                         alt={gig.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <Badge className="absolute top-2 left-2">{gig.category}</Badge>
-                    </div>
-                    <CardContent className="p-4 space-y-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium">
-                          {gig.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                        </div>
-                        <span className="text-sm text-muted-foreground">{gig.profiles?.username || 'Anonymous'}</span>
-                        {gig.seller_profiles?.pro_member && (
+                      {gig.seller_profiles?.pro_member && (
+                        <div className="absolute top-3 left-3">
                           <ProBadge size="sm" proSince={gig.seller_profiles.pro_since} />
-                        )}
-                      </div>
-                      <h3 className="font-semibold line-clamp-2 min-h-[48px]">{gig.title}</h3>
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span>5.0 (0)</span>
-                      </div>
-                      <div className="flex items-center justify-between pt-2 border-t">
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
-                          <span>{gig.delivery_days}d</span>
                         </div>
-                        <span className="text-lg font-bold">{gig.price_sol} SOL</span>
+                      )}
+                      <Badge className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm text-foreground border-0">
+                        {gig.category}
+                      </Badge>
+                    </div>
+
+                    {/* Content Section - Amazon-style */}
+                    <CardContent className="p-4 space-y-3">
+                      {/* Title - Prominent */}
+                      <h3 className="font-semibold text-base line-clamp-2 leading-tight group-hover:text-primary transition-colors min-h-[2.5rem]">
+                        {gig.title}
+                      </h3>
+
+                      {/* Seller Info */}
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={gig.profiles?.avatar_url} />
+                          <AvatarFallback className="text-xs">
+                            {gig.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm text-muted-foreground">
+                            {gig.profiles?.username || 'Anonymous'}
+                          </span>
+                          {gig.seller_profiles?.verified && (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rating - More prominent */}
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400"
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm font-semibold">5.0</span>
+                        <span className="text-sm text-muted-foreground">(127)</span>
+                      </div>
+
+                      {/* Delivery Time Badge */}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{gig.delivery_days} day delivery</span>
+                      </div>
+
+                      {/* Price & CTA - Emphasized like Amazon */}
+                      <div className="pt-3 border-t flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Price</p>
+                          <p className="text-2xl font-bold text-foreground">{gig.price_sol} <span className="text-base">SOL</span></p>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="gap-2 shadow-lg"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/gigs/${gig.id}`);
+                          }}
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                          View
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

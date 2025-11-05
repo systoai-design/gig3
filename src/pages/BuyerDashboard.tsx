@@ -121,7 +121,7 @@ export default function BuyerDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12 pt-28">
         <h1 className="text-4xl font-bold mb-8">My Orders</h1>
 
         {/* Stats Cards */}
