@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -15,6 +15,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { CheckCircle2, Loader2, Wallet, Shield, Zap, TrendingUp } from 'lucide-react';
+import { ScrollReveal } from '@/components/animations/ScrollReveal';
+import { StaggerContainer } from '@/components/animations/StaggerContainer';
+import { FormProgressBar } from '@/components/animations/FormProgressBar';
 
 const SKILL_OPTIONS = [
   'Design & Graphics',
@@ -36,6 +39,7 @@ export default function BecomeCreator() {
   const [loading, setLoading] = useState(false);
   const [isAlreadySeller, setIsAlreadySeller] = useState(false);
   const [checkingRole, setCheckingRole] = useState(true);
+  const formContainerRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     bio: '',
@@ -240,23 +244,28 @@ export default function BecomeCreator() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <FormProgressBar containerRef={formContainerRef} />
       
-      {/* Hero Section */}
-      <section className="pt-32 pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Join the Builder Economy on <span className="gradient-text">GIG3</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Turn your skills into SOL - earn cryptocurrency by offering your services on Web3
-          </p>
-        </div>
-      </section>
+      <div ref={formContainerRef} className="overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
+        {/* Hero Section */}
+        <ScrollReveal>
+          <section className="pt-32 pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
+            <div className="container mx-auto px-4 text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                Join the Builder Economy on <span className="gradient-text">GIG3</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Turn your skills into SOL - earn cryptocurrency by offering your services on Web3
+              </p>
+            </div>
+          </section>
+        </ScrollReveal>
 
-      {/* Benefits */}
-      <section className="py-12 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+        {/* Benefits */}
+        <ScrollReveal>
+          <section className="py-12 bg-background">
+            <div className="container mx-auto px-4">
+              <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
             <Card>
               <CardContent className="pt-6 text-center">
                 <div className="inline-flex p-3 rounded-full bg-primary/10 mb-4">
@@ -290,24 +299,24 @@ export default function BecomeCreator() {
                 </p>
               </CardContent>
             </Card>
-          </div>
+              </StaggerContainer>
 
-          {/* Application Form */}
-          <Card className="max-w-3xl mx-auto">
-            <CardHeader>
-              <CardTitle>Creator Application</CardTitle>
-              <CardDescription>
-                Complete your profile to start offering services on GIG3
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Wallet Connection */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Wallet className="h-4 w-4" />
-                    Solana Wallet
-                  </Label>
+              {/* Application Form */}
+              <Card className="max-w-3xl mx-auto">
+                <CardHeader>
+                  <CardTitle>Creator Application</CardTitle>
+                  <CardDescription>
+                    Complete your profile to start offering services on GIG3
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Wallet Connection */}
+                    <div id="wallet-section" className="space-y-2 scroll-mt-32">
+                      <Label className="flex items-center gap-2">
+                        <Wallet className="h-4 w-4" />
+                        Solana Wallet
+                      </Label>
                   <div className="flex items-center gap-4">
                     <WalletMultiButton />
                     {connected && publicKey && (
@@ -319,13 +328,13 @@ export default function BecomeCreator() {
                   <p className="text-sm text-muted-foreground">
                     Your wallet will receive payments for completed orders
                   </p>
-                </div>
+                    </div>
 
-                {/* Bio */}
-                <div className="space-y-2">
-                  <Label htmlFor="bio">
-                    Bio / About You <span className="text-destructive">*</span>
-                  </Label>
+                    {/* Bio */}
+                    <div id="bio-section" className="space-y-2 scroll-mt-32">
+                      <Label htmlFor="bio">
+                        Bio / About You <span className="text-destructive">*</span>
+                      </Label>
                   <Textarea
                     id="bio"
                     placeholder="Tell buyers about your experience and what makes you unique... (minimum 50 characters)"
@@ -337,13 +346,13 @@ export default function BecomeCreator() {
                   <p className="text-sm text-muted-foreground">
                     {formData.bio.length} / 50 characters minimum
                   </p>
-                </div>
+                    </div>
 
-                {/* Skills */}
-                <div className="space-y-3">
-                  <Label>
-                    Skills & Services <span className="text-destructive">*</span>
-                  </Label>
+                    {/* Skills */}
+                    <div id="skills-section" className="space-y-3 scroll-mt-32">
+                      <Label>
+                        Skills & Services <span className="text-destructive">*</span>
+                      </Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {SKILL_OPTIONS.map((skill) => (
                       <div key={skill} className="flex items-center space-x-2">
@@ -361,11 +370,11 @@ export default function BecomeCreator() {
                       </div>
                     ))}
                   </div>
-                </div>
+                    </div>
 
-                {/* Portfolio Links */}
-                <div className="space-y-3">
-                  <Label>Portfolio Links (Optional)</Label>
+                    {/* Portfolio Links */}
+                    <div id="portfolio-section" className="space-y-3 scroll-mt-32">
+                      <Label>Portfolio Links (Optional)</Label>
                   {formData.portfolioLinks.map((link, index) => (
                     <Input
                       key={index}
@@ -385,51 +394,53 @@ export default function BecomeCreator() {
                       + Add Another Link
                     </Button>
                   )}
-                </div>
+                    </div>
 
-                {/* Terms Agreement */}
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={formData.agreeToTerms}
-                    onCheckedChange={(checked) =>
-                      setFormData(prev => ({ ...prev, agreeToTerms: checked as boolean }))
-                    }
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                  >
-                    I agree to the GIG3 creator terms and conditions
-                  </label>
-                </div>
+                    {/* Terms Agreement */}
+                    <div id="terms-section" className="flex items-start space-x-2 scroll-mt-32">
+                      <Checkbox
+                        id="terms"
+                        checked={formData.agreeToTerms}
+                        onCheckedChange={(checked) =>
+                          setFormData(prev => ({ ...prev, agreeToTerms: checked as boolean }))
+                        }
+                      />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        I agree to the GIG3 creator terms and conditions
+                      </label>
+                    </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full"
-                  disabled={loading || !connected}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting Application...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="mr-2 h-4 w-4" />
-                      Become a Creator
-                    </>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+                    {/* Submit Button */}
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="w-full"
+                      disabled={loading || !connected}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting Application...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="mr-2 h-4 w-4" />
+                          Become a Creator
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+        </ScrollReveal>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
