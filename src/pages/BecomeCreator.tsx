@@ -242,7 +242,7 @@ export default function BecomeCreator() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="py-12 bg-gradient-to-br from-primary/5 to-secondary/5">
+      <section className="pt-32 pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Join the Builder Economy on <span className="gradient-text">GIG3</span>
