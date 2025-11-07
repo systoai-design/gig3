@@ -110,6 +110,9 @@ All colors MUST be HSL.
     --chart-5: 0 0% 0%;
     --radius: 2.188rem;
 
+    /* Layout spacing */
+    --navbar-height: 80px;
+
     /* GIG3 Brand colors */
     --gig3-red: 0 99% 59%;
     --dark-red: 0 68% 46%;
@@ -302,5 +305,14 @@ All colors MUST be HSL.
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 700;
   line-height: 1.2;
+}
+
+/* Navbar spacing utilities */
+.pt-navbar {
+  padding-top: var(--navbar-height);
+}
+
+.mt-navbar {
+  margin-top: var(--navbar-height);
 }
 }

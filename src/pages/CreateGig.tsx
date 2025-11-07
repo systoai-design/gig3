@@ -250,7 +250,7 @@ export default function CreateGig() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 py-12 flex items-center justify-center">
+        <main className="container mx-auto px-4 pt-navbar pb-12 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
       </div>
@@ -260,7 +260,7 @@ export default function CreateGig() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12 max-w-3xl">
+      <main className="container mx-auto px-4 pt-navbar pb-12 max-w-3xl">
         <h1 className="text-4xl font-bold mb-2">Create a New Gig</h1>
         <p className="text-muted-foreground mb-8">Share your skills with the community</p>
 

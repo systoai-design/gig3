@@ -218,7 +218,7 @@ export default function Explore() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="container mx-auto px-4 pt-32 pb-12">
+      <main className="container mx-auto px-4 pt-navbar pb-12">
         <h1 className="text-4xl font-bold mb-8">Explore Services</h1>
 
         {/* Search and Filters */}

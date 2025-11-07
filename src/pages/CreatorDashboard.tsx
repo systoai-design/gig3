@@ -113,7 +113,7 @@ export default function CreatorDashboard() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 py-12">
+        <main className="container mx-auto px-4 pt-navbar pb-12">
           <Skeleton className="h-12 w-64 mb-8" />
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {[...Array(3)].map((_, i) => (
@@ -128,7 +128,7 @@ export default function CreatorDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-navbar pb-12">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <h1 className="text-4xl font-bold">Creator Dashboard</h1>

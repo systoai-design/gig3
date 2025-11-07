@@ -209,7 +209,7 @@ export default function BecomeCreator() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12 pt-28">
+      <main className="container mx-auto px-4 pt-navbar pb-12">
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -250,10 +250,10 @@ export default function BecomeCreator() {
         termsAgreed={formData.agreeToTerms}
       />
       
-      <main className="pb-12">
+      <main className="pt-navbar pb-12">
         {/* Hero Section */}
         <ScrollReveal>
-          <section className="pt-32 pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
+          <section className="pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">
             <div className="container mx-auto px-4 text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Join the Builder Economy on <span className="gradient-text">GIG3</span>
