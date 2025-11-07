@@ -40,6 +40,13 @@ export const ParticleBackground = ({
         const computedValue = getComputedStyle(document.documentElement)
           .getPropertyValue(varName)
           .trim();
+        
+        // Convert space-separated HSL to comma-separated for Canvas API
+        // Modern CSS: "0 99% 59%" → Canvas needs: "0, 99%, 59%"
+        if (computedValue && !computedValue.includes(',')) {
+          return computedValue.replace(/\s+/g, ', ');
+        }
+        
         return computedValue || '0, 99%, 59%'; // Fallback HSL values
       }
     }
