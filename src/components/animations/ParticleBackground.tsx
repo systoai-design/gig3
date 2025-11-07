@@ -30,6 +30,21 @@ export const ParticleBackground = ({
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const mouseTrailRef = useRef<Array<{ x: number; y: number; opacity: number }>>([]);
   const animationFrameRef = useRef<number>();
+  const resolvedColorsRef = useRef({ particle: '', glow: '' });
+
+  // Resolve CSS variables to actual color values
+  const resolveCSSColor = (cssColor: string): string => {
+    if (cssColor.startsWith('var(')) {
+      const varName = cssColor.match(/var\((--[\w-]+)\)/)?.[1];
+      if (varName) {
+        const computedValue = getComputedStyle(document.documentElement)
+          .getPropertyValue(varName)
+          .trim();
+        return computedValue || '0, 99%, 59%'; // Fallback HSL values
+      }
+    }
+    return cssColor;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -37,6 +52,12 @@ export const ParticleBackground = ({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Resolve colors once
+    resolvedColorsRef.current = {
+      particle: resolveCSSColor(particleColor),
+      glow: resolveCSSColor(glowColor)
+    };
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -92,9 +113,9 @@ export const ParticleBackground = ({
           mouseRef.current.x, mouseRef.current.y, 0,
           mouseRef.current.x, mouseRef.current.y, glowSize
         );
-        gradient.addColorStop(0, `hsla(${glowColor}, 0.4)`);
-        gradient.addColorStop(0.3, `hsla(${glowColor}, 0.2)`);
-        gradient.addColorStop(1, `hsla(${glowColor}, 0)`);
+        gradient.addColorStop(0, `hsla(${resolvedColorsRef.current.glow}, 0.4)`);
+        gradient.addColorStop(0.3, `hsla(${resolvedColorsRef.current.glow}, 0.2)`);
+        gradient.addColorStop(1, `hsla(${resolvedColorsRef.current.glow}, 0)`);
         
         ctx.fillStyle = gradient;
         ctx.beginPath();
@@ -111,8 +132,8 @@ export const ParticleBackground = ({
             trail.x, trail.y, 0,
             trail.x, trail.y, 30
           );
-          gradient.addColorStop(0, `hsla(${glowColor}, ${trail.opacity * 0.3})`);
-          gradient.addColorStop(1, `hsla(${glowColor}, 0)`);
+          gradient.addColorStop(0, `hsla(${resolvedColorsRef.current.glow}, ${trail.opacity * 0.3})`);
+          gradient.addColorStop(1, `hsla(${resolvedColorsRef.current.glow}, 0)`);
           
           ctx.fillStyle = gradient;
           ctx.beginPath();
@@ -161,9 +182,9 @@ export const ParticleBackground = ({
           particle.x, particle.y, 0,
           particle.x, particle.y, particle.size * 3
         );
-        particleGradient.addColorStop(0, `hsla(${particleColor}, ${particle.opacity})`);
-        particleGradient.addColorStop(0.5, `hsla(${particleColor}, ${particle.opacity * 0.5})`);
-        particleGradient.addColorStop(1, `hsla(${particleColor}, 0)`);
+        particleGradient.addColorStop(0, `hsla(${resolvedColorsRef.current.particle}, ${particle.opacity})`);
+        particleGradient.addColorStop(0.5, `hsla(${resolvedColorsRef.current.particle}, ${particle.opacity * 0.5})`);
+        particleGradient.addColorStop(1, `hsla(${resolvedColorsRef.current.particle}, 0)`);
         
         ctx.fillStyle = particleGradient;
         ctx.beginPath();
@@ -171,7 +192,7 @@ export const ParticleBackground = ({
         ctx.fill();
 
         // Draw solid particle core
-        ctx.fillStyle = `hsla(${particleColor}, ${particle.opacity})`;
+        ctx.fillStyle = `hsla(${resolvedColorsRef.current.particle}, ${particle.opacity})`;
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();
@@ -184,7 +205,7 @@ export const ParticleBackground = ({
 
           if (distance < connectionDistance) {
             const lineOpacity = 0.2 * (1 - distance / connectionDistance);
-            ctx.strokeStyle = `hsla(${particleColor}, ${lineOpacity})`;
+            ctx.strokeStyle = `hsla(${resolvedColorsRef.current.particle}, ${lineOpacity})`;
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
@@ -196,7 +217,7 @@ export const ParticleBackground = ({
         // Draw connection to mouse if close
         if (distance < glowSize * 0.8) {
           const lineOpacity = 0.3 * (1 - distance / (glowSize * 0.8));
-          ctx.strokeStyle = `hsla(${glowColor}, ${lineOpacity})`;
+          ctx.strokeStyle = `hsla(${resolvedColorsRef.current.glow}, ${lineOpacity})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(particle.x, particle.y);
