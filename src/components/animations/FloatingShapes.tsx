@@ -20,7 +20,7 @@ export const FloatingShapes = ({ count = 5, className = '' }: FloatingShapesProp
       {shapes.map((shape) => (
         <motion.div
           key={shape.id}
-          className="absolute rounded-full blur-3xl opacity-10"
+          className="absolute rounded-full blur-xl opacity-10"
           style={{
             width: shape.size,
             height: shape.size,

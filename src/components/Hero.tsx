@@ -1,25 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Search, ArrowRight, Sparkles } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { TextReveal } from "@/components/animations/TextReveal";
-import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
-import { FloatingShapes } from "@/components/animations/FloatingShapes";
-import { MagneticButton } from "@/components/animations/MagneticButton";
-import { GradientMesh } from "@/components/ui/gradient-mesh";
 import { motion } from "framer-motion";
+import { Search, TrendingUp, Shield, Zap, Code, Palette, Video } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { GlassmorphicCard } from "./animations/GlassmorphicCard";
+import { TextReveal } from "./animations/TextReveal";
+import { FloatingShapes } from "./animations/FloatingShapes";
+import { MagneticButton } from "./animations/MagneticButton";
+import { ParticleBackground } from "./animations/ParticleBackground";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
+import { NoiseTexture } from "./ui/noise-texture";
+import { GradientMesh } from "./ui/gradient-mesh";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [showSpline, setShowSpline] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSpline(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const popularServices = [
     { label: "Website Development", icon: "→" },
@@ -30,62 +25,31 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[800px] flex items-center justify-center overflow-hidden bg-gray-900 dark:bg-black will-change-transform">
-      {/* Multi-layer Parallax Background - Slowest */}
-      {showSpline && (
-        <motion.div 
-          className="absolute inset-0 w-full h-full" 
-          style={{ 
-            contain: 'layout paint', 
-            transform: 'translateZ(0)',
-            y: -20
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-        >
-          <iframe 
-            src="https://my.spline.design/animatedpaperboat-U6wecpseljShuR13EAC0IwfN/" 
-            frameBorder="0" 
-            width="100%" 
-            height="100%"
-            className="w-full h-full pointer-events-none"
-            title="3D Background Animation"
-            loading="lazy"
-            sandbox="allow-scripts"
-            style={{ willChange: 'transform' }}
-          />
-        </motion.div>
-      )}
-      
-      {/* Mid-ground: Gradient Mesh - Medium Speed */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: -10 }}
-      >
-        <GradientMesh colors={['hsl(0, 99%, 59%)', 'hsl(280, 68%, 62%)', 'hsl(212, 100%, 48%)']} className="opacity-30 dark:opacity-20" />
-      </motion.div>
-      
-      {/* Mid-ground: Floating Shapes - Medium Speed */}
-      <motion.div
-        className="absolute inset-0"
-        style={{ y: -15 }}
-      >
-        <FloatingShapes count={6} className="opacity-20 dark:opacity-10" />
-      </motion.div>
-      
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/50 to-gray-900/70 dark:from-black/80 dark:via-black/70 dark:to-black/90"></div>
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
+      {/* Animated Background Layers */}
+      <div className="absolute inset-0 z-0">
+        {/* Particle System with Mouse Interaction */}
+        <ParticleBackground />
+        
+        {/* Gradient Mesh */}
+        <GradientMesh className="opacity-40" animated={false} />
+        
+        {/* Floating Shapes */}
+        <FloatingShapes count={3} />
+        
+        {/* Noise Texture */}
+        <NoiseTexture opacity={0.03} />
+      </div>
       
       {/* Content */}
-      <div className="container mx-auto px-4 relative z-10 py-20 md:py-32">
+      <div className="container mx-auto px-4 relative z-10 py-20">
         <div className="max-w-5xl mx-auto">
           {/* Massive Typography */}
           <div className="mb-12">
-            <TextReveal className="text-display-xl text-white mb-4" delay={0.2}>
+            <TextReveal className="text-display-xl mb-4" delay={0.2}>
               Our Freelancers
             </TextReveal>
-            <TextReveal className="text-display-lg text-white/90 font-light" delay={0.4}>
+            <TextReveal className="text-display-lg font-light" delay={0.4}>
               Will Take It From Here
             </TextReveal>
             
@@ -93,7 +57,7 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
-              className="text-xl md:text-2xl text-white/70 mt-6 max-w-2xl"
+              className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-2xl"
             >
               Discover world-class talent on the decentralized marketplace. Powered by Solana.
             </motion.p>
@@ -109,13 +73,13 @@ export const Hero = () => {
             <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <div className="flex-1 flex items-center gap-3 px-4 min-w-0">
-                  <Search className="h-5 w-5 text-white/50 flex-shrink-0" />
+                  <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   <input
                     type="text"
                     placeholder="What service are you looking for?"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
-                    className="flex-1 py-4 text-base sm:text-lg bg-transparent text-white placeholder:text-white/40 focus:outline-none min-w-0"
+                    className="flex-1 py-4 text-base sm:text-lg bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         navigate('/explore');
@@ -147,7 +111,7 @@ export const Hero = () => {
             transition={{ delay: 1, duration: 0.6 }}
             className="flex flex-wrap gap-3 mb-16 justify-center"
           >
-            <span className="text-white/60 text-sm font-medium self-center mr-2">Popular:</span>
+            <span className="text-muted-foreground text-sm font-medium self-center mr-2">Popular:</span>
             {popularServices.map((service, index) => (
               <motion.button
                 key={service.label}
@@ -157,16 +121,15 @@ export const Hero = () => {
                 onClick={() => navigate(`/explore?q=${encodeURIComponent(service.label)}`)}
                 className="group relative"
               >
-                <GlassmorphicCard blur="md" opacity={0.1} className="px-5 py-3 hover:bg-white/20 transition-all duration-300">
+                <GlassmorphicCard blur="md" opacity={0.1} className="px-5 py-3 hover:bg-accent/20 transition-all duration-300">
                   <div className="flex items-center gap-2">
-                    <span className="text-white text-sm font-medium">{service.label}</span>
+                    <span className="text-foreground text-sm font-medium">{service.label}</span>
                     {service.badge && (
                       <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-accent-amber to-accent-pink text-white rounded-full">
-                        <Sparkles className="h-3 w-3" />
+                        <TrendingUp className="h-3 w-3" />
                         {service.badge}
                       </span>
                     )}
-                    <ArrowRight className="h-3.5 w-3.5 text-white/70 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" />
                   </div>
                 </GlassmorphicCard>
               </motion.button>
@@ -194,7 +157,7 @@ export const Hero = () => {
                     transition={{ delay: 1.6 + index * 0.1, duration: 0.4 }}
                   >
                     <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
-                    <div className="text-white/60 text-sm font-medium">{stat.label}</div>
+                    <div className="text-muted-foreground text-sm font-medium">{stat.label}</div>
                   </motion.div>
                 ))}
               </div>

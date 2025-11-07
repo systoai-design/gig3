@@ -20,7 +20,7 @@ interface Gig {
   seller_profiles?: {
     pro_member: boolean;
     pro_since: string | null;
-  };
+  } | null;
 }
 
 export const FeaturedGigs = () => {
@@ -34,29 +34,32 @@ export const FeaturedGigs = () => {
 
   const fetchGigs = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch gigs
+      const { data: gigsData, error: gigsError } = await supabase
         .from('gigs')
         .select('*')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(8);
 
-      if (error) throw error;
-      
-      const gigsWithProfiles = await Promise.all(
-        (data || []).map(async (gig) => {
-          const { data: sellerProfile } = await supabase
-            .from('seller_profiles')
-            .select('pro_member, pro_since')
-            .eq('user_id', gig.seller_id)
-            .maybeSingle();
-          
-          return {
-            ...gig,
-            seller_profiles: sellerProfile || undefined
-          };
-        })
+      if (gigsError) throw gigsError;
+
+      // Fetch seller profiles in one query
+      const sellerIds = (gigsData || []).map(g => g.seller_id);
+      const { data: profilesData } = await supabase
+        .from('seller_profiles')
+        .select('user_id, pro_member, pro_since')
+        .in('user_id', sellerIds);
+
+      // Map profiles to gigs
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.user_id, p])
       );
+
+      const gigsWithProfiles = (gigsData || []).map(gig => ({
+        ...gig,
+        seller_profiles: profilesMap.get(gig.seller_id) || null
+      }));
       
       setGigs(gigsWithProfiles as Gig[]);
     } catch (error) {
@@ -176,6 +179,7 @@ export const FeaturedGigs = () => {
                           src={gig.images[0]}
                           alt={gig.title}
                           loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (

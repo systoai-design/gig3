@@ -20,7 +20,7 @@ export const GradientMesh = ({
                      radial-gradient(at 100% 100%, ${colors[2]} 0%, transparent 50%),
                      radial-gradient(at 0% 100%, ${colors[0]} 0%, transparent 50%)`,
         opacity: 0.05,
-        filter: 'blur(80px)'
+        filter: 'blur(40px)'
       }}
       {...(animated && {
         animate: {

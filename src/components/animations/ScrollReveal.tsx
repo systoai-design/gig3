@@ -66,7 +66,8 @@ export const ScrollReveal = ({
 }: ScrollRevealProps) => {
   const [ref, inView] = useInView({
     triggerOnce: once,
-    threshold
+    threshold,
+    rootMargin: '0px 0px -100px 0px'
   });
 
   const transition = spring

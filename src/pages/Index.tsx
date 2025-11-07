@@ -8,7 +8,6 @@ import { FeaturedGigs } from "@/components/FeaturedGigs";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
-import { ParallaxSection } from "@/components/animations/ParallaxSection";
 import { ScrollProgressBar } from "@/components/animations/ScrollProgressBar";
 
 const Index = () => {
@@ -22,9 +21,9 @@ const Index = () => {
         <Categories />
       </ScrollReveal>
       
-      <ParallaxSection speed={0.3}>
+      <ScrollReveal animation="fadeUp">
         <PopularServices />
-      </ParallaxSection>
+      </ScrollReveal>
       
       <ScrollReveal animation="scale" delay={0.2}>
         <PromoBanner />
