@@ -51,7 +51,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4 relative z-10 py-20">
         <div className="max-w-5xl mx-auto">
           {/* Massive Typography */}
-          <div className="mb-12">
+          <div className="mb-12 text-center">
             <TextReveal className="text-display-xl mb-4" delay={0.2}>
               Our Freelancers
             </TextReveal>
@@ -63,7 +63,7 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
-              className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-2xl"
+              className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-2xl mx-auto"
             >
               Discover world-class talent on the decentralized marketplace. Powered by Solana.
             </motion.p>
