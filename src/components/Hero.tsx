@@ -29,7 +29,13 @@ export const Hero = () => {
       {/* Animated Background Layers */}
       <div className="absolute inset-0 z-0">
         {/* Particle System with Mouse Interaction */}
-        <ParticleBackground />
+        <ParticleBackground 
+          particleCount={60}
+          particleColor="var(--primary)"
+          glowColor="var(--primary)"
+          glowSize={180}
+          connectionDistance={120}
+        />
         
         {/* Gradient Mesh */}
         <GradientMesh className="opacity-40" animated={false} />
