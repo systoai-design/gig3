@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings } from "lucide-react";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import gig3LogoLight from "@/assets/gig3_logo_light.png";
 import gig3LogoDark from "@/assets/gig3_logo_dark_v2.png";
 
@@ -206,69 +214,216 @@ export const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-full hover:bg-primary/10 transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <Menu className="h-6 w-6 text-primary" />
-          </button>
-        </div>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden relative"
+              >
+                <motion.div
+                  animate={{ rotate: isMenuOpen ? 90 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {isMenuOpen ? (
+                    <X className="h-6 w-6 text-primary" />
+                  ) : (
+                    <Menu className="h-6 w-6 text-primary" />
+                  )}
+                </motion.div>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              
+              <div className="flex flex-col space-y-6 mt-6">
+                {/* Search */}
+                <form onSubmit={handleSearch} className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search for services..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-full"
+                  />
+                </form>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <div className="flex flex-col space-y-4">
-              <form onSubmit={handleSearch} className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search for services..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-input rounded-[35px] bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-              </form>
-              <a href="/explore" className="text-sm font-medium text-foreground hover:text-primary">
-                Explore
-              </a>
-              {!isSeller && user && (
-                <a href="/become-creator" className="text-sm font-medium text-foreground hover:text-primary">
-                  Become a Creator
-                </a>
-              )}
-              {user && (
-                <>
-                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/favorites')}>
-                    <Heart className="h-4 w-4 mr-2" />
-                    Favorites
+                <Separator />
+
+                {/* Navigation Links */}
+                <div className="flex flex-col space-y-3">
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-base" 
+                    onClick={() => {
+                      navigate('/explore');
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Search className="h-5 w-5 mr-3" />
+                    Explore Services
                   </Button>
-                  <Button variant="ghost" size="sm" className="justify-start relative" onClick={() => navigate('/cart')}>
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Cart
-                    {cartCount > 0 && (
-                      <Badge variant="destructive" className="ml-2">{cartCount}</Badge>
-                    )}
-                  </Button>
-                </>
-              )}
-              {user ? (
-                <>
-                  <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate('/dashboard/buyer')}>
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </Button>
-                  <Button variant="ghost" size="sm" className="justify-start text-destructive" onClick={signOut}>
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <div className="w-full">
-                  <WalletMultiButton className="!bg-gradient-primary hover:!opacity-90 !text-white !border-0 !w-full" />
+                  
+                  {!isSeller && user && (
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start text-base"
+                      onClick={() => {
+                        navigate('/become-creator');
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <Briefcase className="h-5 w-5 mr-3" />
+                      Become a Creator
+                    </Button>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-        )}
+
+                {user && (
+                  <>
+                    <Separator />
+                    
+                    {/* User Actions */}
+                    <div className="flex flex-col space-y-3">
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base relative" 
+                        onClick={() => {
+                          navigate('/favorites');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Heart className="h-5 w-5 mr-3" />
+                        Favorites
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base" 
+                        onClick={() => {
+                          navigate('/cart');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <ShoppingCart className="h-5 w-5 mr-3" />
+                        Cart
+                        {cartCount > 0 && (
+                          <Badge variant="destructive" className="ml-auto">
+                            {cartCount}
+                          </Badge>
+                        )}
+                      </Button>
+                    </div>
+
+                    <Separator />
+
+                    {/* Account Links */}
+                    <div className="flex flex-col space-y-3">
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base"
+                        onClick={() => {
+                          navigate(`/profile/${user.id}`);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <User className="h-5 w-5 mr-3" />
+                        My Profile
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base"
+                        onClick={() => {
+                          navigate('/settings');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <Settings className="h-5 w-5 mr-3" />
+                        Settings
+                      </Button>
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base"
+                        onClick={() => {
+                          navigate('/dashboard/buyer');
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <LayoutDashboard className="h-5 w-5 mr-3" />
+                        My Orders
+                      </Button>
+                      
+                      {isSeller && (
+                        <>
+                          <Button 
+                            variant="ghost" 
+                            className="justify-start text-base"
+                            onClick={() => {
+                              navigate('/dashboard/seller');
+                              setIsMenuOpen(false);
+                            }}
+                          >
+                            <LayoutDashboard className="h-5 w-5 mr-3" />
+                            Creator Dashboard
+                          </Button>
+                          
+                          <Button 
+                            variant="ghost" 
+                            className="justify-start text-base"
+                            onClick={() => {
+                              navigate('/dashboard/seller?tab=gigs');
+                              setIsMenuOpen(false);
+                            }}
+                          >
+                            <Briefcase className="h-5 w-5 mr-3" />
+                            My Gigs
+                          </Button>
+                        </>
+                      )}
+                    </div>
+
+                    <Separator />
+
+                    {/* Wallet & Sign Out */}
+                    <div className="flex flex-col space-y-3">
+                      {user?.user_metadata?.wallet_address && (
+                        <div className="w-full">
+                          <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90 !w-full !justify-center" />
+                        </div>
+                      )}
+                      
+                      <Button 
+                        variant="ghost" 
+                        className="justify-start text-base text-destructive hover:text-destructive"
+                        onClick={() => {
+                          signOut();
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-5 w-5 mr-3" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {!user && (
+                  <>
+                    <Separator />
+                    <div className="w-full">
+                      <WalletMultiButton className="!bg-gradient-primary hover:!opacity-90 !text-white !border-0 !w-full !justify-center" />
+                    </div>
+                  </>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       <AuthDialog 
