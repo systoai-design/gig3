@@ -4,7 +4,7 @@ import { useRef, ReactNode } from 'react';
 interface MagneticButtonProps {
   children: ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   strength?: number;
 }
 
@@ -44,6 +44,7 @@ export const MagneticButton = ({
   return (
     <motion.button
       ref={ref}
+      type="button"
       style={{ x: xSpring, y: ySpring }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

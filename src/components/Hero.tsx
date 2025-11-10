@@ -77,7 +77,14 @@ export const Hero = () => {
             className="max-w-3xl mx-auto mb-8"
           >
             <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate('/explore');
+                }}
+                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
+              >
                 <div className="flex-1 flex items-center gap-3 px-4 min-w-0">
                   <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   <input
@@ -86,15 +93,14 @@ export const Hero = () => {
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                     className="flex-1 py-4 text-base sm:text-lg bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        navigate('/explore');
-                      }
-                    }}
                   />
                 </div>
                 <MagneticButton
-                  onClick={() => navigate('/explore')}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigate('/explore');
+                  }}
                   className="bg-gradient-to-r from-primary to-accent-pink hover:from-primary/90 hover:to-accent-pink/90 text-white px-6 sm:px-8 py-4 rounded-3xl font-semibold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   {isMobile ? (
@@ -106,7 +112,7 @@ export const Hero = () => {
                     "Search"
                   )}
                 </MagneticButton>
-              </div>
+              </form>
             </GlassmorphicCard>
           </motion.div>
 
