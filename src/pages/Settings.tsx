@@ -116,6 +116,7 @@ export default function Settings() {
       const { error } = await supabase
         .from('profiles')
         .update({
+          name: formData.name,
           username: formData.username,
           tagline: formData.tagline,
           bio: formData.bio,
@@ -248,10 +249,9 @@ export default function Settings() {
                     <Input
                       id="name"
                       value={formData.name}
-                      disabled
-                      className="bg-muted"
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Your full name"
                     />
-                    <p className="text-xs text-muted-foreground">Name cannot be changed</p>
                   </div>
 
                   <div className="space-y-2">
