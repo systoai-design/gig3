@@ -15,31 +15,34 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <ScrollProgressBar />
       <Navbar />
-      <Hero />
       
-      <ScrollReveal animation="fadeUp">
-        <Categories />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="fadeUp">
-        <PopularServices />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="scale" delay={0.2}>
-        <PromoBanner />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="fadeLeft">
-        <GuaranteeSection />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="fadeUp" delay={0.1}>
-        <FeaturedGigs />
-      </ScrollReveal>
-      
-      <ScrollReveal animation="fadeUp">
-        <HowItWorks />
-      </ScrollReveal>
+      <div className="pt-navbar">
+        <Hero />
+        
+        <ScrollReveal animation="fadeUp">
+          <Categories />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeUp">
+          <PopularServices />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="scale" delay={0.2}>
+          <PromoBanner />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeLeft">
+          <GuaranteeSection />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeUp" delay={0.1}>
+          <FeaturedGigs />
+        </ScrollReveal>
+        
+        <ScrollReveal animation="fadeUp">
+          <HowItWorks />
+        </ScrollReveal>
+      </div>
       
       <Footer />
     </div>

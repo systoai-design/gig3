@@ -88,7 +88,7 @@ export const Navbar = () => {
   return (
     <motion.nav 
       animate={{
-        y: scrollDirection === "down" && scrollY.get() > 50 ? -100 : 0,
+        y: scrollDirection === "down" && scrollY.get() > 50 ? -200 : 0,
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl backdrop-blur-xl rounded-full shadow-lg border border-border/50 dark:shadow-primary/10"
