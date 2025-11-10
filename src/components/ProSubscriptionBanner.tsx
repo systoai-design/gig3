@@ -23,7 +23,7 @@ export const ProSubscriptionBanner = () => {
 
   return (
     <>
-      <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
+      <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent-cyan/10 border-primary/30 shadow-[0_0_30px_rgba(14,165,233,0.2)] dark:shadow-[0_0_30px_rgba(14,165,233,0.15)]">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">

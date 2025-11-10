@@ -197,7 +197,7 @@ export default function EditGig() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 pt-navbar pb-12 max-w-3xl">
+        <main className="container mx-auto px-4 pt-navbar pt-8 pb-12 max-w-3xl">
           <Skeleton className="h-12 w-64 mb-8" />
           <div className="space-y-6">
             <Skeleton className="h-10 w-full" />
@@ -212,7 +212,7 @@ export default function EditGig() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-navbar pb-12 max-w-3xl">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-12 max-w-3xl">
         <h1 className="text-4xl font-bold mb-2">Edit Gig</h1>
         <p className="text-muted-foreground mb-8">Update your gig details</p>
 

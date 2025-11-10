@@ -209,7 +209,7 @@ export default function BecomeCreator() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-navbar pb-12">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -250,7 +250,7 @@ export default function BecomeCreator() {
         termsAgreed={formData.agreeToTerms}
       />
       
-      <main className="pt-navbar pb-12">
+      <main className="pt-navbar pt-8 pb-12">
         {/* Hero Section */}
         <ScrollReveal>
           <section className="pb-12 bg-gradient-to-br from-primary/5 to-secondary/5">

@@ -99,7 +99,7 @@ export default function Cart() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-background pt-navbar pb-20">
+        <div className="min-h-screen bg-background pt-navbar pt-8 pb-20">
           <div className="container mx-auto px-4">
             <Skeleton className="h-12 w-64 mb-8" />
             <div className="grid gap-6">
@@ -117,7 +117,7 @@ export default function Cart() {
   return (
     <>
       <Navbar />
-        <div className="min-h-screen bg-background pt-navbar pb-20">
+        <div className="min-h-screen bg-background pt-navbar pt-8 pb-20">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-4xl font-bold">Shopping Cart</h1>

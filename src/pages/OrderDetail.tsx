@@ -190,7 +190,7 @@ export default function OrderDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 pt-navbar pb-12">
+        <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
           <Skeleton className="h-10 w-32 mb-6" />
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
@@ -209,7 +209,7 @@ export default function OrderDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-navbar pb-12">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
         <Button 
           variant="ghost" 
           className="mb-6"

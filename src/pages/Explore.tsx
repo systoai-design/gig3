@@ -361,7 +361,7 @@ export default function Explore() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <main className="container mx-auto px-4 pt-navbar pb-12">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

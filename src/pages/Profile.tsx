@@ -94,7 +94,7 @@ export default function Profile() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 pt-navbar pb-12">
+        <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
           <div className="max-w-4xl mx-auto space-y-8">
             <Skeleton className="h-48 w-full" />
             <Skeleton className="h-64 w-full" />
@@ -131,7 +131,7 @@ export default function Profile() {
       />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 pt-navbar pb-8">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
