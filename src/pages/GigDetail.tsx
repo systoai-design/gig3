@@ -140,7 +140,7 @@ export default function GigDetail() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container mx-auto px-4 pt-navbar pb-12">
+        <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-4">
               <Skeleton className="h-96 w-full" />
@@ -163,7 +163,7 @@ export default function GigDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-navbar pb-12">
+      <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-6">
             {/* Image Gallery */}
