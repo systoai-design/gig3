@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.check-delivery-deadlines]
 verify_jwt = false
+
+[functions.release-escrow-payment]
+verify_jwt = true
+
+[functions.approve-delivery]
+verify_jwt = true

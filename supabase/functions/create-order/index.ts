@@ -1,193 +1,160 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.77.0";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.77.0';
+import { Connection, PublicKey } from 'https://esm.sh/@solana/web3.js@1.98.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-payment',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface OrderRequest {
-  gigId: string;
-  buyerId: string;
-  sellerId: string;
-  amount: number;
-}
+const ESCROW_WALLET = 'W6Qe25zGpwRpt7k8Hrg2RANF7N88XP7JU5BEeKaTrJ2';
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    const { 
+      gigId, 
+      buyerId, 
+      sellerId, 
+      amount, 
+      deliveryDays,
+      packageIndex,
+      transactionSignature,
+      escrowWallet 
+    } = await req.json();
+
+    console.log('Creating order:', { gigId, buyerId, sellerId, amount, transactionSignature });
+
+    // Verify escrow wallet matches
+    if (escrowWallet !== ESCROW_WALLET) {
+      throw new Error('Invalid escrow wallet');
+    }
+
+    // Connect to Solana devnet
+    const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+
+    console.log('Verifying transaction on Solana:', transactionSignature);
+
+    // Verify transaction exists and is confirmed
+    const txInfo = await connection.getTransaction(transactionSignature, {
+      maxSupportedTransactionVersion: 0
+    });
+
+    if (!txInfo) {
+      throw new Error('Transaction not found on blockchain');
+    }
+
+    console.log('Transaction found:', txInfo);
+
+    // Verify transaction was successful
+    if (txInfo.meta?.err) {
+      throw new Error('Transaction failed on blockchain');
+    }
+
+    // Get the transfer instruction
+    const instructions = txInfo.transaction.message.compiledInstructions;
+    if (!instructions || instructions.length === 0) {
+      throw new Error('No instructions found in transaction');
+    }
+
+    // For SystemProgram transfer, lamports are in the instruction data
+    // The amount transferred is visible in the balance changes
+    const preBalances = txInfo.meta?.preBalances || [];
+    const postBalances = txInfo.meta?.postBalances || [];
+    
+    // Calculate the amount transferred (difference in escrow wallet balance)
+    // Escrow wallet should be the recipient (usually index 1)
+    let transferAmount = 0;
+    if (postBalances.length > 1 && preBalances.length > 1) {
+      transferAmount = (postBalances[1] - preBalances[1]) / 1000000000; // Convert lamports to SOL
+    }
+
+    console.log('Transfer amount:', transferAmount, 'SOL');
+
+    if (Math.abs(transferAmount - amount) > 0.0001) {
+      throw new Error(`Amount mismatch: expected ${amount} SOL, got ${transferAmount} SOL`);
+    }
+
+    // Verify recipient is escrow wallet
+    const accountKeys = txInfo.transaction.message.staticAccountKeys;
+    if (accountKeys && accountKeys.length > 1) {
+      const recipientKey = accountKeys[1].toBase58();
+      if (recipientKey !== ESCROW_WALLET) {
+        throw new Error('Transaction not sent to escrow wallet');
+      }
+    } else {
+      throw new Error('Could not verify transaction recipient');
+    }
+
+    console.log('Transaction verified successfully');
+
+    // Create Supabase client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Check if payment header exists
-    const paymentHeader = req.headers.get('x-payment');
-    
-    if (!paymentHeader) {
-      // No payment provided - respond with 402 Payment Required
-      const orderData: OrderRequest = await req.json();
-      
-      // Fetch gig details for payment instructions
-      const { data: gig, error: gigError } = await supabaseAdmin
-        .from('gigs')
-        .select('*, profiles!gigs_seller_id_fkey(wallet_address)')
-        .eq('id', orderData.gigId)
-        .single();
-
-      if (gigError || !gig) {
-        throw new Error('Gig not found');
-      }
-
-      const sellerWallet = (gig.profiles as any)?.wallet_address;
-      if (!sellerWallet) {
-        throw new Error('Seller wallet not configured');
-      }
-
-      // Updated escrow system - all funds go to escrow wallet
-      const escrowWallet = 'BBRKYbrTZc1toK1R7E4WeZWiiAhY4vNJSaW4Bd3uiPgR';
-      
-      // x402 payment instructions - payment goes to escrow
-      const paymentInstructions = {
-        protocol: 'x402',
-        version: '1.0',
-        blockchain: 'solana',
-        network: 'devnet', // Change to 'mainnet' for production
-        token: 'USDC',
-        amount: orderData.amount.toString(),
-        recipients: [
-          {
-            address: escrowWallet,
-            amount: orderData.amount.toString(),
-            label: 'GIG3 Escrow - Secure Payment Holding'
-          }
-        ],
-        metadata: {
-          gigId: orderData.gigId,
-          buyerId: orderData.buyerId,
-          sellerId: orderData.sellerId,
-          orderId: crypto.randomUUID(), // Temporary order ID for tracking
-        }
-      };
-
-      console.log('Responding with 402 Payment Required', paymentInstructions);
-
-      return new Response(
-        JSON.stringify(paymentInstructions),
-        {
-          status: 402,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json',
-            'X-Payment-Required': 'solana-x402',
-          },
-        }
-      );
-    }
-
-    // Payment provided - verify and create order
-    console.log('Payment received, verifying...');
-    const paymentProof = JSON.parse(paymentHeader);
-    const orderData: OrderRequest = await req.json();
-
-    // Verify payment on Solana blockchain
-    // In production, this would call x402 facilitator API
-    const isPaymentValid = await verifyPayment(paymentProof);
-
-    if (!isPaymentValid) {
-      return new Response(
-        JSON.stringify({ error: 'Payment verification failed' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
-    // Create order in database with escrow tracking
+    // Create order in database
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
-        gig_id: orderData.gigId,
-        buyer_id: orderData.buyerId,
-        seller_id: orderData.sellerId,
-        amount_sol: orderData.amount,
+        gig_id: gigId,
+        buyer_id: buyerId,
+        seller_id: sellerId,
+        amount_sol: amount,
         status: 'in_progress',
-        transaction_signature: paymentProof.signature,
-        escrow_account: 'BBRKYbrTZc1toK1R7E4WeZWiiAhY4vNJSaW4Bd3uiPgR',
+        escrow_account: ESCROW_WALLET,
+        transaction_signature: transactionSignature,
+        platform_fee_sol: 0, // 0% platform fee
       })
       .select()
       .single();
 
     if (orderError) {
       console.error('Order creation error:', orderError);
-      throw new Error('Failed to create order');
+      throw orderError;
     }
+
+    console.log('Order created:', order.id);
 
     // Log escrow transaction
     await supabaseAdmin
       .from('escrow_transactions')
       .insert({
         order_id: order.id,
-        amount_sol: orderData.amount,
+        amount_sol: amount,
         transaction_type: 'deposit',
-        transaction_signature: paymentProof.signature,
+        transaction_signature: transactionSignature,
       });
 
-    console.log('Order created successfully:', order.id);
+    console.log('Escrow transaction logged');
 
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        order,
-        message: 'Payment verified and order created'
+        success: true,
+        orderId: order.id,
+        transactionSignature,
+        message: 'Order created and payment verified'
       }),
       {
-        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+        status: 200,
+      },
     );
 
   } catch (error) {
-    console.error('Error in create-order function:', error);
+    console.error('Create order error:', error);
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'Unknown error' 
       }),
       {
-        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+        status: 400,
+      },
     );
   }
 });
-
-// Verify payment on Solana blockchain
-async function verifyPayment(paymentProof: any): Promise<boolean> {
-  try {
-    // TODO: Integrate with x402 facilitator for production
-    // For now, basic validation
-    console.log('Verifying payment proof:', paymentProof);
-    
-    // Check if signature exists
-    if (!paymentProof.signature || typeof paymentProof.signature !== 'string') {
-      console.error('Invalid signature format');
-      return false;
-    }
-
-    // In production, call CDP facilitator API or community facilitator
-    // Example: POST https://facilitator.x402.dev/verify
-    // with paymentProof data
-    
-    // For devnet testing, accept any valid-looking signature
-    return paymentProof.signature.length > 50;
-    
-  } catch (error) {
-    console.error('Payment verification error:', error);
-    return false;
-  }
-}
