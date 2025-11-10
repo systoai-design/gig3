@@ -203,6 +203,7 @@ export type Database = {
           attachments: string[] | null
           content: string
           created_at: string
+          edited_at: string | null
           id: string
           order_id: string | null
           read_at: string | null
@@ -213,6 +214,7 @@ export type Database = {
           attachments?: string[] | null
           content: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           order_id?: string | null
           read_at?: string | null
@@ -223,6 +225,7 @@ export type Database = {
           attachments?: string[] | null
           content?: string
           created_at?: string
+          edited_at?: string | null
           id?: string
           order_id?: string | null
           read_at?: string | null

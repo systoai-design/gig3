@@ -29,6 +29,7 @@ export default function GigDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorited } = useFavorites();
@@ -36,6 +37,41 @@ export default function GigDetail() {
   useEffect(() => {
     fetchGig();
   }, [id]);
+
+  useEffect(() => {
+    if (user && gig?.seller_id) {
+      fetchUnreadCount();
+      
+      // Subscribe to new messages to update count in real-time
+      const channel = supabase
+        .channel(`unread:${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'messages',
+            filter: `receiver_id=eq.${user.id}`,
+          },
+          () => fetchUnreadCount()
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages',
+            filter: `receiver_id=eq.${user.id}`,
+          },
+          () => fetchUnreadCount()
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user, gig]);
 
   const fetchGig = async () => {
     try {
@@ -61,6 +97,25 @@ export default function GigDetail() {
       navigate('/');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUnreadCount = async () => {
+    if (!user || !gig?.seller_id) return;
+    
+    try {
+      const { count, error } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', user.id)
+        .eq('sender_id', gig.seller_id)
+        .is('read_at', null);
+        
+      if (!error && count !== null) {
+        setUnreadCount(count);
+      }
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
     }
   };
 
@@ -329,6 +384,11 @@ export default function GigDetail() {
                 <TabsTrigger value="chat">
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Contact Seller
+                  {unreadCount > 0 && (
+                    <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                      {unreadCount}
+                    </Badge>
+                  )}
                 </TabsTrigger>
               )}
             </TabsList>
