@@ -77,14 +77,17 @@ export default function Explore() {
         .from('gigs')
         .select(`
           *,
-          profiles:seller_id (username, avatar_url),
-          seller_profiles!inner (pro_member, pro_since)
+          profiles:seller_id (
+            username, 
+            avatar_url,
+            seller_profiles!seller_profiles_user_id_fkey (pro_member, pro_since)
+          )
         `)
         .eq('status', 'active');
 
       // Pro filter
       if (proOnly) {
-        query = query.eq('seller_profiles.pro_member', true);
+        query = query.eq('profiles.seller_profiles.pro_member', true);
       }
 
       // Search filter
@@ -449,7 +452,7 @@ export default function Explore() {
               <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {gigs.map((gig) => {
                   const seller = gig.profiles;
-                  const sellerProfile = gig.seller_profiles;
+                  const sellerProfile = gig.profiles?.seller_profiles;
                   const avgRating = gig.avg_rating || 0;
                   const reviewCount = gig.review_count || 0;
 
