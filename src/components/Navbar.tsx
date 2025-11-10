@@ -94,7 +94,7 @@ export const Navbar = () => {
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl backdrop-blur-xl rounded-full shadow-lg border border-border/50 dark:shadow-primary/10"
       style={{ willChange: 'transform' }}
     >
-      <div className="container mx-auto px-6 relative bg-background/80 dark:bg-card/80 rounded-full transition-colors duration-300">
+      <div className="px-6 relative bg-background/80 dark:bg-card/80 rounded-full transition-colors duration-300">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <div className="flex items-center space-x-8">
