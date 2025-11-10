@@ -511,24 +511,33 @@ export default function Explore() {
                             onClick={() => navigate(`/gig/${gig.id}`)}
                           >
                             <div className="flex items-start gap-2 mb-2">
-                              <Avatar className="h-8 w-8 flex-shrink-0">
-                                <AvatarImage src={seller?.avatar_url || undefined} />
-                                <AvatarFallback>
-                                  <User className="h-4 w-4" />
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">
-                                  {seller?.username || 'Anonymous'}
-                                </p>
-                                {reviewCount > 0 && (
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                    <span>{avgRating.toFixed(1)}</span>
-                                    <span>({reviewCount})</span>
-                                  </div>
-                                )}
-                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/profile/${gig.seller_id}`);
+                                }}
+                                className="flex items-start gap-2 hover:opacity-80 transition-opacity cursor-pointer flex-1 min-w-0"
+                                type="button"
+                              >
+                                <Avatar className="h-8 w-8 flex-shrink-0">
+                                  <AvatarImage src={seller?.avatar_url || undefined} />
+                                  <AvatarFallback>
+                                    <User className="h-4 w-4" />
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate hover:text-primary transition-colors">
+                                    {seller?.username || 'Anonymous'}
+                                  </p>
+                                  {reviewCount > 0 && (
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                      <span>{avgRating.toFixed(1)}</span>
+                                      <span>({reviewCount})</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </button>
                               {sellerProfile?.pro_member && (
                                 <ProBadge />
                               )}
