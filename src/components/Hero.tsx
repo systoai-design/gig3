@@ -123,6 +123,11 @@ export const Hero = () => {
                 key={service.label}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
+                whileHover={{ 
+                  y: -4,
+                  scale: 1.02,
+                  boxShadow: "0 8px 30px hsla(var(--primary) / 0.3)"
+                }}
                 transition={{ 
                   delay: 1.1 + index * 0.1, 
                   duration: 0.5,
