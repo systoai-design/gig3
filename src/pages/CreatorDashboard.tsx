@@ -12,7 +12,9 @@ import { toast } from 'sonner';
 import { Plus, Package, DollarSign, Star, Edit, Eye, Trash2 } from 'lucide-react';
 import { ProSubscriptionBanner } from '@/components/ProSubscriptionBanner';
 import { ProBadge } from '@/components/ProBadge';
+import { ProfileCompletionChecklist } from '@/components/ProfileCompletionChecklist';
 import { useProStatus } from '@/hooks/useProStatus';
+import { calculateProfileCompletion } from '@/lib/profileUtils';
 import { motion } from 'framer-motion';
 import { StaggerContainer, StaggerItem } from '@/components/animations/StaggerContainer';
 
@@ -22,6 +24,9 @@ export default function CreatorDashboard() {
   const [gigs, setGigs] = useState<any[]>([]);
   const [stats, setStats] = useState({ totalGigs: 0, activeGigs: 0, totalOrders: 0 });
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+  const [sellerProfile, setSellerProfile] = useState<any>(null);
+  const [completion, setCompletion] = useState(0);
   const { data: proStatus } = useProStatus(user?.id);
 
   useEffect(() => {
@@ -62,6 +67,30 @@ export default function CreatorDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single();
+      
+      setProfile(profileData);
+
+      // Fetch seller profile
+      const { data: sellerData } = await supabase
+        .from('seller_profiles')
+        .select('*')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+      
+      setSellerProfile(sellerData);
+      
+      // Calculate completion
+      if (profileData) {
+        const completionPercent = calculateProfileCompletion(profileData, sellerData);
+        setCompletion(completionPercent);
+      }
+
       // Fetch gigs
       const { data: gigsData, error: gigsError } = await supabase
         .from('gigs')
@@ -147,6 +176,17 @@ export default function CreatorDashboard() {
             Create New Gig
           </Button>
         </motion.div>
+
+        {/* Profile Completion Checklist */}
+        {completion < 100 && profile && (
+          <div className="mb-8">
+            <ProfileCompletionChecklist
+              completion={completion}
+              profile={profile}
+              sellerProfile={sellerProfile}
+            />
+          </div>
+        )}
 
         {/* Pro Subscription Banner */}
         <div className="mb-8">

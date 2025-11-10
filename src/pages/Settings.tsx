@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ImageUploader } from '@/components/settings/ImageUploader';
+import { ProfessionalSection } from '@/components/settings/ProfessionalSection';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
@@ -156,26 +157,32 @@ export default function Settings() {
     }
   };
 
-  const handleSaveProfessional = async () => {
+  const handleUpdateProfessional = async (data: {
+    skills?: string[];
+    portfolio_items?: any[];
+    education?: any[];
+    certifications?: any[];
+  }) => {
     if (!isSeller) return;
     
     setSaving(true);
     try {
+      const updateData: any = {
+        updated_at: new Date().toISOString(),
+      };
+      
+      if (data.skills !== undefined) updateData.skills = data.skills;
+      if (data.portfolio_items !== undefined) updateData.portfolio_items = data.portfolio_items;
+      if (data.education !== undefined) updateData.education = data.education;
+      if (data.certifications !== undefined) updateData.certifications = data.certifications;
+
       const { error } = await supabase
         .from('seller_profiles')
-        .update({
-          portfolio_items: portfolioItems,
-          education,
-          certifications,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('user_id', user!.id);
 
       if (error) throw error;
-      toast.success('Professional details updated successfully');
-      fetchProfile();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update professional details');
+      await fetchProfile();
     } finally {
       setSaving(false);
     }
@@ -452,21 +459,13 @@ export default function Settings() {
             {/* Professional Tab (Sellers only) */}
             {isSeller && (
               <TabsContent value="professional">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Professional Details</CardTitle>
-                    <CardDescription>Manage your portfolio, education, and certifications</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <p className="text-sm text-muted-foreground">
-                      Professional features coming soon. You can manage your skills from the Seller Dashboard.
-                    </p>
-                    <Button onClick={handleSaveProfessional} disabled={saving} className="w-full">
-                      <Save className="h-4 w-4 mr-2" />
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </Button>
-                  </CardContent>
-                </Card>
+                <ProfessionalSection
+                  skills={sellerProfile?.skills || []}
+                  portfolioItems={portfolioItems}
+                  education={education}
+                  certifications={certifications}
+                  onUpdate={handleUpdateProfessional}
+                />
               </TabsContent>
             )}
 
