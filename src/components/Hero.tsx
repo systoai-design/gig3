@@ -100,7 +100,7 @@ export const Hero = () => {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="max-w-3xl mx-auto mb-8"
           >
-            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2">
+            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-primary/40 dark:border-primary/50">
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
