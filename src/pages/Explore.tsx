@@ -78,16 +78,26 @@ export default function Explore() {
         .select(`
           *,
           profiles:seller_id (
-            username, 
-            avatar_url,
-            seller_profiles!seller_profiles_user_id_fkey (pro_member, pro_since)
+            username,
+            avatar_url
           )
         `)
         .eq('status', 'active');
 
-      // Pro filter
+      // Pro filter - fetch pro user ids and filter gigs by seller_id
       if (proOnly) {
-        query = query.eq('profiles.seller_profiles.pro_member', true);
+        const { data: proUsers, error: proErr } = await supabase
+          .from('seller_profiles')
+          .select('user_id')
+          .eq('pro_member', true);
+        if (proErr) throw proErr;
+        const proIds = (proUsers || []).map(u => u.user_id).filter(Boolean);
+        if (proIds.length === 0) {
+          setGigs([]);
+          setLoading(false);
+          return;
+        }
+        query = query.in('seller_id', proIds);
       }
 
       // Search filter
@@ -134,10 +144,21 @@ export default function Explore() {
 
       if (error) throw error;
 
+      // Fetch seller profiles in batch for pro badge and metadata
+      const sellerIds = Array.from(new Set((data || []).map((g: any) => g.seller_id)));
+      let sellerProfilesMap: Record<string, any> = {};
+      if (sellerIds.length > 0) {
+        const { data: sellerProfiles } = await supabase
+          .from('seller_profiles')
+          .select('user_id, pro_member, pro_since')
+          .in('user_id', sellerIds);
+        sellerProfilesMap = Object.fromEntries((sellerProfiles || []).map((sp: any) => [sp.user_id, sp]));
+      }
+
       // Fetch reviews for rating filter
       if (minRating > 0 && data) {
         const gigsWithReviews = await Promise.all(
-          data.map(async (gig) => {
+          data.map(async (gig: any) => {
             const { data: reviews } = await supabase
               .from('reviews')
               .select('rating')
@@ -147,16 +168,16 @@ export default function Explore() {
               ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
               : 0;
 
-            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0 };
+            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0, seller_profile: sellerProfilesMap[gig.seller_id] };
           })
         );
 
-        const filtered = gigsWithReviews.filter((gig) => gig.avg_rating >= minRating);
+        const filtered = gigsWithReviews.filter((gig: any) => gig.avg_rating >= minRating);
         setGigs(filtered);
       } else if (data) {
         // Fetch review counts without filtering
         const gigsWithReviews = await Promise.all(
-          data.map(async (gig) => {
+          data.map(async (gig: any) => {
             const { data: reviews } = await supabase
               .from('reviews')
               .select('rating')
@@ -166,7 +187,7 @@ export default function Explore() {
               ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
               : 0;
 
-            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0 };
+            return { ...gig, avg_rating: avgRating, review_count: reviews?.length || 0, seller_profile: sellerProfilesMap[gig.seller_id] };
           })
         );
         setGigs(gigsWithReviews);
@@ -452,7 +473,7 @@ export default function Explore() {
               <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {gigs.map((gig) => {
                   const seller = gig.profiles;
-                  const sellerProfile = gig.profiles?.seller_profiles;
+                  const sellerProfile = gig.seller_profile;
                   const avgRating = gig.avg_rating || 0;
                   const reviewCount = gig.review_count || 0;
 
