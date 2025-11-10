@@ -67,10 +67,7 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
     try {
       let query = supabase
         .from('messages')
-        .select(`
-          *,
-          sender_profile:profiles!messages_sender_id_fkey(username, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: true });
 
       if (orderId) {
@@ -86,14 +83,10 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
 
       if (error) throw error;
       
-      const typedData = data?.map(msg => ({
-        ...msg,
-        profiles: msg.sender_profile
-      })) || [];
-      
-      setMessages(typedData as any);
+      setMessages(data || []);
     } catch (error: any) {
       console.error('Error fetching messages:', error);
+      toast.error('Failed to load messages');
     }
   };
 
