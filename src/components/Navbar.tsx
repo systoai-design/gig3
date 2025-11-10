@@ -12,6 +12,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,8 +42,9 @@ export const Navbar = () => {
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
 
-  // Scroll-based navbar styling
+  // Scroll-based navbar styling and auto-hide
   const { scrollY } = useScroll();
+  const scrollDirection = useScrollDirection();
   const navbarBg = useTransform(
     scrollY,
     [0, 100],
@@ -85,7 +87,12 @@ export const Navbar = () => {
 
   return (
     <motion.nav 
+      animate={{
+        y: scrollDirection === "down" && scrollY.get() > 50 ? -100 : 0,
+      }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
       className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-7xl backdrop-blur-xl rounded-full shadow-lg border border-border/50 dark:shadow-primary/10"
+      style={{ willChange: 'transform' }}
     >
       <div className="container mx-auto px-6 relative bg-background/80 dark:bg-card/80 rounded-full transition-colors duration-300">
         <div className="flex items-center justify-between h-14">
