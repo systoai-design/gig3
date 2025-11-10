@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
-import { Send, User } from 'lucide-react';
+import { Send, User, Check, CheckCheck } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -14,6 +14,7 @@ interface Message {
   receiver_id: string;
   content: string;
   created_at: string;
+  read_at: string | null;
   profiles?: {
     username: string;
     avatar_url: string | null;
@@ -50,6 +51,17 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
           fetchMessages();
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          fetchMessages();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -60,6 +72,33 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      markMessagesAsRead();
+    }
+  }, [messages, user]);
+
+  const markMessagesAsRead = async () => {
+    if (!user) return;
+    
+    try {
+      const unreadMessages = messages.filter(
+        msg => msg.receiver_id === user.id && !msg.read_at
+      );
+      
+      if (unreadMessages.length === 0) return;
+      
+      const { error } = await supabase
+        .from('messages')
+        .update({ read_at: new Date().toISOString() })
+        .in('id', unreadMessages.map(m => m.id));
+        
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+    }
+  };
 
   const fetchMessages = async () => {
     if (!user) return;
@@ -156,12 +195,28 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
                     >
                       <p className="text-sm break-words">{message.content}</p>
                     </div>
-                    <span className="text-xs text-muted-foreground mt-1">
-                      {new Date(message.created_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                    {isOwn ? (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                        <span>
+                          {new Date(message.created_at).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        {message.read_at ? (
+                          <CheckCheck className="h-3 w-3 text-primary" aria-label="Read" />
+                        ) : (
+                          <Check className="h-3 w-3" aria-label="Sent" />
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground mt-1">
+                        {new Date(message.created_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                    )}
                   </div>
                 </div>
               );
