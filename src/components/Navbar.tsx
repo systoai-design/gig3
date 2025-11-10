@@ -11,6 +11,7 @@ import { AuthDialog } from "@/components/AuthDialog";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -139,6 +140,8 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
+            <ThemeToggle />
+            
             {!isSeller && user && (
               <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="hover:text-primary">
                 Become a Creator
@@ -254,6 +257,12 @@ export const Navbar = () => {
                     className="w-full pl-10 pr-4 py-2 rounded-full"
                   />
                 </form>
+
+                {/* Theme Toggle */}
+                <div className="flex items-center justify-between px-2">
+                  <span className="text-sm font-medium">Theme</span>
+                  <ThemeToggle />
+                </div>
 
                 <Separator />
 
