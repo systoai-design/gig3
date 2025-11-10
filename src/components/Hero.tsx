@@ -1,11 +1,9 @@
 import { motion } from "framer-motion";
-import { Search, TrendingUp, Shield, Zap, Code, Palette, Video } from "lucide-react";
+import { Search, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GlassmorphicCard } from "./animations/GlassmorphicCard";
 import { TextReveal } from "./animations/TextReveal";
-import { FloatingShapes } from "./animations/FloatingShapes";
 import { MagneticButton } from "./animations/MagneticButton";
-import { ParticleBackground } from "./animations/ParticleBackground";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
 import { NoiseTexture } from "./ui/noise-texture";
@@ -64,25 +62,13 @@ export const Hero = () => {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-      {/* Animated Background Layers */}
+      {/* Simplified Background */}
       <div className="absolute inset-0 z-0">
-        {/* Particle System with Mouse Interaction */}
-        <ParticleBackground 
-          particleCount={60}
-          particleColor="var(--primary)"
-          glowColor="var(--primary)"
-          glowSize={180}
-          connectionDistance={120}
-        />
-        
         {/* Gradient Mesh */}
-        <GradientMesh className="opacity-40" animated={false} />
-        
-        {/* Floating Shapes */}
-        <FloatingShapes count={3} />
+        <GradientMesh className="opacity-30" animated={true} />
         
         {/* Noise Texture */}
-        <NoiseTexture opacity={0.03} />
+        <NoiseTexture opacity={0.02} />
       </div>
       
       {/* Content */}
