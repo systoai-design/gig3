@@ -133,7 +133,7 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
 
   return (
     <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-3 md:p-4" ref={scrollRef}>
         <div className="space-y-4">
           {messages.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
@@ -147,21 +147,21 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
                   key={message.id}
                   className={`flex items-start gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src={message.profiles?.avatar_url || undefined} />
                     <AvatarFallback>
                       <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
+                  <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
                     <div
-                      className={`rounded-lg px-4 py-2 max-w-[70%] ${
+                      className={`rounded-lg px-3 md:px-4 py-2 ${
                         isOwn
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
                       }`}
                     >
-                      <p className="text-sm">{message.content}</p>
+                      <p className="text-sm break-words">{message.content}</p>
                     </div>
                     <span className="text-xs text-muted-foreground mt-1">
                       {new Date(message.created_at).toLocaleTimeString([], {
@@ -177,15 +177,21 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
         </div>
       </ScrollArea>
 
-      <form onSubmit={handleSendMessage} className="border-t p-4">
+      <form onSubmit={handleSendMessage} className="border-t p-3 md:p-4">
         <div className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             disabled={sending}
+            className="min-h-[44px]"
           />
-          <Button type="submit" size="icon" disabled={sending || !newMessage.trim()}>
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={sending || !newMessage.trim()}
+            className="min-w-[44px] min-h-[44px] flex-shrink-0"
+          >
             <Send className="h-4 w-4" />
           </Button>
         </div>

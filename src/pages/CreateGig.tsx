@@ -305,12 +305,12 @@ export default function CreateGig() {
           {/* Pricing Type Selection */}
           <div className="space-y-4">
             <Label>Pricing Model</Label>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 type="button"
                 variant={usePackages ? 'default' : 'outline'}
                 onClick={() => setUsePackages(true)}
-                className="flex-1"
+                className="flex-1 min-h-[44px]"
               >
                 Tiered Packages (Recommended)
               </Button>
@@ -318,7 +318,7 @@ export default function CreateGig() {
                 type="button"
                 variant={!usePackages ? 'default' : 'outline'}
                 onClick={() => setUsePackages(false)}
-                className="flex-1"
+                className="flex-1 min-h-[44px]"
               >
                 Single Price
               </Button>
@@ -329,8 +329,8 @@ export default function CreateGig() {
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Create Your Packages</h3>
               {packages.map((pkg, pkgIdx) => (
-                <div key={pkgIdx} className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">{pkg.name} Package</h4>
+                <div key={pkgIdx} className="border rounded-lg p-4 md:p-6 space-y-4">
+                  <h4 className="font-semibold text-lg">{pkg.name} Package</h4>
                   
                   <div>
                     <Label>Package Description *</Label>
@@ -344,10 +344,11 @@ export default function CreateGig() {
                       }}
                       rows={2}
                       required
+                      className="min-h-[44px]"
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <Label>Price (SOL) *</Label>
                       <Input
@@ -361,6 +362,7 @@ export default function CreateGig() {
                           setPackages(newPackages);
                         }}
                         required
+                        className="min-h-[44px]"
                       />
                     </div>
                     <div>
@@ -375,6 +377,7 @@ export default function CreateGig() {
                           setPackages(newPackages);
                         }}
                         required
+                        className="min-h-[44px]"
                       />
                     </div>
                     <div>
@@ -389,6 +392,7 @@ export default function CreateGig() {
                           setPackages(newPackages);
                         }}
                         required
+                        className="min-h-[44px]"
                       />
                     </div>
                   </div>
@@ -403,6 +407,7 @@ export default function CreateGig() {
                             value={feature}
                             onChange={(e) => updatePackageFeature(pkgIdx, featIdx, e.target.value)}
                             required
+                            className="min-h-[44px]"
                           />
                           {pkg.features.length > 1 && (
                             <Button
@@ -410,6 +415,7 @@ export default function CreateGig() {
                               variant="ghost"
                               size="icon"
                               onClick={() => removePackageFeature(pkgIdx, featIdx)}
+                              className="min-w-[44px] min-h-[44px] flex-shrink-0"
                             >
                               <X className="h-4 w-4" />
                             </Button>
@@ -421,6 +427,7 @@ export default function CreateGig() {
                         variant="outline"
                         size="sm"
                         onClick={() => addPackageFeature(pkgIdx)}
+                        className="w-full sm:w-auto min-h-[44px]"
                       >
                         + Add Feature
                       </Button>
@@ -430,7 +437,7 @@ export default function CreateGig() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="price">Price (SOL) *</Label>
                 <Input
@@ -441,6 +448,7 @@ export default function CreateGig() {
                   value={formData.price_sol}
                   onChange={(e) => setFormData({ ...formData, price_sol: e.target.value })}
                   required
+                  className="min-h-[44px]"
                 />
               </div>
               <div>
@@ -452,6 +460,7 @@ export default function CreateGig() {
                   value={formData.delivery_days}
                   onChange={(e) => setFormData({ ...formData, delivery_days: e.target.value })}
                   required
+                  className="min-h-[44px]"
                 />
               </div>
             </div>
@@ -460,10 +469,11 @@ export default function CreateGig() {
           <div>
             <Label>Gig Images * (Max 5)</Label>
             <div className="mt-2">
-              <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
-                <div className="text-center">
+              <label className="flex items-center justify-center w-full h-40 md:h-32 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                <div className="text-center p-4">
                   <Upload className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
                   <span className="text-sm text-muted-foreground">Click to upload images</span>
+                  <span className="text-xs text-muted-foreground block mt-1">Max 5 images</span>
                 </div>
                 <input
                   type="file"
@@ -476,14 +486,14 @@ export default function CreateGig() {
             </div>
 
             {imagePreviews.length > 0 && (
-              <div className="grid grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
                 {imagePreviews.map((preview, index) => (
                   <div key={index} className="relative group">
                     <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 p-2 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity min-w-[44px] min-h-[44px] flex items-center justify-center"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -493,7 +503,7 @@ export default function CreateGig() {
             )}
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full">
+          <Button type="submit" disabled={loading} className="w-full min-h-[48px]">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -13,6 +13,8 @@ import { Plus, Package, DollarSign, Star, Edit, Eye, Trash2 } from 'lucide-react
 import { ProSubscriptionBanner } from '@/components/ProSubscriptionBanner';
 import { ProBadge } from '@/components/ProBadge';
 import { useProStatus } from '@/hooks/useProStatus';
+import { motion } from 'framer-motion';
+import { StaggerContainer, StaggerItem } from '@/components/animations/StaggerContainer';
 
 export default function CreatorDashboard() {
   const { user } = useAuth();
@@ -129,18 +131,22 @@ export default function CreatorDashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-navbar pb-12">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <h1 className="text-4xl font-bold">Creator Dashboard</h1>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <h1 className="text-3xl md:text-4xl font-bold">Creator Dashboard</h1>
             {proStatus?.isPro && (
               <ProBadge size="lg" proSince={proStatus.proSince} />
             )}
           </div>
-          <Button onClick={() => navigate('/create-gig')}>
+          <Button onClick={() => navigate('/create-gig')} className="w-full md:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Create New Gig
           </Button>
-        </div>
+        </motion.div>
 
         {/* Pro Subscription Banner */}
         <div className="mb-8">
@@ -148,40 +154,52 @@ export default function CreatorDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Gigs</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalGigs}</div>
-              <p className="text-xs text-muted-foreground">{stats.activeGigs} active</p>
-            </CardContent>
-          </Card>
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+          <StaggerItem>
+            <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
+              <Card className="hover-lift">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Gigs</CardTitle>
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalGigs}</div>
+                  <p className="text-xs text-muted-foreground">{stats.activeGigs} active</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </StaggerItem>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalOrders}</div>
-              <p className="text-xs text-muted-foreground">All time</p>
-            </CardContent>
-          </Card>
+          <StaggerItem>
+            <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
+              <Card className="hover-lift">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalOrders}</div>
+                  <p className="text-xs text-muted-foreground">All time</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </StaggerItem>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-              <Star className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">5.0</div>
-              <p className="text-xs text-muted-foreground">0 reviews</p>
-            </CardContent>
-          </Card>
-        </div>
+          <StaggerItem>
+            <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
+              <Card className="hover-lift">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+                  <Star className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">5.0</div>
+                  <p className="text-xs text-muted-foreground">0 reviews</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </StaggerItem>
+        </StaggerContainer>
 
         {/* Gigs List */}
         <Card>
@@ -198,57 +216,66 @@ export default function CreatorDashboard() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <StaggerContainer className="space-y-4">
                 {gigs.map((gig) => (
-                  <div key={gig.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                    <img 
-                      src={gig.images?.[0] || '/placeholder.svg'} 
-                      alt={gig.title}
-                      className="w-24 h-24 object-cover rounded"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold">{gig.title}</h3>
-                        <Badge variant={gig.status === 'active' ? 'default' : 'secondary'}>
-                          {gig.status}
-                        </Badge>
+                  <StaggerItem key={gig.id}>
+                    <motion.div 
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                    >
+                      <img 
+                        src={gig.images?.[0] || '/placeholder.svg'} 
+                        alt={gig.title}
+                        className="w-full md:w-24 h-48 md:h-24 object-cover rounded"
+                      />
+                      <div className="flex-1 w-full">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h3 className="font-semibold">{gig.title}</h3>
+                          <Badge variant={gig.status === 'active' ? 'default' : 'secondary'}>
+                            {gig.status}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{gig.description}</p>
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                          <span>{gig.category}</span>
+                          <span className="font-semibold text-foreground">{gig.price_sol} SOL</span>
+                          <span>{gig.delivery_days} days</span>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-1">{gig.description}</p>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>{gig.category}</span>
-                        <span className="font-semibold text-foreground">{gig.price_sol} SOL</span>
-                        <span>{gig.delivery_days} days</span>
+                      <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="min-w-[44px] min-h-[44px]"
+                          onClick={() => navigate(`/gigs/${gig.id}`)}
+                          title="View"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="min-w-[44px] min-h-[44px]"
+                          onClick={() => navigate(`/edit-gig/${gig.id}`)}
+                          title="Edit"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="min-w-[44px] min-h-[44px]"
+                          onClick={() => handleDeleteGig(gig.id)}
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => navigate(`/gigs/${gig.id}`)}
-                        title="View"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => navigate(`/edit-gig/${gig.id}`)}
-                        title="Edit"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleDeleteGig(gig.id)}
-                        title="Delete"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </div>
+                    </motion.div>
+                  </StaggerItem>
                 ))}
-              </div>
+              </StaggerContainer>
             )}
           </CardContent>
         </Card>
