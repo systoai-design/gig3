@@ -96,7 +96,7 @@ export const HowItWorks = () => {
                           transition={{ duration: 0.5 }}
                           className="flex-shrink-0"
                         >
-                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent-pink flex items-center justify-center shadow-lg">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent-cyan flex items-center justify-center shadow-lg">
                             <Icon className="h-8 w-8 text-white" />
                           </div>
                         </motion.div>
@@ -116,7 +116,7 @@ export const HowItWorks = () => {
                   {/* Number Badge */}
                   <motion.div
                     whileHover={{ scale: 1.1, rotate: 5 }}
-                    className="flex-shrink-0 w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent-pink flex items-center justify-center shadow-xl"
+                    className="flex-shrink-0 w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent-cyan flex items-center justify-center shadow-xl"
                   >
                     <span className="text-2xl font-black text-white">{step.number}</span>
                   </motion.div>
@@ -139,7 +139,7 @@ export const HowItWorks = () => {
         >
           <MagneticButton
             onClick={() => navigate('/explore')}
-            className="bg-gradient-to-r from-primary to-accent-pink hover:from-primary/90 hover:to-accent-pink/90 text-white px-12 py-6 rounded-full font-bold text-lg shadow-xl"
+            className="bg-gradient-to-r from-primary to-accent-cyan hover:from-primary/90 hover:to-accent-cyan/90 text-white px-12 py-6 rounded-full font-bold text-lg shadow-xl"
           >
             Start Your Project Now
           </MagneticButton>

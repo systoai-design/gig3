@@ -10,7 +10,7 @@ export const ScrollProgressBar = () => {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent-pink to-accent-purple origin-left z-[100]"
+      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent-cyan to-accent-purple origin-left z-[100]"
       style={{ scaleX }}
     />
   );

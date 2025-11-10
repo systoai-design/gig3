@@ -95,7 +95,7 @@ export const FeaturedGigs = () => {
             </p>
             <MagneticButton 
               onClick={() => navigate('/become-creator')}
-              className="bg-gradient-to-r from-primary to-accent-pink text-white px-8 py-4 rounded-full font-semibold"
+              className="bg-gradient-to-r from-primary to-accent-cyan text-white px-8 py-4 rounded-full font-semibold"
             >
               Become a Creator
             </MagneticButton>
@@ -200,10 +200,10 @@ export const FeaturedGigs = () => {
                     <div className="p-5">
                       {/* Creator Info */}
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-pink"></div>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-cyan"></div>
                         <span className="text-sm font-medium text-foreground">Creator</span>
                         {gig.seller_profiles?.pro_member && (
-                          <AnimatedBadge glow pulse className="bg-gradient-to-r from-accent-amber to-accent-pink text-white text-xs">
+                          <AnimatedBadge glow pulse className="bg-gradient-to-r from-accent-blue to-accent-cyan text-white text-xs">
                             PRO
                           </AnimatedBadge>
                         )}
@@ -225,7 +225,7 @@ export const FeaturedGigs = () => {
                             e.stopPropagation();
                             navigate(`/gig/${gig.id}`);
                           }}
-                          className="bg-gradient-to-r from-primary to-accent-pink text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:scale-105 transition-transform"
+                          className="bg-gradient-to-r from-primary to-accent-cyan text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:scale-105 transition-transform"
                         >
                           View
                           <ArrowRight className="h-4 w-4" />

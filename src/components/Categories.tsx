@@ -8,12 +8,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 const categories = [
   { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan" },
-  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-pink to-accent-purple" },
+  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-cyan to-accent-purple" },
   { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary" },
-  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-pink" },
-  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-pink" },
+  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-blue" },
+  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-cyan" },
   { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue" },
-  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-pink" },
+  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-cyan" },
   { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple" },
   { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue" },
 ];

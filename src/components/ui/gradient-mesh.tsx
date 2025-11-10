@@ -8,7 +8,7 @@ interface GradientMeshProps {
 
 export const GradientMesh = ({ 
   className = '',
-  colors = ['hsl(0, 99%, 59%)', 'hsl(335, 100%, 77%)', 'hsl(280, 68%, 62%)'],
+  colors = ['hsl(212, 100%, 48%)', 'hsl(200, 100%, 55%)', 'hsl(180, 77%, 52%)'],
   animated = true
 }: GradientMeshProps) => {
   return (

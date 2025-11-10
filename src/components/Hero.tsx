@@ -7,14 +7,52 @@ import { FloatingShapes } from "./animations/FloatingShapes";
 import { MagneticButton } from "./animations/MagneticButton";
 import { ParticleBackground } from "./animations/ParticleBackground";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NoiseTexture } from "./ui/noise-texture";
 import { GradientMesh } from "./ui/gradient-mesh";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Hero = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [searchValue, setSearchValue] = useState("");
+  const [stats, setStats] = useState({
+    creators: 0,
+    services: 0,
+    avgRating: 0,
+    reviewCount: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch stats from database
+        const [creatorsRes, servicesRes, reviewsRes] = await Promise.all([
+          supabase.from('seller_profiles').select('user_id', { count: 'exact', head: true }),
+          supabase.from('gigs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+          supabase.from('reviews').select('rating')
+        ]);
+
+        const creators = creatorsRes.count || 0;
+        const services = servicesRes.count || 0;
+        const reviews = reviewsRes.data || [];
+        const avgRating = reviews.length > 0 
+          ? Math.round(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length)
+          : 0;
+
+        setStats({
+          creators,
+          services,
+          avgRating,
+          reviewCount: reviews.length
+        });
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const popularServices = [
     { label: "Website Development", icon: "→" },
@@ -101,7 +139,7 @@ export const Hero = () => {
                     e.stopPropagation();
                     navigate('/explore');
                   }}
-                  className="bg-gradient-to-r from-primary to-accent-pink hover:from-primary/90 hover:to-accent-pink/90 text-white px-6 sm:px-8 py-4 rounded-3xl font-semibold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
+                  className="bg-gradient-to-r from-primary to-accent-cyan hover:from-primary/90 hover:to-accent-cyan/90 text-white px-6 sm:px-8 py-4 rounded-3xl font-semibold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   {isMobile ? (
                     <>
@@ -146,7 +184,7 @@ export const Hero = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-foreground text-sm font-medium">{service.label}</span>
                     {service.badge && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-accent-amber to-accent-pink text-white rounded-full">
+                      <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full">
                         <TrendingUp className="h-3 w-3" />
                         {service.badge}
                       </span>
@@ -166,10 +204,22 @@ export const Hero = () => {
             <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 {[
-                  { value: "10K+", label: "Creators" },
-                  { value: "50K+", label: "Services" },
-                  { value: "99%", label: "Satisfaction" },
-                  { value: "24/7", label: "Support" }
+                  { 
+                    value: stats.creators > 0 ? `${stats.creators.toLocaleString()}${stats.creators >= 1000 ? '+' : ''}` : '0', 
+                    label: "Creators" 
+                  },
+                  { 
+                    value: stats.services > 0 ? `${stats.services.toLocaleString()}${stats.services >= 1000 ? '+' : ''}` : '0', 
+                    label: "Services" 
+                  },
+                  { 
+                    value: stats.reviewCount > 0 ? `${stats.avgRating}★` : 'New', 
+                    label: "Satisfaction" 
+                  },
+                  { 
+                    value: "24/7", 
+                    label: "Support" 
+                  }
                 ].map((stat, index) => (
                   <motion.div
                     key={stat.label}

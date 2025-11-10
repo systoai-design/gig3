@@ -46,7 +46,7 @@ export const FormProgressBar = ({
     <div className="sticky top-16 left-0 right-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
       {/* Progress Bar */}
       <motion.div
-        className="h-1 bg-gradient-to-r from-primary via-accent-pink to-accent-purple origin-left"
+        className="h-1 bg-gradient-to-r from-primary via-accent-cyan to-accent-purple origin-left"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: progressPercentage / 100 }}
         transition={{ duration: 0.3, ease: "easeOut" }}

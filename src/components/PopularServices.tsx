@@ -20,7 +20,7 @@ const services = [
   { 
     title: "Video Editing",
     image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800&q=80",
-    gradient: "from-primary/90 to-accent-pink/90"
+    gradient: "from-primary/90 to-accent-cyan/90"
   },
   { 
     title: "3D Animation",
@@ -30,7 +30,7 @@ const services = [
   { 
     title: "Logo Design",
     image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&q=80",
-    gradient: "from-accent-pink/90 to-accent-purple/90"
+    gradient: "from-accent-cyan/90 to-accent-purple/90"
   },
   { 
     title: "Smart Contracts",
