@@ -57,11 +57,11 @@ export const Hero = () => {
   }, []);
 
   const popularServices = [
-    { label: "Website Development", icon: "→", borderColor: "border-accent-blue/50" },
-    { label: "Logo Design", icon: "→", borderColor: "border-accent-purple/50" },
-    { label: "Video Editing", icon: "→", borderColor: "border-accent-pink/50" },
-    { label: "AI Services", icon: "→", borderColor: "border-accent-amber/50" },
-    { label: "Smart Contracts", badge: "NEW", icon: "→", borderColor: "border-accent-cyan/60" },
+    { label: "Website Development", icon: "→", borderColor: "border-accent-blue/70" },
+    { label: "Logo Design", icon: "→", borderColor: "border-accent-purple/70" },
+    { label: "Video Editing", icon: "→", borderColor: "border-accent-pink/70" },
+    { label: "AI Services", icon: "→", borderColor: "border-accent-amber/70" },
+    { label: "Smart Contracts", badge: "NEW", icon: "→", borderColor: "border-accent-cyan/80" },
   ];
 
   return (
@@ -104,7 +104,7 @@ export const Hero = () => {
             transition={{ delay: 0.8, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             className="max-w-3xl mx-auto mb-8"
           >
-            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-primary/60 dark:border-primary/50">
+            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-primary/70 dark:border-primary/60">
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -158,13 +158,14 @@ export const Hero = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 whileHover={{ 
-                  y: -4,
+                  y: -2,
                   scale: 1.02,
-                  boxShadow: "0 8px 30px hsla(var(--primary) / 0.3)"
+                  boxShadow: "0 8px 30px hsla(var(--primary) / 0.3)",
+                  transition: { duration: 0.2, type: "spring", stiffness: 400, damping: 30 }
                 }}
                 transition={{ 
                   delay: 1.1 + index * 0.1, 
-                  duration: 0.5,
+                  duration: 0.8,
                   ease: [0.25, 0.1, 0.25, 1]
                 }}
                 onClick={() => navigate(`/explore?q=${encodeURIComponent(service.label)}`)}
@@ -191,7 +192,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/40 dark:border-primary/30">
+            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/50 dark:border-primary/40">
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
                 {[
                   { 
