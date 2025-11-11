@@ -64,13 +64,13 @@ serve(async (req) => {
       throw new Error('Only the buyer can approve delivery');
     }
 
-    // Verify order status
-    if (order.status !== 'delivered') {
-      throw new Error('Order must be in delivered status to approve');
+    // Verify order status - accept both proof_submitted and delivered
+    if (order.status !== 'proof_submitted' && order.status !== 'delivered') {
+      throw new Error('Order must have proof submitted before approval');
     }
 
-    // Verify proof has been submitted
-    if (!order.proof_files || order.proof_files.length === 0) {
+    // Verify proof has been submitted (description is required, files are optional)
+    if (!order.proof_description && (!order.proof_files || order.proof_files.length === 0)) {
       throw new Error('Seller must submit proof of work before approval');
     }
 
