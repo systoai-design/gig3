@@ -136,14 +136,34 @@ export default function OrderDetail() {
       console.log('Approval response:', { data, error });
 
       // Check both error sources
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
+      if (error) {
+        // Network or function error
+        throw new Error(
+          error.message || 'Failed to connect to payment service. Please try again.'
+        );
+      }
+      
+      if (data?.error) {
+        // Business logic error from the function
+        const errorMsg = data.error;
+        if (errorMsg.includes('authorization') || errorMsg.includes('Unauthorized')) {
+          throw new Error('Authentication failed. Please refresh the page and try again.');
+        } else if (errorMsg.includes('buyer')) {
+          throw new Error('Only the buyer can approve this delivery.');
+        } else if (errorMsg.includes('proof')) {
+          throw new Error('The seller must submit proof of work before approval.');
+        } else if (errorMsg.includes('escrow')) {
+          throw new Error('Failed to release escrow payment. Please contact support.');
+        } else {
+          throw new Error(errorMsg);
+        }
+      }
 
-      toast.success('Delivery approved! Escrow released to seller.');
+      toast.success('✓ Payment released! The seller will receive the funds shortly.');
       await fetchOrder(); // await to ensure UI updates
     } catch (error: any) {
       console.error('Approval error:', error);
-      toast.error(error.message || 'Failed to approve delivery');
+      toast.error(error.message || 'Failed to approve delivery. Please try again or contact support.');
     } finally {
       setApproving(false);
     }

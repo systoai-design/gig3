@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { FileText, Download, ExternalLink } from 'lucide-react';
+import { FileText, Download, ExternalLink, Loader2 } from 'lucide-react';
 
 interface ProofReviewProps {
   proofDescription: string;
@@ -99,7 +99,14 @@ export function ProofReview({
               disabled={isLoading}
               className="w-full"
             >
-              ✓ Approve & Release Payment
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Releasing Payment...
+                </>
+              ) : (
+                <>✓ Approve & Release Payment</>
+              )}
             </Button>
             <Button
               variant="outline"
