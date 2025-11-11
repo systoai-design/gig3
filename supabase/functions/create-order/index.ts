@@ -97,7 +97,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Create order in database
+    // Create order in database with 'pending' status first
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
       .insert({
@@ -105,7 +105,7 @@ serve(async (req) => {
         buyer_id: buyerId,
         seller_id: sellerId,
         amount_sol: amount,
-        status: 'in_progress',
+        status: 'pending',
         escrow_account: ESCROW_WALLET,
         transaction_signature: transactionSignature,
         platform_fee_sol: 0, // 0% platform fee
@@ -119,6 +119,19 @@ serve(async (req) => {
     }
 
     console.log('Order created:', order.id);
+
+    // Update to 'in_progress' to trigger payment_confirmed_at timestamp
+    const { error: confirmError } = await supabaseAdmin
+      .from('orders')
+      .update({ status: 'in_progress' })
+      .eq('id', order.id);
+
+    if (confirmError) {
+      console.error('Payment confirmation error:', confirmError);
+      throw confirmError;
+    }
+
+    console.log('Payment confirmed for order:', order.id);
 
     // Log escrow transaction
     await supabaseAdmin

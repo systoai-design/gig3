@@ -20,6 +20,7 @@ import BecomeSeller from "./pages/BecomeCreator";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Favorites from "./pages/Favorites";
 import About from "./pages/About";
 import HowItWorksPage from "./pages/HowItWorksPage";
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/gig/:id" element={<GigDetail />} />
               <Route path="/profile/:userId" element={<Profile />} />
               <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
               <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/become-creator" element={<ProtectedRoute><BecomeSeller /></ProtectedRoute>} />

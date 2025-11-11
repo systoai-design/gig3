@@ -320,9 +320,9 @@ export default function OrderDetail() {
               </Card>
             )}
 
-            {isBuyer && order.status === 'proof_submitted' && order.proof_description && (
+            {isBuyer && (order.status === 'proof_submitted' || order.status === 'delivered') && (order.proof_description || order.proof_files?.length > 0) && (
               <ProofReview
-                proofDescription={order.proof_description}
+                proofDescription={order.proof_description || ''}
                 proofFiles={order.proof_files || []}
                 onApprove={handleApproveDelivery}
                 onRequestRevision={handleRequestRevision}

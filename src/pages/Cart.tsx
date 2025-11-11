@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -8,14 +7,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Trash2, ShoppingBag, Minus, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Cart() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cartItems, loading, removeFromCart, updateQuantity, clearCart } = useCart();
-  const [checkingOut, setCheckingOut] = useState(false);
 
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => {
@@ -32,7 +29,7 @@ export default function Cart() {
     }, 0);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!user) {
       toast({
         title: 'Sign in required',
@@ -44,55 +41,8 @@ export default function Cart() {
 
     if (cartItems.length === 0) return;
 
-    setCheckingOut(true);
-
-    try {
-      // Create orders for each cart item
-      const orderPromises = cartItems.map(async (item) => {
-        if (!item.gig) return null;
-
-        let price = item.gig.price_sol;
-        if (item.package_index !== null && item.gig.packages && item.gig.packages[item.package_index]) {
-          price = item.gig.packages[item.package_index].price;
-        }
-
-        const { data, error } = await supabase
-          .from('orders')
-          .insert({
-            gig_id: item.gig_id,
-            buyer_id: user.id,
-            seller_id: item.gig.seller_id,
-            amount_sol: price * item.quantity,
-            status: 'pending',
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      });
-
-      await Promise.all(orderPromises);
-
-      // Clear cart after successful checkout
-      await clearCart();
-
-      toast({
-        title: 'Orders created',
-        description: `Successfully created ${cartItems.length} order(s)`,
-      });
-
-      navigate('/dashboard/buyer');
-    } catch (error) {
-      console.error('Error during checkout:', error);
-      toast({
-        title: 'Checkout failed',
-        description: 'Failed to create orders. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setCheckingOut(false);
-    }
+    // Navigate to checkout page
+    navigate('/checkout');
   };
 
   if (loading) {
@@ -246,9 +196,8 @@ export default function Cart() {
                       className="w-full"
                       size="lg"
                       onClick={handleCheckout}
-                      disabled={checkingOut}
                     >
-                      {checkingOut ? 'Processing...' : 'Checkout All'}
+                      Proceed to Checkout
                     </Button>
                     <p className="text-xs text-muted-foreground text-center mt-4">
                       Multiple orders will be created for each item

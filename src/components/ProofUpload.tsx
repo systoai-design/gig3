@@ -55,8 +55,8 @@ export function ProofUpload({ orderId, onSuccess }: ProofUploadProps) {
   };
 
   const handleSubmit = async () => {
-    if (!description.trim() && files.length === 0) {
-      toast.error('Please provide a description or upload files');
+    if (!description.trim()) {
+      toast.error('Please provide a detailed description of the completed work');
       return;
     }
 
@@ -96,14 +96,17 @@ export function ProofUpload({ orderId, onSuccess }: ProofUploadProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="description">Delivery Description *</Label>
+          <Label htmlFor="description" className="text-destructive">
+            Delivery Description * (Required)
+          </Label>
           <Textarea
             id="description"
-            placeholder="Describe the completed work and any important details..."
+            placeholder="Describe the completed work, deliverables, and any important details for the buyer..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             className="mt-2"
+            required
           />
         </div>
 
