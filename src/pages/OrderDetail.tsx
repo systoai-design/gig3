@@ -321,13 +321,41 @@ export default function OrderDetail() {
             )}
 
             {isBuyer && (order.status === 'proof_submitted' || order.status === 'delivered') && (order.proof_description || order.proof_files?.length > 0) && (
-              <ProofReview
-                proofDescription={order.proof_description || ''}
-                proofFiles={order.proof_files || []}
-                onApprove={handleApproveDelivery}
-                onRequestRevision={handleRequestRevision}
-                onDispute={handleDispute}
-              />
+              <>
+                {/* Auto-release warning */}
+                {order.delivered_at && (
+                  <Card className="border-yellow-500/50 bg-yellow-500/5">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-3">
+                        <ClockIcon className="h-5 w-5 text-yellow-500 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-sm mb-1">Auto-Release Notice</p>
+                          <p className="text-sm text-muted-foreground">
+                            If no action is taken, escrow will automatically be released to the seller{' '}
+                            {(() => {
+                              const deliveredDate = new Date(order.delivered_at);
+                              const autoReleaseDate = new Date(deliveredDate);
+                              autoReleaseDate.setDate(autoReleaseDate.getDate() + 7);
+                              const daysRemaining = Math.ceil((autoReleaseDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                              return daysRemaining > 0 
+                                ? `in ${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} (${autoReleaseDate.toLocaleDateString()})`
+                                : 'soon';
+                            })()}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                <ProofReview
+                  proofDescription={order.proof_description || ''}
+                  proofFiles={order.proof_files || []}
+                  onApprove={handleApproveDelivery}
+                  onRequestRevision={handleRequestRevision}
+                  onDispute={handleDispute}
+                />
+              </>
             )}
 
             {/* Messaging Section */}
