@@ -15,6 +15,7 @@ export const Hero = () => {
   const isMobile = useIsMobile();
   const [searchValue, setSearchValue] = useState("");
   const [stats, setStats] = useState({
+    totalUsers: 0,
     creators: 0,
     services: 0,
     avgRating: 0,
@@ -25,12 +26,14 @@ export const Hero = () => {
     const fetchStats = async () => {
       try {
         // Fetch stats from database
-        const [creatorsRes, servicesRes, reviewsRes] = await Promise.all([
+        const [totalUsersRes, creatorsRes, servicesRes, reviewsRes] = await Promise.all([
+          supabase.from('profiles').select('id', { count: 'exact', head: true }),
           supabase.from('seller_profiles').select('user_id', { count: 'exact', head: true }),
           supabase.from('gigs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
           supabase.from('reviews').select('rating')
         ]);
 
+        const totalUsers = totalUsersRes.count || 0;
         const creators = creatorsRes.count || 0;
         const services = servicesRes.count || 0;
         const reviews = reviewsRes.data || [];
@@ -39,6 +42,7 @@ export const Hero = () => {
           : 0;
 
         setStats({
+          totalUsers,
           creators,
           services,
           avgRating,
@@ -188,8 +192,12 @@ export const Hero = () => {
             transition={{ delay: 1.4, duration: 0.6 }}
           >
             <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/40 dark:border-primary/30">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
                 {[
+                  { 
+                    value: stats.totalUsers > 0 ? `${stats.totalUsers.toLocaleString()}${stats.totalUsers >= 1000 ? '+' : ''}` : '0', 
+                    label: "Users" 
+                  },
                   { 
                     value: stats.creators > 0 ? `${stats.creators.toLocaleString()}${stats.creators >= 1000 ? '+' : ''}` : '0', 
                     label: "Creators" 
