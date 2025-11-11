@@ -8,10 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ShoppingCart, Package, Clock, Heart, DollarSign, MessageSquare } from 'lucide-react';
+import { ShoppingCart, Package, Clock, Heart, DollarSign, MessageSquare, File } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
 import { OnboardingWizard } from '@/components/OnboardingWizard';
+import FilesHub, { FileItem } from '@/components/FilesHub';
 
 export default function BuyerDashboard() {
   const { user } = useAuth();
@@ -22,12 +23,14 @@ export default function BuyerDashboard() {
   const [totalSpent, setTotalSpent] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [profile, setProfile] = useState<any>(null);
+  const [files, setFiles] = useState<FileItem[]>([]);
 
   useEffect(() => {
     if (user) {
       checkOnboarding();
       fetchOrders();
       fetchFavorites();
+      fetchFiles();
     }
   }, [user]);
 
@@ -118,6 +121,98 @@ export default function BuyerDashboard() {
       fetchFavorites();
     } catch (error: any) {
       console.error('Error removing favorite:', error);
+    }
+  };
+
+  const fetchFiles = async () => {
+    if (!user?.id) return;
+
+    try {
+      const allFiles: FileItem[] = [];
+
+      // Fetch files from orders
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          proof_files,
+          delivered_at,
+          gigs(title),
+          profiles!orders_seller_id_fkey(username, avatar_url)
+        `)
+        .eq('buyer_id', user.id)
+        .not('proof_files', 'is', null);
+
+      if (ordersError) throw ordersError;
+
+      // Process order files
+      ordersData?.forEach((order: any) => {
+        if (order.proof_files && order.proof_files.length > 0) {
+          order.proof_files.forEach((fileUrl: string) => {
+            const fileName = fileUrl.split('/').pop() || 'Unknown file';
+            const fileType = fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'image' :
+                           fileName.match(/\.pdf$/i) ? 'pdf' :
+                           fileName.match(/\.(doc|docx)$/i) ? 'doc' : 'other';
+
+            allFiles.push({
+              id: `order-${order.id}-${fileName}`,
+              url: fileUrl,
+              fileName,
+              fileType,
+              uploadedAt: order.delivered_at || new Date().toISOString(),
+              source: 'order',
+              sourceId: order.id,
+              sourceName: order.gigs?.title || 'Order',
+              sellerName: order.profiles?.username || 'Seller',
+              sellerAvatar: order.profiles?.avatar_url || null
+            });
+          });
+        }
+      });
+
+      // Fetch files from messages
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          attachments,
+          created_at,
+          order_id,
+          profiles!messages_sender_id_fkey(username, avatar_url)
+        `)
+        .eq('receiver_id', user.id)
+        .not('attachments', 'is', null);
+
+      if (messagesError) throw messagesError;
+
+      // Process message files
+      messagesData?.forEach((message: any) => {
+        if (message.attachments && message.attachments.length > 0) {
+          message.attachments.forEach((fileUrl: string) => {
+            const fileName = fileUrl.split('/').pop() || 'Unknown file';
+            const fileType = fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? 'image' :
+                           fileName.match(/\.pdf$/i) ? 'pdf' :
+                           fileName.match(/\.(doc|docx)$/i) ? 'doc' : 'other';
+
+            allFiles.push({
+              id: `message-${message.id}-${fileName}`,
+              url: fileUrl,
+              fileName,
+              fileType,
+              uploadedAt: message.created_at,
+              source: 'message',
+              sourceId: message.id,
+              sourceName: message.order_id ? `Message (Order)` : 'Direct Message',
+              sellerName: message.profiles?.username || 'Seller',
+              sellerAvatar: message.profiles?.avatar_url || null
+            });
+          });
+        }
+      });
+
+      setFiles(allFiles);
+    } catch (error) {
+      console.error('Error fetching files:', error);
     }
   };
 
@@ -220,7 +315,7 @@ export default function BuyerDashboard() {
           </Card>
         </div>
 
-        {/* Tabs for Orders, Favorites, and Messages */}
+        {/* Tabs for Orders, Favorites, Messages, and Files */}
         <Tabs defaultValue="orders" className="space-y-4">
           <TabsList>
             <TabsTrigger value="orders">Orders</TabsTrigger>
@@ -228,6 +323,7 @@ export default function BuyerDashboard() {
             <TabsTrigger value="messages" onClick={() => navigate('/messages')}>
               Messages
             </TabsTrigger>
+            <TabsTrigger value="files">Files ({files.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders">
@@ -336,6 +432,20 @@ export default function BuyerDashboard() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="files">
+            <Card className="border-2 border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <File className="h-5 w-5" />
+                  All Files
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FilesHub files={files} />
               </CardContent>
             </Card>
           </TabsContent>
