@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X } from "lucide-react";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +36,7 @@ export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { cartCount } = useCart();
   
   // Monitor wallet changes and auto-signout if needed
@@ -72,6 +73,26 @@ export const Navbar = () => {
     };
 
     checkSellerRole();
+  }, [user]);
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      setIsAdmin(!!data);
+    };
+
+    checkAdminRole();
   }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -207,6 +228,12 @@ export const Navbar = () => {
                           My Gigs
                         </DropdownMenuItem>
                       </>
+                    )}
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => navigate('/dashboard/admin')}>
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Dashboard
+                      </DropdownMenuItem>
                     )}
                     <DropdownMenuItem onClick={signOut} className="text-destructive">
                       <LogOut className="h-4 w-4 mr-2" />
@@ -397,6 +424,20 @@ export const Navbar = () => {
                             My Gigs
                           </Button>
                         </>
+                      )}
+                      
+                      {isAdmin && (
+                        <Button 
+                          variant="ghost" 
+                          className="justify-start text-base"
+                          onClick={() => {
+                            navigate('/dashboard/admin');
+                            setIsMenuOpen(false);
+                          }}
+                        >
+                          <Shield className="h-5 w-5 mr-3" />
+                          Admin Dashboard
+                        </Button>
                       )}
                     </div>
 
