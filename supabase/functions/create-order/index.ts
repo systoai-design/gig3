@@ -123,7 +123,10 @@ serve(async (req) => {
     // Update to 'in_progress' to trigger payment_confirmed_at timestamp
     const { error: confirmError } = await supabaseAdmin
       .from('orders')
-      .update({ status: 'in_progress' })
+      .update({ 
+        status: 'in_progress',
+        payment_confirmed_at: new Date().toISOString()
+      })
       .eq('id', order.id);
 
     if (confirmError) {
