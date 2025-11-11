@@ -99,175 +99,130 @@ export const Hero = () => {
   ];
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-      {/* Simplified Background */}
-      <div className="absolute inset-0 z-0">
-        {/* Gradient Mesh */}
-        <GradientMesh className="opacity-30" animated={true} />
-        
-        {/* Noise Texture */}
-        <NoiseTexture opacity={0.02} />
-      </div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-20">
+      {/* Ultra-minimal Background */}
+      <NoiseTexture opacity={0.015} />
       
-      {/* Content */}
-      <div className="container mx-auto px-4 relative z-10 py-20">
-        <div className="max-w-5xl mx-auto">
-          {/* Massive Typography */}
-          <div className="mb-12 text-center">
-            <TextReveal className="text-display-xl mb-4" delay={0.1}>
-              Our Freelancers
-            </TextReveal>
-            <TextReveal className="text-display-lg font-light" delay={0.2}>
-              Will Take It From Here
-            </TextReveal>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-              className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-2xl mx-auto"
-            >
-              Discover world-class talent on the decentralized marketplace. Powered by Solana.
-            </motion.p>
-          </div>
+      {/* Main content */}
+      <div className="container mx-auto px-4 py-32 md:py-40 relative z-10">
+        <div className="max-w-5xl mx-auto text-center space-y-12 md:space-y-16">
+          {/* Hero Text - Apple style: lighter weight, more dramatic */}
+          <TextReveal delay={0.05}>
+            <h1 className="text-display-xl mb-8 leading-tight tracking-tight">
+              <span className="gradient-text">Hire Top Creators.</span><br/>
+              <span className="text-foreground/90">Pay with Crypto.</span>
+            </h1>
+          </TextReveal>
           
-          {/* Glassmorphic Search Bar */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+          <TextReveal delay={0.1}>
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-light leading-relaxed">
+              Secure freelance marketplace powered by Solana blockchain.<br className="hidden md:block" />
+              Smart escrow. Instant payments. Zero fraud.
+            </p>
+          </TextReveal>
+          
+          {/* Search Bar - cleaner, more Apple-like */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-            className="max-w-3xl mx-auto mb-8"
+            transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.15 }}
+            className="max-w-2xl mx-auto"
           >
-            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-primary/70 dark:border-primary/60">
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigate('/explore');
-                }}
-                className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
-              >
-                <div className="flex-1 flex items-center gap-3 px-4 min-w-0">
-                  <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (searchValue.trim()) navigate(`/explore?q=${encodeURIComponent(searchValue.trim())}`);
+            }} className="relative group">
+              <div className="bg-muted/50 dark:bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 shadow-md hover:shadow-lg hover:border-border transition-all duration-300">
+                <div className="flex items-center gap-3 p-3">
+                  <Search className="h-5 w-5 text-muted-foreground ml-2" />
                   <input
                     type="text"
                     placeholder="What service are you looking for?"
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
-                    className="flex-1 py-4 text-base sm:text-lg bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
+                    className="flex-1 border-0 bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground outline-none rounded-2xl py-2"
                   />
+                  <motion.button
+                    type="submit"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    className="bg-primary text-primary-foreground px-6 py-2.5 rounded-full font-semibold shadow-sm hover:shadow-md transition-shadow whitespace-nowrap"
+                  >
+                    Search
+                  </motion.button>
                 </div>
-                <MagneticButton
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navigate('/explore');
-                  }}
-                  className="bg-gradient-to-r from-primary to-accent-cyan hover:from-primary/90 hover:to-accent-cyan/90 text-white px-6 sm:px-8 py-4 rounded-3xl font-semibold text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 whitespace-nowrap"
-                >
-                  {isMobile ? (
-                    <>
-                      <Search className="h-5 w-5" />
-                      <span>Search</span>
-                    </>
-                  ) : (
-                    "Search"
-                  )}
-                </MagneticButton>
-              </form>
-            </GlassmorphicCard>
+              </div>
+            </form>
           </motion.div>
 
-          {/* Popular Services with Glass Effect */}
-          <motion.div 
+          {/* Popular Services Tags - simpler pills */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-            className="flex flex-wrap gap-3 mb-16 justify-center"
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-3"
           >
-            <span className="text-muted-foreground text-sm font-medium self-center mr-2">Popular:</span>
+            <span className="text-sm text-muted-foreground font-medium">Popular:</span>
             {popularServices.map((service, index) => (
               <motion.button
                 key={service.label}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ 
-                  y: -2,
-                  scale: 1.02,
-                  boxShadow: "0 8px 30px hsla(var(--primary) / 0.3)",
-                  transition: { duration: 0.2, type: "spring", stiffness: 400, damping: 30 }
-                }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ 
-                  delay: 0.6 + index * 0.05, 
-                  duration: 0.3,
-                  ease: [0.25, 0.1, 0.25, 1]
+                  duration: 0.3, 
+                  delay: 0.25 + index * 0.02,
+                  type: "spring",
+                  stiffness: 150
                 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate(`/explore?q=${encodeURIComponent(service.label)}`)}
-                className="group relative"
+                className="px-4 py-2 rounded-full text-sm font-medium bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-colors duration-200"
               >
-                <GlassmorphicCard blur="md" opacity={0.1} className={`px-5 py-3 hover:bg-accent/20 transition-all duration-300 border-2 ${service.borderColor}`}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-foreground text-sm font-medium">{service.label}</span>
-                    {service.badge && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-accent-blue to-accent-cyan text-white rounded-full">
-                        <TrendingUp className="h-3 w-3" />
-                        {service.badge}
-                      </span>
-                    )}
-                  </div>
-                </GlassmorphicCard>
+                {service.label}
               </motion.button>
             ))}
           </motion.div>
 
-          {/* Animated Stats Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/50 dark:border-primary/40">
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
-                {[
-                  { 
-                    value: stats.totalUsers > 0 ? `${stats.totalUsers.toLocaleString()}${stats.totalUsers >= 1000 ? '+' : ''}` : '0', 
-                    label: "Users" 
-                  },
-                  { 
-                    value: stats.creators > 0 ? `${stats.creators.toLocaleString()}${stats.creators >= 1000 ? '+' : ''}` : '0', 
-                    label: "Creators" 
-                  },
-                  { 
-                    value: stats.services > 0 ? `${stats.services.toLocaleString()}${stats.services >= 1000 ? '+' : ''}` : '0', 
-                    label: "Services" 
-                  },
-                  { 
-                    value: stats.reviewCount > 0 ? `${stats.avgRating}★` : 'New', 
-                    label: "Satisfaction" 
-                  },
-                  { 
-                    value: "24/7", 
-                    label: "Support" 
-                  }
-                ].map((stat, index) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.0 + index * 0.04, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                  >
-                    <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
-                    <div className="text-muted-foreground text-sm font-medium">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </div>
-            </GlassmorphicCard>
-          </motion.div>
+          {/* Stats Section - larger numbers, cleaner layout */}
+          {stats && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 max-w-5xl mx-auto pt-12 border-t border-border/30"
+            >
+              {[
+                { label: 'Active Users', value: stats.totalUsers.toLocaleString() + '+' },
+                { label: 'Creators', value: stats.creators.toLocaleString() + '+' },
+                { label: 'Services', value: stats.services.toLocaleString() + '+' },
+                { label: 'Avg Rating', value: stats.avgRating.toFixed(1), suffix: '/5' }
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.3, 
+                    delay: 0.35 + index * 0.03,
+                    type: "spring",
+                    stiffness: 100
+                  }}
+                  className="text-center space-y-2"
+                >
+                  <div className="text-4xl md:text-5xl font-light tracking-tight text-foreground">
+                    {stat.value}{stat.suffix}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
-
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
     </section>
   );
 };

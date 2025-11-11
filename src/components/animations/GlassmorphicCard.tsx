@@ -21,24 +21,24 @@ export const GlassmorphicCard = ({
   children, 
   className = '',
   blur = 'md',
-  opacity = 0.1,
+  opacity = 0.05,
   variant = 'light',
   hover = true
 }: GlassmorphicCardProps) => {
   const baseClass = variant === 'light' 
-    ? 'bg-white/[var(--opacity)] border-white/20 dark:bg-white/[calc(var(--opacity)*0.5)] dark:border-primary/20' 
-    : 'bg-black/[var(--opacity)] border-white/10 dark:border-primary/10';
+    ? 'bg-white/[var(--opacity)] border-white/10 dark:bg-white/[calc(var(--opacity)*0.3)] dark:border-primary/10' 
+    : 'bg-black/[var(--opacity)] border-white/5 dark:border-primary/5';
 
   return (
     <motion.div
       style={{ '--opacity': opacity } as React.CSSProperties}
-      className={`${baseClass} ${blurValues[blur]} rounded-3xl border transition-all duration-500 ${className}`}
+      className={`${baseClass} ${blurValues[blur]} rounded-2xl border transition-all duration-300 ${className}`}
       {...(hover && {
         whileHover: { 
-          scale: 1.02,
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
+          y: -2,
+          scale: 1.01,
         },
-        transition: { duration: 0.3 }
+        transition: { type: "spring", stiffness: 300, damping: 20 }
       })}
     >
       {children}

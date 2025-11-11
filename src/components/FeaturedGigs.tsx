@@ -127,7 +127,7 @@ export const FeaturedGigs = () => {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
+    <section className="py-32 md:py-40 bg-background relative overflow-hidden">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -164,16 +164,14 @@ export const FeaturedGigs = () => {
         >
           {gigs.map((gig) => (
             <motion.div key={gig.id} variants={item}>
-              <HoverTilt intensity={8} scale={1.03}>
-                <GlassmorphicCard
-                  blur="sm"
-                  opacity={0.03}
-                  hover={false}
-                  className="overflow-hidden cursor-pointer group h-full"
-                >
-                  <div onClick={() => navigate(`/gig/${gig.id}`)}>
+              <motion.div
+                whileHover={{ y: -4, scale: 1.01 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                onClick={() => navigate(`/gig/${gig.id}`)}
+                className="overflow-hidden cursor-pointer group h-full rounded-2xl bg-card border border-border hover:border-border/80 hover:shadow-lg transition-all duration-300"
+              >
                     {/* Image */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-muted rounded-t-2xl">
                       {gig.images && gig.images.length > 0 ? (
                         <img
                           src={gig.images[0]}
@@ -197,7 +195,7 @@ export const FeaturedGigs = () => {
                     </div>
                     
                     {/* Content */}
-                    <div className="p-5">
+                    <div className="p-6">
                       {/* Creator Info */}
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-cyan"></div>
@@ -210,7 +208,7 @@ export const FeaturedGigs = () => {
                       </div>
                       
                       {/* Title */}
-                      <h3 className="font-bold text-foreground mb-4 line-clamp-2 group-hover:gradient-text transition-all duration-300 text-lg">
+                      <h3 className="font-semibold text-foreground mb-4 line-clamp-2 text-lg">
                         {gig.title}
                       </h3>
                       
@@ -218,23 +216,24 @@ export const FeaturedGigs = () => {
                       <div className="flex items-center justify-between pt-4 border-t border-border/50">
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">Starting at</p>
-                          <p className="text-xl font-bold gradient-text">{gig.price_sol} SOL</p>
+                          <p className="text-xl font-semibold text-foreground">{gig.price_sol} SOL</p>
                         </div>
-                        <button
+                        <motion.button
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/gig/${gig.id}`);
                           }}
-                          className="bg-gradient-to-r from-primary to-accent-cyan text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 hover:scale-105 transition-transform"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                          className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2"
                         >
                           View
                           <ArrowRight className="h-4 w-4" />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
-                  </div>
-                </GlassmorphicCard>
-              </HoverTilt>
+              </motion.div>
             </motion.div>
           ))}
         </motion.div>
