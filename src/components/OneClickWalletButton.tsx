@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import bs58 from 'bs58';
+import { WelcomeModal } from './WelcomeModal';
 
 interface OneClickWalletButtonProps {
   className?: string;
@@ -17,6 +18,7 @@ export const OneClickWalletButton = ({ className }: OneClickWalletButtonProps) =
   const { signInWithWallet, signUpWithWallet } = useAuth();
   const [hasPhantom, setHasPhantom] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     // Check if Phantom wallet is available
@@ -67,6 +69,8 @@ export const OneClickWalletButton = ({ className }: OneClickWalletButtonProps) =
               toast.error('Failed to create account: ' + signUpResult.error.message);
             } else {
               toast.success('Account created and signed in!');
+              // Show welcome modal for new users
+              setShowWelcome(true);
             }
           } else {
             toast.error('Sign in failed: ' + error.message);
@@ -121,14 +125,18 @@ export const OneClickWalletButton = ({ className }: OneClickWalletButtonProps) =
   };
 
   return (
-    <Button
-      onClick={handleConnect}
-      disabled={isAuthenticating}
-      className={className}
-      variant="default"
-    >
-      <Wallet className="h-4 w-4 mr-2" />
-      {getButtonLabel()}
-    </Button>
+    <>
+      <Button
+        onClick={handleConnect}
+        disabled={isAuthenticating}
+        className={className}
+        variant="default"
+      >
+        <Wallet className="h-4 w-4 mr-2" />
+        {getButtonLabel()}
+      </Button>
+
+      <WelcomeModal open={showWelcome} onClose={() => setShowWelcome(false)} />
+    </>
   );
 };
