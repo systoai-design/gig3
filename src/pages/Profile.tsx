@@ -6,8 +6,10 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { LayoutDashboard, Briefcase, Plus } from 'lucide-react';
 import { ProfileBanner } from '@/components/profile/ProfileBanner';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileStats } from '@/components/profile/ProfileStats';
@@ -130,6 +132,44 @@ export default function Profile() {
         proSince={sellerProfile?.pro_since}
       />
 
+      {/* Quick Actions for Sellers */}
+      {isSeller && isOwnProfile && (
+        <div className="container mx-auto px-4 pt-6">
+          <div className="max-w-6xl mx-auto">
+            <Card className="border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/dashboard/seller')}
+                    className="flex items-center gap-2"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Incoming Orders
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/dashboard/seller?tab=gigs')}
+                    className="flex items-center gap-2"
+                  >
+                    <Briefcase className="h-4 w-4" />
+                    Manage Gigs
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/create-gig')}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Create New Gig
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="container mx-auto px-4 pt-navbar pt-8 pb-8">
         <div className="max-w-6xl mx-auto">
@@ -179,7 +219,7 @@ export default function Profile() {
                         <Card 
                           key={gig.id}
                           className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                          onClick={() => navigate(`/gigs/${gig.id}`)}
+                          onClick={() => navigate(`/gig/${gig.id}`)}
                         >
                           <div className="relative h-48 overflow-hidden">
                             <img 
