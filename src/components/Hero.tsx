@@ -90,7 +90,7 @@ export const Hero = () => {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
+              transition={{ delay: 0.6, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-2xl mx-auto"
             >
               Discover world-class talent on the decentralized marketplace. Powered by Solana.
@@ -101,7 +101,7 @@ export const Hero = () => {
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             className="max-w-3xl mx-auto mb-8"
           >
             <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-primary/60 dark:border-primary/50">
@@ -148,7 +148,7 @@ export const Hero = () => {
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.6 }}
+            transition={{ delay: 1, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
             className="flex flex-wrap gap-3 mb-16 justify-center"
           >
             <span className="text-muted-foreground text-sm font-medium self-center mr-2">Popular:</span>
@@ -189,7 +189,7 @@ export const Hero = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4, duration: 0.6 }}
+            transition={{ delay: 1.2, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/40 dark:border-primary/30">
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
@@ -219,7 +219,7 @@ export const Hero = () => {
                     key={stat.label}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1.6 + index * 0.1, duration: 0.4 }}
+                    transition={{ delay: 1.4 + index * 0.08, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
                   >
                     <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
                     <div className="text-muted-foreground text-sm font-medium">{stat.label}</div>
