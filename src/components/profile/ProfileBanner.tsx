@@ -12,7 +12,7 @@ export function ProfileBanner({ bannerUrl, isOwnProfile, onEditClick }: ProfileB
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative w-full h-64 md:h-80 overflow-hidden z-0">
+    <div className="relative w-full h-64 md:h-80 overflow-hidden z-[1]">
       {bannerUrl && !imageError ? (
         <img
           src={bannerUrl}
@@ -28,7 +28,7 @@ export function ProfileBanner({ bannerUrl, isOwnProfile, onEditClick }: ProfileB
         <Button
           variant="secondary"
           size="sm"
-          className="absolute bottom-4 right-4 shadow-medium"
+          className="absolute bottom-4 right-4 shadow-medium z-20"
           onClick={onEditClick}
         >
           <Camera className="h-4 w-4 mr-2" />
