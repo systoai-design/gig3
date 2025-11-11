@@ -36,6 +36,7 @@ export const Hero = () => {
           const { data, timestamp } = JSON.parse(cached);
           if (Date.now() - timestamp < CACHE_DURATION) {
             setStats(data);
+            setLoading(false);
             return;
           }
         }
@@ -95,11 +96,11 @@ export const Hero = () => {
   }, []);
 
   const popularServices = [
-    { label: "Website Development", icon: "→", borderColor: "border-accent-blue/70" },
-    { label: "Logo Design", icon: "→", borderColor: "border-accent-purple/70" },
-    { label: "Video Editing", icon: "→", borderColor: "border-accent-pink/70" },
-    { label: "AI Services", icon: "→", borderColor: "border-accent-amber/70" },
-    { label: "Smart Contracts", badge: "NEW", icon: "→", borderColor: "border-accent-cyan/80" },
+    { label: "Website Development", icon: "→", borderColor: "border-black dark:border-white" },
+    { label: "Logo Design", icon: "→", borderColor: "border-black dark:border-white" },
+    { label: "Video Editing", icon: "→", borderColor: "border-black dark:border-white" },
+    { label: "AI Services", icon: "→", borderColor: "border-black dark:border-white" },
+    { label: "Smart Contracts", badge: "NEW", icon: "→", borderColor: "border-black dark:border-white" },
   ];
 
   return (
