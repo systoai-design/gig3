@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Circle, X, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Circle, X, ExternalLink, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useProfileBadges } from '@/hooks/useProfileBadges';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ChecklistItem {
   id: string;
@@ -31,6 +33,14 @@ export function ProfileCompletionChecklist({
 }: ProfileCompletionChecklistProps) {
   const [dismissed, setDismissed] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { getNextBadge, checkAndAwardBadges } = useProfileBadges(user?.id);
+
+  useEffect(() => {
+    if (user?.id && completion > 0) {
+      checkAndAwardBadges(user.id, completion);
+    }
+  }, [completion, user?.id]);
 
   if (dismissed || completion === 100) {
     return null;
@@ -124,6 +134,7 @@ export function ProfileCompletionChecklist({
 
   const incompleteItems = items.filter(item => !item.completed);
   const completedCount = items.filter(item => item.completed).length;
+  const nextBadge = getNextBadge(completion);
 
   const getStrength = (percent: number) => {
     if (percent >= 80) return { label: 'Excellent', color: 'text-primary' };
@@ -173,6 +184,25 @@ export function ProfileCompletionChecklist({
               </div>
               <Progress value={completion} className="h-2" />
             </div>
+
+            {nextBadge && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20"
+              >
+                <div className="text-3xl">{nextBadge.icon}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Award className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold">Next Reward: {nextBadge.label}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {nextBadge.threshold - completion}% away • {nextBadge.perk}
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
             {incompleteItems.length > 0 && (
               <div className="space-y-2">

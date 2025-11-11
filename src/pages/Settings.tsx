@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { calculateProfileCompletion } from '@/lib/profileUtils';
+import { ProfileBadges } from '@/components/ProfileBadges';
 import { X, Plus, Save } from 'lucide-react';
 
 export default function Settings() {
@@ -236,6 +237,9 @@ export default function Settings() {
               <Progress value={completion} className="h-2" />
             </CardContent>
           </Card>
+
+          {/* Profile Badges */}
+          {user && <ProfileBadges userId={user.id} variant="full" />}
 
           <Tabs defaultValue="general" className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">

@@ -17,6 +17,7 @@ import { PortfolioGallery } from '@/components/profile/PortfolioGallery';
 import { EducationSection } from '@/components/profile/EducationSection';
 import { LanguagesCard } from '@/components/profile/LanguagesCard';
 import { SkillsSection } from '@/components/profile/SkillsSection';
+import { ProfileBadges } from '@/components/ProfileBadges';
 
 export default function Profile() {
   const { userId } = useParams();
@@ -186,6 +187,9 @@ export default function Profile() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Profile Badges */}
+              <ProfileBadges userId={userId!} variant="full" />
 
               {/* Skills Section */}
               {isSeller && sellerProfile?.skills && (
