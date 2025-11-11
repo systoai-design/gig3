@@ -192,7 +192,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-12 pb-24">
         <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
 
         {/* Stats Cards */}
