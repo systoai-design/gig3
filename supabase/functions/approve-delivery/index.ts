@@ -96,10 +96,39 @@ serve(async (req) => {
 
     if (releaseError) {
       console.error('Failed to release escrow:', releaseError);
+      
+      // Rollback: revert order status to proof_submitted
+      console.log('Rolling back order status to proof_submitted...');
+      await supabaseAdmin
+        .from('orders')
+        .update({ 
+          status: 'proof_submitted',
+          delivered_at: null
+        })
+        .eq('id', orderId);
+      
       throw new Error('Failed to release payment to seller: ' + releaseError.message);
     }
 
     console.log('Escrow released:', releaseData);
+
+    // Send notifications to both parties
+    await supabaseAdmin.from('notifications').insert([
+      {
+        user_id: order.seller_id,
+        type: 'payment',
+        title: 'Payment Released',
+        message: `Payment for order has been released to your wallet`,
+        link: `/orders/${orderId}`
+      },
+      {
+        user_id: order.buyer_id,
+        type: 'order_update',
+        title: 'Order Completed',
+        message: `Your order has been completed successfully`,
+        link: `/orders/${orderId}`
+      }
+    ]);
 
     return new Response(
       JSON.stringify({ 
