@@ -44,7 +44,7 @@ export const PopularServices = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section className="py-32 md:py-40 bg-background relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-b from-background via-muted/30 to-background relative overflow-hidden">
       <div className="container mx-auto px-4 mb-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -105,8 +105,8 @@ export const PopularServices = () => {
                           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                         />
                         
-                        {/* Gradient Overlay - reduced opacity */}
-                        <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-40 group-hover:opacity-50 transition-opacity duration-300`}></div>
+                        {/* Gradient Overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${service.gradient} opacity-60 group-hover:opacity-70 transition-opacity duration-300`}></div>
                         
                         {/* Content */}
                         <div className="absolute inset-0 p-8 flex flex-col justify-end">

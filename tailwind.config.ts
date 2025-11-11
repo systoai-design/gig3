@@ -13,9 +13,6 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -64,13 +61,9 @@ export default {
         'gradient-hero': 'var(--gradient-hero)',
       },
       boxShadow: {
-        'xs': '0 1px 2px rgba(0, 0, 0, 0.05)',
-        'sm': '0 2px 8px rgba(0, 0, 0, 0.08)',
-        'md': '0 4px 16px rgba(0, 0, 0, 0.12)',
-        'lg': '0 8px 32px rgba(0, 0, 0, 0.16)',
-        'xl': '0 16px 48px rgba(0, 0, 0, 0.20)',
-        'sm-dark': '0 2px 8px rgba(0, 0, 0, 0.4)',
-        'md-dark': '0 4px 16px rgba(0, 0, 0, 0.5)',
+        'subtle': 'var(--shadow-subtle)',
+        'medium': 'var(--shadow-medium)',
+        'large': 'var(--shadow-large)',
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',

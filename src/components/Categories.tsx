@@ -49,29 +49,44 @@ export const Categories = () => {
     const Icon = category.icon;
     
     return (
-      <motion.button
-        onClick={() => navigate('/explore')}
-        whileHover={{ y: -4, scale: 1.01 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="w-full h-[200px] cursor-pointer overflow-hidden group relative rounded-2xl bg-card border border-border hover:border-border/80 hover:shadow-lg transition-all duration-300 p-6 flex flex-col justify-between"
-      >
-        {/* Icon */}
-        <div className="relative">
-          <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl bg-primary/10 dark:bg-primary/5 p-3 flex items-center justify-center group-hover:bg-primary/15 transition-colors duration-300`}>
-            <Icon className="w-full h-full text-primary" />
-          </div>
-        </div>
-        
-        {/* Title */}
-        <h3 className="text-sm md:text-base font-semibold text-foreground text-left mt-auto">
-          {category.name}
-        </h3>
-      </motion.button>
+      <HoverTilt intensity={10} scale={1.03}>
+        <GlassmorphicCard
+          blur="sm"
+          opacity={0.05}
+          variant="light"
+          className="h-[200px] cursor-pointer overflow-hidden group relative border-2 hover:border-primary/30 dark:hover:border-primary/50 transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_15px_50px_rgba(0,0,0,0.6)]"
+        >
+          <button
+            onClick={() => navigate('/explore')}
+            className="w-full h-full p-6 flex flex-col justify-between relative"
+          >
+            {/* Gradient Background */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+            
+            {/* Icon */}
+            <div className="relative">
+              <motion.div
+                whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
+                transition={{ duration: 0.5, type: 'spring', stiffness: 300 }}
+                className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}
+              >
+                <Icon className="w-full h-full text-white" />
+              </motion.div>
+            </div>
+            
+            {/* Title */}
+            <h3 className="text-sm md:text-base font-bold text-foreground text-left mt-auto group-hover:gradient-text transition-all duration-300">
+              {category.name}
+            </h3>
+          </button>
+        </GlassmorphicCard>
+      </HoverTilt>
     );
   };
 
   return (
-    <section className="py-32 md:py-40 bg-background relative overflow-hidden">
+    <section className="py-24 bg-background relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none"></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.div

@@ -17,27 +17,27 @@ const Index = () => {
       <Navbar />
       <Hero />
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="fadeUp">
         <Categories />
       </ScrollReveal>
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="fadeUp">
         <PopularServices />
       </ScrollReveal>
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="scale" delay={0.2}>
         <PromoBanner />
       </ScrollReveal>
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="fadeLeft">
         <GuaranteeSection />
       </ScrollReveal>
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="fadeUp" delay={0.1}>
         <FeaturedGigs />
       </ScrollReveal>
       
-      <ScrollReveal animation="fadeUp" delay={0}>
+      <ScrollReveal animation="fadeUp">
         <HowItWorks />
       </ScrollReveal>
       
