@@ -29,15 +29,16 @@ export const FloatingShapes = ({ count = 5, className = '' }: FloatingShapesProp
             background: `radial-gradient(circle, hsl(${Math.random() * 360}, 70%, 60%), transparent)`
           }}
           animate={{
-            x: [0, Math.random() * 100 - 50, 0],
-            y: [0, Math.random() * 100 - 50, 0],
-            scale: [1, 1.2, 1],
-            opacity: [0.05, 0.15, 0.05]
+            x: [0, Math.random() * 100 - 50],
+            y: [0, Math.random() * 100 - 50],
+            scale: [1, 1.2],
+            opacity: [0.05, 0.15]
           }}
           transition={{
             duration: shape.duration,
             delay: shape.delay,
             repeat: Infinity,
+            repeatType: "reverse",
             ease: "easeInOut"
           }}
         />

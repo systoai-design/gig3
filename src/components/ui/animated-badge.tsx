@@ -19,12 +19,13 @@ export const AnimatedBadge = ({
       className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-semibold ${className}`}
       {...(pulse && {
         animate: {
-          scale: [1, 1.05, 1],
-          opacity: [1, 0.8, 1]
+          scale: [1, 1.05],
+          opacity: [1, 0.8]
         },
         transition: {
           duration: 2,
           repeat: Infinity,
+          repeatType: "reverse",
           ease: "easeInOut"
         }
       })}

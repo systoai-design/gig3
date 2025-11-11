@@ -24,11 +24,12 @@ export const GradientMesh = ({
       }}
       {...(animated && {
         animate: {
-          opacity: [0.03, 0.08, 0.03]
+          opacity: [0.03, 0.08]
         },
         transition: {
           duration: 8,
           repeat: Infinity,
+          repeatType: "reverse",
           ease: "easeInOut"
         }
       })}
