@@ -68,9 +68,25 @@ serve(async (req) => {
       throw new Error('Seller must submit proof of work before approval');
     }
 
-    console.log('Order eligible for approval, releasing escrow...');
+    console.log('Order eligible for approval, updating status and releasing escrow...');
 
-    // Release escrow funds to seller
+    // First, update order status to "delivered" so release-escrow can process it
+    const { error: updateError } = await supabaseAdmin
+      .from('orders')
+      .update({ 
+        status: 'delivered',
+        delivered_at: new Date().toISOString()
+      })
+      .eq('id', orderId);
+
+    if (updateError) {
+      console.error('Failed to update order status:', updateError);
+      throw new Error('Failed to update order status');
+    }
+
+    console.log('Order status updated to delivered, releasing escrow...');
+
+    // Now release escrow funds to seller
     const { data: releaseData, error: releaseError } = await supabaseAdmin.functions.invoke(
       'release-escrow-payment',
       {

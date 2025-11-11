@@ -12,6 +12,8 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NotificationBell } from "@/components/NotificationBell";
+import { useSignOut } from "@/hooks/useSignOut";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +35,8 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const signOut = useSignOut();
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -171,6 +174,7 @@ export const Navbar = () => {
             
             {user && (
               <>
+                <NotificationBell />
                 <Button variant="ghost" size="icon" onClick={() => navigate('/favorites')}>
                   <Heart className="h-5 w-5" />
                 </Button>

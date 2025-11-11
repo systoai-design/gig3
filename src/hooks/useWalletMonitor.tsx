@@ -32,7 +32,7 @@ export const useWalletMonitor = () => {
       }
     } else if (!connected && previousWalletRef.current) {
       // Wallet was disconnected
-      toast.info('Wallet disconnected. Please reconnect to continue.');
+      toast.info('Wallet disconnected. You have been signed out.');
       signOut();
     }
 
