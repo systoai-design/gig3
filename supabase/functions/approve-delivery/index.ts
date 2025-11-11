@@ -16,28 +16,22 @@ serve(async (req) => {
 
     console.log('Approving delivery for order:', orderId);
 
-    // Get authenticated user
+    // Get JWT from Authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('No authorization header');
     }
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
-    );
+    // Extract JWT token and decode to get user_id (Supabase already validated it with verify_jwt=true)
+    const token = authHeader.replace('Bearer ', '');
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.sub;
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      throw new Error('Unauthorized');
+    if (!userId) {
+      throw new Error('Invalid token');
     }
 
-    console.log('User authenticated:', user.id);
+    console.log('User authenticated:', userId);
 
     // Create admin client for privileged operations
     const supabaseAdmin = createClient(
@@ -60,7 +54,7 @@ serve(async (req) => {
     console.log('Order found:', order);
 
     // Verify user is the buyer
-    if (order.buyer_id !== user.id) {
+    if (order.buyer_id !== userId) {
       throw new Error('Only the buyer can approve delivery');
     }
 
