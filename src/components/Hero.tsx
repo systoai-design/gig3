@@ -143,7 +143,7 @@ export const Hero = () => {
             transition={{ delay: 0.4, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
             className="max-w-3xl mx-auto mb-8"
           >
-            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-primary/70 dark:border-primary/60">
+            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-black dark:border-white">
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -231,7 +231,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/50 dark:border-primary/40">
+            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-black dark:border-white">
               {loading ? (
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
                   {[1, 2, 3, 4, 5].map((i) => (
