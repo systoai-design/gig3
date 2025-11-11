@@ -10,8 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { Users, Package, ShoppingCart, AlertTriangle, DollarSign, TrendingUp } from 'lucide-react';
+import { Users, Package, ShoppingCart, AlertTriangle, DollarSign, TrendingUp, FileText } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -28,6 +32,10 @@ export default function AdminDashboard() {
   const [disputes, setDisputes] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [gigs, setGigs] = useState<any[]>([]);
+  const [selectedDispute, setSelectedDispute] = useState<any>(null);
+  const [resolutionNotes, setResolutionNotes] = useState('');
+  const [refundPercentage, setRefundPercentage] = useState(100);
+  const [showResolutionDialog, setShowResolutionDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -114,22 +122,37 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDisputeResolution = async (orderId: string, action: 'refund' | 'release') => {
+  const handleDisputeResolution = async (orderId: string, action: 'refund' | 'release', notes: string, refundPercent: number) => {
     try {
+      // First, update admin_notes in the order
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ admin_notes: notes })
+        .eq('id', orderId);
+
+      if (updateError) throw updateError;
+
+      // Then invoke the dispute resolution function
       const { data, error } = await supabase.functions.invoke('handle-dispute', {
         body: {
           orderId,
           action,
-          reason: `Admin resolved: ${action}`,
-          refundPercentage: action === 'refund' ? 100 : 0
+          reason: notes || `Admin resolved: ${action}`,
+          refundPercentage: refundPercent
         }
       });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      toast.success(`Dispute resolved: ${action}`);
+      toast.success(`Dispute resolved: ${action === 'refund' ? `${refundPercent}% refund issued` : 'funds released to seller'}`);
+      setShowResolutionDialog(false);
+      setSelectedDispute(null);
+      setResolutionNotes('');
+      setRefundPercentage(100);
       fetchDashboardData();
     } catch (error: any) {
+      console.error('Dispute resolution error:', error);
       toast.error(error.message || 'Failed to resolve dispute');
     }
   };
@@ -259,42 +282,87 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     {disputes.map((dispute) => (
                       <div key={dispute.id} className="p-4 border rounded-lg space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold">{dispute.gigs?.title}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Buyer: {dispute.profiles?.username} | Seller: {dispute.seller?.username}
-                            </p>
-                            <p className="text-sm mt-2">Amount: {dispute.amount_sol} SOL</p>
-                            {dispute.dispute_reason && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Reason: {dispute.dispute_reason}
-                              </p>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{dispute.gigs?.title}</h3>
+                            <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Buyer:</span>{' '}
+                                <span className="font-medium">{dispute.profiles?.username}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Seller:</span>{' '}
+                                <span className="font-medium">{dispute.seller?.username}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Amount:</span>{' '}
+                                <span className="font-medium">{dispute.amount_sol} SOL</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Platform Fee:</span>{' '}
+                                <span className="font-medium">{dispute.platform_fee_sol || 0} SOL</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Disputed:</span>{' '}
+                                <span className="font-medium">
+                                  {new Date(dispute.disputed_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Show proof if available */}
+                            {dispute.proof_description && (
+                              <div className="mt-3 p-3 bg-muted/50 rounded border">
+                                <Label className="text-xs font-semibold">Seller's Proof:</Label>
+                                <p className="text-sm mt-1 whitespace-pre-wrap">{dispute.proof_description}</p>
+                                {dispute.proof_files && dispute.proof_files.length > 0 && (
+                                  <div className="flex gap-2 mt-2">
+                                    {dispute.proof_files.map((url: string, idx: number) => (
+                                      <Button
+                                        key={idx}
+                                        variant="outline"
+                                        size="sm"
+                                        asChild
+                                      >
+                                        <a href={url} target="_blank" rel="noopener noreferrer">
+                                          <FileText className="h-4 w-4 mr-2" />
+                                          View File {idx + 1}
+                                        </a>
+                                      </Button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Show admin notes if any */}
+                            {dispute.admin_notes && (
+                              <div className="mt-3 p-3 bg-green-500/10 rounded border border-green-500/20">
+                                <Label className="text-xs font-semibold text-green-600 dark:text-green-400">Previous Admin Notes:</Label>
+                                <p className="text-sm mt-1">{dispute.admin_notes}</p>
+                              </div>
                             )}
                           </div>
                           <Badge variant="destructive">Disputed</Badge>
                         </div>
-                        <div className="flex gap-2">
+                        
+                        <div className="flex gap-2 pt-2 border-t">
                           <Button 
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
-                            onClick={() => handleDisputeResolution(dispute.id, 'refund')}
+                            onClick={() => {
+                              setSelectedDispute(dispute);
+                              setShowResolutionDialog(true);
+                            }}
                           >
-                            Refund Buyer
-                          </Button>
-                          <Button 
-                            variant="default"
-                            size="sm"
-                            onClick={() => handleDisputeResolution(dispute.id, 'release')}
-                          >
-                            Release to Seller
+                            Resolve Dispute
                           </Button>
                           <Button 
                             variant="outline"
                             size="sm"
                             onClick={() => navigate(`/orders/${dispute.id}`)}
                           >
-                            View Details
+                            View Full Details
                           </Button>
                         </div>
                       </div>
@@ -403,6 +471,109 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Dispute Resolution Dialog */}
+        <Dialog open={showResolutionDialog} onOpenChange={setShowResolutionDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Resolve Dispute</DialogTitle>
+              <DialogDescription>
+                Review the order details and choose how to resolve this dispute.
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedDispute && (
+              <div className="space-y-4">
+                {/* Order Summary */}
+                <div className="p-4 bg-muted/50 rounded space-y-2">
+                  <h4 className="font-semibold">{selectedDispute.gigs?.title}</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>Buyer: {selectedDispute.profiles?.username}</div>
+                    <div>Seller: {selectedDispute.seller?.username}</div>
+                    <div>Amount: {selectedDispute.amount_sol} SOL</div>
+                    <div>Fee: {selectedDispute.platform_fee_sol || 0} SOL</div>
+                  </div>
+                </div>
+
+                {/* Resolution Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="resolution-notes">Resolution Notes *</Label>
+                  <Textarea
+                    id="resolution-notes"
+                    placeholder="Explain why you're resolving this way (visible to buyer and seller)..."
+                    value={resolutionNotes}
+                    onChange={(e) => setResolutionNotes(e.target.value)}
+                    rows={4}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    These notes will be saved to the order and visible to both parties.
+                  </p>
+                </div>
+
+                {/* Refund Percentage Slider */}
+                <div className="space-y-2">
+                  <Label>Refund Percentage: {refundPercentage}%</Label>
+                  <Slider
+                    value={[refundPercentage]}
+                    onValueChange={(value) => setRefundPercentage(value[0])}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="py-4"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Release to Seller (0%)</span>
+                    <span>Partial Refund (50%)</span>
+                    <span>Full Refund (100%)</span>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded text-sm">
+                    <div>Buyer receives: <strong>{((selectedDispute.amount_sol * refundPercentage) / 100).toFixed(4)} SOL</strong></div>
+                    <div>Seller receives: <strong>{((selectedDispute.amount_sol * (100 - refundPercentage)) / 100).toFixed(4)} SOL</strong></div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowResolutionDialog(false);
+                      setSelectedDispute(null);
+                      setResolutionNotes('');
+                      setRefundPercentage(100);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDisputeResolution(
+                      selectedDispute.id,
+                      'refund',
+                      resolutionNotes,
+                      refundPercentage
+                    )}
+                    disabled={!resolutionNotes.trim()}
+                  >
+                    Process {refundPercentage === 100 ? 'Full' : 'Partial'} Refund
+                  </Button>
+                  <Button
+                    onClick={() => handleDisputeResolution(
+                      selectedDispute.id,
+                      'release',
+                      resolutionNotes,
+                      0
+                    )}
+                    disabled={!resolutionNotes.trim()}
+                  >
+                    Release to Seller
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
       <Footer />
     </div>

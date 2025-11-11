@@ -33,7 +33,7 @@ export function OrderStatusIndicator({
       id: 'delivered',
       label: 'Proof Submitted',
       icon: Package,
-      completed: !!deliveredAt || ['completed'].includes(currentStatus),
+      completed: !!deliveredAt || currentStatus === 'proof_submitted' || currentStatus === 'completed',
       active: currentStatus === 'proof_submitted' || currentStatus === 'delivered',
     },
     {
