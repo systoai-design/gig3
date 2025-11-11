@@ -115,22 +115,23 @@ export default function Profile() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Profile Banner */}
-      <ProfileBanner
-        bannerUrl={profile.banner_url}
-        isOwnProfile={isOwnProfile}
-        onEditClick={() => navigate('/settings?tab=media')}
-      />
+      {/* Profile Banner & Header */}
+      <div className="relative">
+        <ProfileBanner
+          bannerUrl={profile.banner_url}
+          isOwnProfile={isOwnProfile}
+          onEditClick={() => navigate('/settings?tab=media')}
+        />
 
-      {/* Profile Header */}
-      <ProfileHeader
-        profile={profile}
-        roles={roles}
-        isOwnProfile={isOwnProfile}
-        onEditClick={() => navigate('/settings')}
-        proMember={sellerProfile?.pro_member}
-        proSince={sellerProfile?.pro_since}
-      />
+        <ProfileHeader
+          profile={profile}
+          roles={roles}
+          isOwnProfile={isOwnProfile}
+          onEditClick={() => navigate('/settings')}
+          proMember={sellerProfile?.pro_member}
+          proSince={sellerProfile?.pro_since}
+        />
+      </div>
 
       {/* Quick Actions for Sellers */}
       {isSeller && isOwnProfile && (
