@@ -6,7 +6,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -155,7 +154,6 @@ export default function Checkout() {
         <div className="min-h-screen bg-background pt-navbar flex items-center justify-center">
           <p>Loading cart...</p>
         </div>
-        <Footer />
       </>
     );
   }
@@ -172,7 +170,6 @@ export default function Checkout() {
             </CardContent>
           </Card>
         </div>
-        <Footer />
       </>
     );
   }
@@ -375,7 +372,6 @@ export default function Checkout() {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

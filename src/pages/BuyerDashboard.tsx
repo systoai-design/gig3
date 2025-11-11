@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -172,7 +172,10 @@ export default function BuyerDashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-navbar pt-16 pb-12">
-        <h1 className="text-4xl font-bold mb-8">My Orders</h1>
+        <div className="flex items-center gap-4 mb-8">
+          <BackButton />
+          <h1 className="text-4xl font-bold">My Orders</h1>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -338,7 +341,6 @@ export default function BuyerDashboard() {
           </TabsContent>
         </Tabs>
       </main>
-      <Footer />
 
       {/* Onboarding Wizard */}
       <OnboardingWizard

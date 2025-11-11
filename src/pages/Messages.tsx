@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -157,8 +157,9 @@ export default function Messages() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-navbar pt-16 pb-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex items-center gap-4 mb-8">
+          <BackButton />
+          <div className="flex-1">
             <h1 className="text-4xl font-bold">Messages</h1>
             {unreadCount > 0 && (
               <p className="text-muted-foreground mt-2">
@@ -270,7 +271,6 @@ export default function Messages() {
           </div>
         )}
       </main>
-      <Footer />
 
       {/* Message Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

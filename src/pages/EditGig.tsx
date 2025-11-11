@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -213,8 +213,13 @@ export default function EditGig() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-navbar pt-8 pb-12 max-w-3xl">
-        <h1 className="text-4xl font-bold mb-2">Edit Gig</h1>
-        <p className="text-muted-foreground mb-8">Update your gig details</p>
+        <div className="flex items-center gap-4 mb-8">
+          <BackButton />
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Edit Gig</h1>
+            <p className="text-muted-foreground">Update your gig details</p>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -366,7 +371,6 @@ export default function EditGig() {
           </div>
         </form>
       </main>
-      <Footer />
     </div>
   );
 }

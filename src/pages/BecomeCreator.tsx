@@ -5,7 +5,6 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -235,7 +234,6 @@ export default function BecomeCreator() {
             </CardContent>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -442,8 +440,6 @@ export default function BecomeCreator() {
             </div>
           </section>
         </ScrollReveal>
-
-        <Footer />
       </main>
     </div>
   );

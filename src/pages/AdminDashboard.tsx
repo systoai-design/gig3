@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -193,7 +193,10 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 pt-12 pb-24">
-        <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
+        <div className="flex items-center gap-4 mb-8">
+          <BackButton />
+          <h1 className="text-4xl font-bold">Admin Dashboard</h1>
+        </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
@@ -575,7 +578,6 @@ export default function AdminDashboard() {
           </DialogContent>
         </Dialog>
       </main>
-      <Footer />
     </div>
   );
 }

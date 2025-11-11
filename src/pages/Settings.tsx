@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -218,9 +218,12 @@ export default function Settings() {
       <Navbar />
       <main className="container mx-auto px-4 pt-navbar pt-8 pb-12">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Profile Settings</h1>
-            <p className="text-muted-foreground">Manage your profile and preferences</p>
+          <div className="flex items-center gap-4">
+            <BackButton />
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Profile Settings</h1>
+              <p className="text-muted-foreground">Manage your profile and preferences</p>
+            </div>
           </div>
 
           {/* Profile Completion */}
@@ -551,7 +554,6 @@ export default function Settings() {
           </Tabs>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

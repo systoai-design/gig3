@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import { BackButton } from '@/components/BackButton';
 import { useFavorites } from '@/hooks/useFavorites';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -101,7 +101,6 @@ export default function Favorites() {
             </div>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -111,7 +110,10 @@ export default function Favorites() {
       <Navbar />
       <div className="min-h-screen bg-background pt-navbar pt-8 pb-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-8">My Favorites</h1>
+          <div className="flex items-center gap-4 mb-8">
+            <BackButton />
+            <h1 className="text-4xl font-bold">My Favorites</h1>
+          </div>
 
           {gigs.length === 0 ? (
             <Card className="p-12 text-center">
@@ -215,7 +217,6 @@ export default function Favorites() {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 }
