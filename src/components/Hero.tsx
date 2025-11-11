@@ -100,7 +100,7 @@ export const Hero = () => {
             transition={{ delay: 0.8, duration: 0.6 }}
             className="max-w-3xl mx-auto mb-8"
           >
-            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-primary/40 dark:border-primary/50">
+            <GlassmorphicCard blur="xl" opacity={0.15} hover={false} className="p-2 border-2 border-border">
               <form 
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -166,7 +166,7 @@ export const Hero = () => {
                 onClick={() => navigate(`/explore?q=${encodeURIComponent(service.label)}`)}
                 className="group relative"
               >
-                <GlassmorphicCard blur="md" opacity={0.1} className="px-5 py-3 hover:bg-accent/20 transition-all duration-300">
+                <GlassmorphicCard blur="md" opacity={0.1} className="px-5 py-3 hover:bg-accent/20 transition-all duration-300 border-2 border-border">
                   <div className="flex items-center gap-2">
                     <span className="text-foreground text-sm font-medium">{service.label}</span>
                     {service.badge && (
@@ -187,7 +187,7 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4, duration: 0.6 }}
           >
-            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6">
+            <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-border">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
                 {[
                   { 
