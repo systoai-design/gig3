@@ -16,7 +16,7 @@ import { ProofUpload } from '@/components/ProofUpload';
 import { ProofReview } from '@/components/ProofReview';
 import { OrderStatusIndicator } from '@/components/OrderStatusIndicator';
 import { toast } from 'sonner';
-import { ArrowLeft, ExternalLink, MessageSquare, Clock as ClockIcon } from 'lucide-react';
+import { ArrowLeft, ExternalLink, MessageSquare, Clock as ClockIcon, AlertTriangle, FileText } from 'lucide-react';
 
 interface Order {
   id: string;
@@ -182,6 +182,25 @@ export default function OrderDetail() {
       fetchOrder();
     } catch (error: any) {
       toast.error(error.message || 'Failed to file dispute');
+    }
+  };
+
+  const handleCancelDispute = async () => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          status: 'proof_submitted',
+          disputed_at: null
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success('Dispute cancelled. Order returned to review.');
+      fetchOrder();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to cancel dispute');
     }
   };
 
@@ -384,6 +403,57 @@ export default function OrderDetail() {
                   isLoading={approving}
                 />
               </>
+            )}
+
+            {/* Disputed Order Actions */}
+            {isBuyer && order.status === 'disputed' && (order.proof_description || order.proof_files?.length > 0) && (
+              <Card className="border-destructive">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <AlertTriangle className="h-5 w-5" />
+                    Order Disputed
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    This order is currently under dispute. An admin will review the case. 
+                    If you'd like to cancel the dispute and review the proof again, click below.
+                  </p>
+                  
+                  {/* Show proof for reference */}
+                  <div className="border-t pt-4">
+                    <p className="text-sm font-medium mb-2">Submitted Proof</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {order.proof_description}
+                    </p>
+                    {order.proof_files && order.proof_files.length > 0 && (
+                      <div className="mt-3 space-y-2">
+                        {order.proof_files.map((url, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            asChild
+                          >
+                            <a href={url} target="_blank" rel="noopener noreferrer">
+                              <FileText className="h-4 w-4 mr-2" />
+                              View File {index + 1}
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelDispute}
+                    className="w-full"
+                  >
+                    Cancel Dispute & Return to Review
+                  </Button>
+                </CardContent>
+              </Card>
             )}
 
             {/* Messaging Section */}

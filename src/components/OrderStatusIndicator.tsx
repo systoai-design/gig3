@@ -19,28 +19,28 @@ export function OrderStatusIndicator({
       id: 'payment',
       label: 'Payment Confirmed',
       icon: Check,
-      completed: !!paymentConfirmedAt || !['pending', 'cancelled', 'disputed'].includes(currentStatus),
+      completed: !!paymentConfirmedAt || ['in_progress', 'proof_submitted', 'delivered', 'completed'].includes(currentStatus),
       active: currentStatus === 'pending',
     },
     {
       id: 'in_progress',
       label: 'In Progress',
       icon: Clock,
-      completed: currentStatus !== 'pending',
+      completed: ['proof_submitted', 'delivered', 'completed'].includes(currentStatus),
       active: currentStatus === 'in_progress',
     },
     {
       id: 'delivered',
       label: 'Proof Submitted',
       icon: Package,
-      completed: !!deliveredAt || currentStatus === 'proof_submitted' || currentStatus === 'completed',
+      completed: !!deliveredAt || ['completed'].includes(currentStatus),
       active: currentStatus === 'proof_submitted' || currentStatus === 'delivered',
     },
     {
       id: 'completed',
       label: 'Completed',
       icon: CheckCircle2,
-      completed: !!completedAt,
+      completed: !!completedAt || currentStatus === 'completed',
       active: currentStatus === 'completed',
     },
   ];
@@ -49,7 +49,7 @@ export function OrderStatusIndicator({
     <div className="w-full py-6">
       <div className="flex items-center justify-between relative">
         {/* Animated gradient progress line */}
-        <div className="absolute top-5 left-0 right-0 h-1 bg-gradient-to-r from-muted via-muted to-muted rounded-full overflow-hidden">
+        <div className="absolute top-6 left-0 right-0 h-1.5 bg-gradient-to-r from-muted via-muted to-muted rounded-full overflow-hidden">
           <div 
             className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-magenta-500 transition-all duration-700 ease-out relative"
             style={{
@@ -65,10 +65,10 @@ export function OrderStatusIndicator({
         {steps.map((step) => {
           const Icon = step.icon;
           return (
-            <div key={step.id} className="flex flex-col items-center gap-3 bg-background px-2 z-10">
+            <div key={step.id} className="flex flex-col items-center gap-4 bg-background px-2 z-10">
               <div
                 className={cn(
-                  'w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-500 relative',
+                  'w-14 h-14 rounded-full flex items-center justify-center border-2 transition-all duration-500 relative',
                   step.completed && [
                     'bg-gradient-to-br from-cyan-500 via-purple-500 to-magenta-500',
                     'border-transparent',
@@ -93,14 +93,14 @@ export function OrderStatusIndicator({
                 
                 {/* Completion checkmark overlay */}
                 {step.completed && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
-                    <Check className="w-3 h-3 text-white" />
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center border-2 border-background">
+                    <Check className="w-3.5 h-3.5 text-white" />
                   </div>
                 )}
               </div>
               
               <span className={cn(
-                'text-xs font-medium text-center max-w-[80px] leading-tight',
+                'text-xs font-medium text-center max-w-[90px] leading-tight',
                 step.completed && 'text-foreground font-semibold',
                 step.active && !step.completed && 'text-primary font-semibold',
                 !step.active && !step.completed && 'text-muted-foreground'
