@@ -9,6 +9,7 @@ import { useState, useEffect, startTransition } from "react";
 import { NoiseTexture } from "./ui/noise-texture";
 import { GradientMesh } from "./ui/gradient-mesh";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "./ui/skeleton";
 
 const CACHE_KEY = 'hero_stats_cache';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -17,6 +18,7 @@ export const Hero = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [searchValue, setSearchValue] = useState("");
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     creators: 0,
@@ -65,6 +67,7 @@ export const Hero = () => {
         // Update state with low priority
         startTransition(() => {
           setStats(newStats);
+          setLoading(false);
         });
 
         // Cache the results
@@ -82,6 +85,7 @@ export const Hero = () => {
           avgRating: 5,
           reviewCount: 1000
         });
+        setLoading(false);
       }
     };
 
@@ -227,40 +231,51 @@ export const Hero = () => {
             transition={{ delay: 0.9, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <GlassmorphicCard blur="lg" opacity={0.08} hover={false} className="px-8 py-6 border-2 border-primary/50 dark:border-primary/40">
-              <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
-                {[
-                  { 
-                    value: stats.totalUsers > 0 ? `${stats.totalUsers.toLocaleString()}${stats.totalUsers >= 1000 ? '+' : ''}` : '0', 
-                    label: "Users" 
-                  },
-                  { 
-                    value: stats.creators > 0 ? `${stats.creators.toLocaleString()}${stats.creators >= 1000 ? '+' : ''}` : '0', 
-                    label: "Creators" 
-                  },
-                  { 
-                    value: stats.services > 0 ? `${stats.services.toLocaleString()}${stats.services >= 1000 ? '+' : ''}` : '0', 
-                    label: "Services" 
-                  },
-                  { 
-                    value: stats.reviewCount > 0 ? `${stats.avgRating}★` : 'New', 
-                    label: "Satisfaction" 
-                  },
-                  { 
-                    value: "24/7", 
-                    label: "Support" 
-                  }
-                ].map((stat, index) => (
-                  <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.0 + index * 0.04, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-                  >
-                    <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
-                    <div className="text-muted-foreground text-sm font-medium">{stat.label}</div>
-                  </motion.div>
-                ))}
-              </div>
+              {loading ? (
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex flex-col items-center gap-2">
+                      <Skeleton className="h-10 w-20 mb-1" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 text-center">
+                  {[
+                    { 
+                      value: stats.totalUsers > 0 ? `${stats.totalUsers.toLocaleString()}${stats.totalUsers >= 1000 ? '+' : ''}` : '0', 
+                      label: "Users" 
+                    },
+                    { 
+                      value: stats.creators > 0 ? `${stats.creators.toLocaleString()}${stats.creators >= 1000 ? '+' : ''}` : '0', 
+                      label: "Creators" 
+                    },
+                    { 
+                      value: stats.services > 0 ? `${stats.services.toLocaleString()}${stats.services >= 1000 ? '+' : ''}` : '0', 
+                      label: "Services" 
+                    },
+                    { 
+                      value: stats.reviewCount > 0 ? `${stats.avgRating}★` : 'New', 
+                      label: "Satisfaction" 
+                    },
+                    { 
+                      value: "24/7", 
+                      label: "Support" 
+                    }
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={stat.label}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+                    >
+                      <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
+                      <div className="text-muted-foreground text-sm font-medium">{stat.label}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </GlassmorphicCard>
           </motion.div>
         </div>

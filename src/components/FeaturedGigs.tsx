@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProBadge } from "@/components/ProBadge";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Gig {
   id: string;
@@ -71,10 +72,33 @@ export const FeaturedGigs = () => {
 
   if (loading) {
     return (
-      <section className="py-20 bg-background">
+      <section className="py-24 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center">
-            <p className="text-muted-foreground">Loading services...</p>
+          <div className="flex items-end justify-between mb-16">
+            <div>
+              <Skeleton className="h-12 w-64 mb-3" />
+              <Skeleton className="h-6 w-96" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="space-y-4">
+                <Skeleton className="aspect-[4/3] w-full" />
+                <div className="space-y-3 px-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <div className="flex items-center justify-between pt-2">
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-9 w-20 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
