@@ -14,6 +14,7 @@ import { ReviewDialog } from '@/components/ReviewDialog';
 import { OrderTimeline } from '@/components/OrderTimeline';
 import { ProofUpload } from '@/components/ProofUpload';
 import { ProofReview } from '@/components/ProofReview';
+import { OrderStatusIndicator } from '@/components/OrderStatusIndicator';
 import { toast } from 'sonner';
 import { ArrowLeft, ExternalLink, MessageSquare, Clock as ClockIcon } from 'lucide-react';
 
@@ -61,6 +62,7 @@ export default function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [hasReview, setHasReview] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   useEffect(() => {
     fetchOrder();
@@ -123,17 +125,27 @@ export default function OrderDetail() {
   };
 
   const handleApproveDelivery = async () => {
+    setApproving(true);
     try {
+      console.log('Approving delivery for order:', id);
+      
       const { data, error } = await supabase.functions.invoke('approve-delivery', {
         body: { orderId: id }
       });
 
+      console.log('Approval response:', { data, error });
+
+      // Check both error sources
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       toast.success('Delivery approved! Escrow released to seller.');
-      fetchOrder();
+      await fetchOrder(); // await to ensure UI updates
     } catch (error: any) {
+      console.error('Approval error:', error);
       toast.error(error.message || 'Failed to approve delivery');
+    } finally {
+      setApproving(false);
     }
   };
 
@@ -281,6 +293,21 @@ export default function OrderDetail() {
               </CardContent>
             </Card>
 
+            {/* Status Progress Indicator */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <OrderStatusIndicator
+                  currentStatus={order.status}
+                  paymentConfirmedAt={order.payment_confirmed_at}
+                  deliveredAt={order.delivered_at}
+                  completedAt={order.completed_at}
+                />
+              </CardContent>
+            </Card>
+
             {/* Order Timeline */}
             <Card>
               <CardHeader>
@@ -354,6 +381,7 @@ export default function OrderDetail() {
                   onApprove={handleApproveDelivery}
                   onRequestRevision={handleRequestRevision}
                   onDispute={handleDispute}
+                  isLoading={approving}
                 />
               </>
             )}
