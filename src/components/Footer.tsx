@@ -24,9 +24,9 @@ export const Footer = () => {
       { label: "Success Stories", href: "/success-stories" },
     ],
     resources: [
-      { label: "Documentation", href: "/docs" },
-      { label: "API", href: "/api" },
-      { label: "Smart Contracts", href: "/contracts" },
+      { label: "Documentation", href: "/documentation" },
+      { label: "API", href: "/api-docs" },
+      { label: "Smart Contracts", href: "/smart-contracts" },
       { label: "Blog", href: "/blog" },
     ],
   };

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X, Shield } from "lucide-react";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X, Shield, Twitter } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -165,6 +165,15 @@ export const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => window.open('https://twitter.com/gig3_io', '_blank')}
+              className="hover:text-primary"
+              aria-label="Follow us on Twitter"
+            >
+              <Twitter className="h-5 w-5" />
+            </Button>
             <ThemeToggle />
             
             {!isSeller && user && (
@@ -295,11 +304,21 @@ export const Navbar = () => {
                   />
                 </form>
 
-                {/* Theme Toggle */}
-                <div className="flex items-center justify-between px-2">
-                  <span className="text-sm font-medium">Theme</span>
-                  <ThemeToggle />
-                </div>
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between px-2">
+              <span className="text-sm font-medium">Theme</span>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => window.open('https://twitter.com/gig3_io', '_blank')}
+                  aria-label="Follow us on Twitter"
+                >
+                  <Twitter className="h-5 w-5" />
+                </Button>
+                <ThemeToggle />
+              </div>
+            </div>
 
                 <Separator />
 
