@@ -29,7 +29,12 @@ export const OneClickWalletButton = ({ className }: OneClickWalletButtonProps) =
   // Handle wallet authentication after connection
   useEffect(() => {
     const authenticate = async () => {
-      if (!publicKey || !signMessage || isAuthenticating) return;
+      if (!publicKey || isAuthenticating) return;
+      
+      if (!signMessage) {
+        toast.error('This wallet does not support message signing');
+        return;
+      }
 
       setIsAuthenticating(true);
       
@@ -94,11 +99,6 @@ export const OneClickWalletButton = ({ className }: OneClickWalletButtonProps) =
   }, [publicKey, signMessage, isAuthenticating, signInWithWallet, signUpWithWallet]);
 
   const handleConnect = async () => {
-    if (!signMessage) {
-      toast.error('Your wallet does not support message signing');
-      return;
-    }
-
     try {
       if (hasPhantom) {
         // Auto-select and connect to Phantom
