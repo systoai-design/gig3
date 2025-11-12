@@ -168,7 +168,7 @@ export const Navbar = () => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => window.open('https://twitter.com/gig3_io', '_blank')}
+              onClick={() => window.open('https://x.com/Gig3dotfun', '_blank')}
               className="hover:text-primary"
               aria-label="Follow us on Twitter"
             >
@@ -311,7 +311,7 @@ export const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => window.open('https://twitter.com/gig3_io', '_blank')}
+                  onClick={() => window.open('https://x.com/Gig3dotfun', '_blank')}
                   aria-label="Follow us on Twitter"
                 >
                   <Twitter className="h-5 w-5" />

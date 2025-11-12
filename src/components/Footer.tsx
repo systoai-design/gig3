@@ -57,7 +57,7 @@ export const Footer = () => {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+                { icon: Twitter, href: "https://x.com/Gig3dotfun", label: "Twitter" },
                 { icon: Github, href: "https://github.com", label: "GitHub" },
                 { icon: MessageCircle, href: "#", label: "Discord" }
               ].map((social) => (
