@@ -86,23 +86,25 @@ export default function Settings() {
       setIsSeller(isSellerUser);
 
       // Fetch seller profile if seller
+      let sellerData = null;
       if (isSellerUser) {
-        const { data: sellerData } = await supabase
+        const { data: fetchedSellerData } = await supabase
           .from('seller_profiles')
           .select('*')
           .eq('user_id', user!.id)
           .maybeSingle();
 
-        if (sellerData) {
-          setSellerProfile(sellerData);
-          setPortfolioItems((sellerData.portfolio_items as any[]) || []);
-          setEducation((sellerData.education as any[]) || []);
-          setCertifications((sellerData.certifications as any[]) || []);
+        if (fetchedSellerData) {
+          sellerData = fetchedSellerData;
+          setSellerProfile(fetchedSellerData);
+          setPortfolioItems((fetchedSellerData.portfolio_items as any[]) || []);
+          setEducation((fetchedSellerData.education as any[]) || []);
+          setCertifications((fetchedSellerData.certifications as any[]) || []);
         }
       }
 
-      // Calculate completion
-      const completionPercent = calculateProfileCompletion(profileData, sellerProfile);
+      // Calculate completion using fresh data
+      const completionPercent = calculateProfileCompletion(profileData, sellerData);
       setCompletion(completionPercent);
     } catch (error: any) {
       toast.error('Failed to load profile');
