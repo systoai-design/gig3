@@ -341,7 +341,7 @@ export default function Checkout() {
                             {transactionSignature}
                           </p>
                           <a
-                            href={`https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`}
+                            href={`https://explorer.solana.com/tx/${transactionSignature}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"

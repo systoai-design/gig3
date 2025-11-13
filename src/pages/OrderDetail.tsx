@@ -317,7 +317,7 @@ export default function OrderDetail() {
                     <div>
                       <p className="text-sm text-muted-foreground">Transaction</p>
                       <a
-                        href={`https://explorer.solana.com/tx/${order.transaction_signature}?cluster=devnet`}
+                        href={`https://explorer.solana.com/tx/${order.transaction_signature}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-primary hover:underline flex items-center gap-1"
