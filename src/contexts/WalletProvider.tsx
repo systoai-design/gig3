@@ -13,8 +13,8 @@ interface Props {
 }
 
 export const WalletProvider: FC<Props> = ({ children }) => {
-  // Use devnet for development
-  const network = WalletAdapterNetwork.Devnet;
+  // Use mainnet for production
+  const network = WalletAdapterNetwork.Mainnet;
   
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 

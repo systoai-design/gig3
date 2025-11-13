@@ -119,8 +119,8 @@ serve(async (req) => {
 
     console.log('Escrow wallet loaded:', escrowKeypair.publicKey.toBase58());
 
-    // Connect to Solana devnet
-    const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+    // Connect to Solana mainnet
+    const connection = new Connection('https://api.mainnet-beta.solana.com', 'confirmed');
 
     // Calculate amount to send (100% to seller, 0% platform fee)
     const amountToSend = order.amount_sol;
