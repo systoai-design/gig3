@@ -21,8 +21,6 @@ export default function Checkout() {
   const { user } = useAuth();
   const { cartItems, loading, clearCart } = useCart();
   const { publicKey, sendTransaction } = useWallet();
-  const [transactionSignature, setTransactionSignature] = useState('');
-  const [confirming, setConfirming] = useState(false);
   const [sendingPayment, setSendingPayment] = useState(false);
 
   const calculateTotal = () => {
@@ -55,9 +53,19 @@ export default function Checkout() {
       return;
     }
 
+    if (!user) {
+      toast.error('Please sign in to continue');
+      return;
+    }
+
     try {
       setSendingPayment(true);
-      const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+      toast.info('Preparing transaction...');
+      
+      const connection = new Connection(
+        import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+        'confirmed'
+      );
 
       // Create transfer transaction
       const transaction = await createEscrowTransfer(
@@ -67,44 +75,24 @@ export default function Checkout() {
         totalAmount
       );
 
+      toast.info('Please approve the transaction in your wallet...');
+      
       // Send transaction
       const signature = await sendTransaction(transaction, connection);
       
-      toast.success('Payment sent! Waiting for confirmation...');
+      toast.info('Payment sent! Confirming on blockchain...');
       
       // Wait for confirmation
       await connection.confirmTransaction(signature, 'confirmed');
       
-      setTransactionSignature(signature);
-      toast.success('Payment confirmed on blockchain!');
-    } catch (error: any) {
-      console.error('Payment error:', error);
-      toast.error(error.message || 'Failed to send payment');
-    } finally {
-      setSendingPayment(false);
-    }
-  };
+      toast.success('Payment confirmed! Creating your orders...');
 
-  const handleConfirmPayment = async () => {
-    if (!transactionSignature.trim()) {
-      toast.error('Please enter a transaction signature');
-      return;
-    }
-
-    if (!user) {
-      toast.error('Please sign in to continue');
-      return;
-    }
-
-    setConfirming(true);
-
-    try {
-      // Create orders for each cart item
+      // Automatically create orders for each cart item
       const orderPromises = cartItems.map(async (item) => {
         if (!item.gig) return null;
 
         let price = item.gig.price_sol;
-        let deliveryDays = 7; // Default delivery days
+        let deliveryDays = 7;
         
         if (item.package_index !== null && item.gig.packages && item.gig.packages[item.package_index]) {
           const pkg = item.gig.packages[item.package_index];
@@ -112,7 +100,6 @@ export default function Checkout() {
           deliveryDays = pkg.delivery_days || 7;
         }
 
-        // Call create-order edge function
         const { data, error } = await supabase.functions.invoke('create-order', {
           body: {
             gigId: item.gig_id,
@@ -121,7 +108,7 @@ export default function Checkout() {
             amount: price * item.quantity,
             deliveryDays,
             packageIndex: item.package_index,
-            transactionSignature: transactionSignature,
+            transactionSignature: signature,
             escrowWallet: escrowWalletAddress,
           },
         });
@@ -130,20 +117,23 @@ export default function Checkout() {
         return data;
       });
 
-      const results = await Promise.all(orderPromises);
+      await Promise.all(orderPromises);
       
       // Clear cart
       await clearCart();
 
       toast.success(`Successfully created ${cartItems.length} order(s)!`);
-      
-      // Navigate to buyer dashboard
       navigate('/dashboard/buyer');
+      
     } catch (error: any) {
-      console.error('Checkout error:', error);
-      toast.error(error.message || 'Failed to create orders. Please contact support.');
+      console.error('Payment error:', error);
+      if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
+        toast.error('Transaction cancelled');
+      } else {
+        toast.error(error.message || 'Failed to complete payment');
+      }
     } finally {
-      setConfirming(false);
+      setSendingPayment(false);
     }
   };
 
@@ -276,10 +266,10 @@ export default function Checkout() {
               </Card>
 
               {/* Send Payment */}
-              {publicKey && !transactionSignature && (
+              {publicKey && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Step 2: Send Payment to Escrow</CardTitle>
+                    <CardTitle>Step 2: Complete Payment</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
@@ -313,58 +303,20 @@ export default function Checkout() {
                       onClick={handleSendPayment}
                       disabled={sendingPayment}
                     >
-                      {sendingPayment ? 'Sending Payment...' : 'Send Payment via Wallet'}
+                      {sendingPayment ? 'Processing Payment...' : 'Pay & Create Orders'}
                     </Button>
 
-                    <p className="text-xs text-muted-foreground text-center">
-                      Funds will be held in escrow until work is delivered and approved
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+                    {sendingPayment && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        Please approve the transaction in your wallet and wait while we create your orders...
+                      </p>
+                    )}
 
-              {/* Confirm Payment */}
-              {transactionSignature && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Step 3: Confirm Payment</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded">
-                      <div className="flex items-start gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                        <div className="flex-1">
-                          <p className="font-medium text-green-700 dark:text-green-400">
-                            Payment Sent Successfully!
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1 break-all">
-                            {transactionSignature}
-                          </p>
-                          <a
-                            href={`https://explorer.solana.com/tx/${transactionSignature}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"
-                          >
-                            View on Solana Explorer
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      onClick={handleConfirmPayment}
-                      disabled={confirming}
-                    >
-                      {confirming ? 'Creating Orders...' : 'Confirm & Create Orders'}
-                    </Button>
-
-                    <p className="text-xs text-muted-foreground text-center">
-                      Click to verify payment and create your orders
-                    </p>
+                    {!sendingPayment && (
+                      <p className="text-xs text-muted-foreground text-center">
+                        Funds will be held in escrow until work is delivered and approved
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               )}
