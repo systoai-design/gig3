@@ -234,7 +234,7 @@ export default function CreateGig() {
       if (error) throw error;
 
       toast.success('Gig created successfully!');
-      navigate(`/gigs/${data.id}`);
+      navigate(`/gig/${data.id}`);
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
