@@ -46,7 +46,10 @@ export const SubscriptionDialog = ({ open, onOpenChange, onSuccess }: Subscripti
       const { payment } = response.data;
 
       // Create transaction
-      const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+      const connection = new Connection(
+        import.meta.env.VITE_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+        'confirmed'
+      );
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
