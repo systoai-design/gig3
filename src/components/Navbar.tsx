@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import gig3LogoLight from "@/assets/gig3_logo_light.png";
-import gig3LogoDark from "@/assets/gig3_logo_dark_v2.png";
+import gig3LogoDark from "@/assets/gig3_logo_6.png";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
