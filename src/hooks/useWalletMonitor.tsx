@@ -13,15 +13,22 @@ export const useWalletMonitor = () => {
   const { user, signOut } = useAuth();
   const previousWalletRef = useRef<string | null>(null);
   const disconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    // Skip on initial mount to prevent false positives
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      previousWalletRef.current = publicKey?.toBase58() || null;
-      return;
+    // Debounce wallet changes to prevent rapid-fire checks
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      // Skip on initial mount to prevent false positives
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        previousWalletRef.current = publicKey?.toBase58() || null;
+        return;
+      }
 
     const currentWalletAddress = publicKey?.toBase58() || null;
     const userWalletAddress = user?.user_metadata?.wallet_address;
@@ -57,15 +64,16 @@ export const useWalletMonitor = () => {
       }
     }
 
-    previousWalletRef.current = currentWalletAddress;
-  }, [publicKey, connected, user, signOut]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
+      previousWalletRef.current = currentWalletAddress;
+    }, 300); // 300ms debounce
+    
     return () => {
       if (disconnectTimeoutRef.current) {
         clearTimeout(disconnectTimeoutRef.current);
       }
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
     };
-  }, []);
+  }, [publicKey, connected, user, signOut]);
 };

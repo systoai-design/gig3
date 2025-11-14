@@ -83,6 +83,12 @@ export default function GigDetail() {
       if (gigError) throw gigError;
       setGig(gigData);
 
+      // Track view analytics
+      if (gigData?.seller_id && user) {
+        const { trackGigEvent } = await import('@/lib/analytics');
+        trackGigEvent(gigData.id, gigData.seller_id, 'view', user.id);
+      }
+
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
