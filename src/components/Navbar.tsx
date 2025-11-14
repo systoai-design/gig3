@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { OneClickWalletButton } from '@/components/OneClickWalletButton';
 import { supabase } from "@/integrations/supabase/client";
 import { useWalletMonitor } from "@/hooks/useWalletMonitor";
 import { AuthDialog } from "@/components/AuthDialog";
@@ -257,12 +256,7 @@ export const Navbar = () => {
                 </DropdownMenu>
               </div>
             ) : (
-              <>
-                <Button onClick={() => setAuthDialogOpen(true)}>
-                  Sign In
-                </Button>
-                <OneClickWalletButton />
-              </>
+              <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90" />
             )}
           </div>
 
@@ -499,17 +493,7 @@ export const Navbar = () => {
                   <>
                     <Separator />
                     <div className="flex flex-col space-y-3">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setAuthDialogOpen(true);
-                          setIsMenuOpen(false);
-                        }}
-                        className="w-full justify-start"
-                      >
-                        Sign In
-                      </Button>
-                      <OneClickWalletButton className="w-full" />
+                      <WalletMultiButton className="!w-full !bg-primary !text-primary-foreground hover:!bg-primary/90" />
                     </div>
                   </>
                 )}

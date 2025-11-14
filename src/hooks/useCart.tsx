@@ -68,6 +68,13 @@ export const useCart = () => {
     }
 
     try {
+      // Get gig details for tracking
+      const { data: gigData } = await supabase
+        .from('gigs')
+        .select('seller_id')
+        .eq('id', gigId)
+        .single();
+
       const { error } = await supabase
         .from('cart_items')
         .insert({
@@ -87,6 +94,12 @@ export const useCart = () => {
           throw error;
         }
         return;
+      }
+
+      // Track analytics
+      if (gigData?.seller_id) {
+        const { trackGigEvent } = await import('@/lib/analytics');
+        trackGigEvent(gigId, gigData.seller_id, 'add_to_cart', user.id);
       }
 
       toast({

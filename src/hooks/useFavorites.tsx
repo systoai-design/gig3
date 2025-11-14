@@ -64,6 +64,13 @@ export const useFavorites = () => {
           description: 'Gig removed from your favorites',
         });
       } else {
+        // Get gig details for tracking
+        const { data: gigData } = await supabase
+          .from('gigs')
+          .select('seller_id')
+          .eq('id', gigId)
+          .single();
+
         const { error } = await supabase
           .from('favorites')
           .insert({
@@ -74,6 +81,12 @@ export const useFavorites = () => {
         if (error) throw error;
 
         setFavorites((prev) => new Set([...prev, gigId]));
+
+        // Track analytics
+        if (gigData?.seller_id) {
+          const { trackGigEvent } = await import('@/lib/analytics');
+          trackGigEvent(gigId, gigData.seller_id, 'favorite', user.id);
+        }
 
         toast({
           title: 'Added to favorites',

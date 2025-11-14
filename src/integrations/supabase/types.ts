@@ -140,6 +140,55 @@ export type Database = {
           },
         ]
       }
+      gig_analytics: {
+        Row: {
+          created_at: string
+          event_type: string
+          gig_id: string
+          id: string
+          seller_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          gig_id: string
+          id?: string
+          seller_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          gig_id?: string
+          id?: string
+          seller_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gig_analytics_gig_id_fkey"
+            columns: ["gig_id"]
+            isOneToOne: false
+            referencedRelation: "gigs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gig_analytics_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gig_analytics_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gigs: {
         Row: {
           category: string
