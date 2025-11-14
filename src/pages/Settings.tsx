@@ -244,7 +244,7 @@ export default function Settings() {
           {user && <ProfileBadges userId={user.id} variant="full" />}
 
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className={`grid w-full ${isSeller ? 'grid-cols-5' : 'grid-cols-4'}`}>
               <TabsTrigger value="general">General</TabsTrigger>
               <TabsTrigger value="account">Account</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>

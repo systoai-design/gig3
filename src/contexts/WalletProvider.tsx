@@ -16,7 +16,10 @@ export const WalletProvider: FC<Props> = ({ children }) => {
   // Use mainnet for production
   const network = WalletAdapterNetwork.Mainnet;
   
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = useMemo(() => {
+    // Use custom RPC if provided (e.g., Helius, QuickNode), fallback to public
+    return import.meta.env.VITE_SOLANA_RPC_URL || clusterApiUrl(network);
+  }, [network]);
 
   const wallets = useMemo(
     () => [
