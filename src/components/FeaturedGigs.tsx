@@ -18,10 +18,17 @@ interface Gig {
   category: string;
   images: string[];
   seller_id: string;
+  profiles?: {
+    username: string;
+    avatar_url: string | null;
+    name: string | null;
+  } | null;
   seller_profiles?: {
     pro_member: boolean;
     pro_since: string | null;
   } | null;
+  avg_rating?: number;
+  review_count?: number;
 }
 
 export const FeaturedGigs = () => {
@@ -35,34 +42,56 @@ export const FeaturedGigs = () => {
 
   const fetchGigs = async () => {
     try {
-      // Fetch gigs
+      // Fetch gigs with seller profiles for creator info
       const { data: gigsData, error: gigsError } = await supabase
         .from('gigs')
-        .select('*')
+        .select(`
+          *,
+          profiles:seller_id (
+            username,
+            avatar_url,
+            name
+          )
+        `)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(8);
 
       if (gigsError) throw gigsError;
 
-      // Fetch seller profiles in one query
+      // Fetch seller profiles for PRO badge in one query
       const sellerIds = (gigsData || []).map(g => g.seller_id);
       const { data: profilesData } = await supabase
         .from('seller_profiles')
         .select('user_id, pro_member, pro_since')
         .in('user_id', sellerIds);
 
-      // Map profiles to gigs
       const profilesMap = new Map(
         (profilesData || []).map(p => [p.user_id, p])
       );
 
-      const gigsWithProfiles = (gigsData || []).map(gig => ({
-        ...gig,
-        seller_profiles: profilesMap.get(gig.seller_id) || null
-      }));
+      // Fetch reviews for ratings
+      const gigsWithReviews = await Promise.all(
+        (gigsData || []).map(async (gig) => {
+          const { data: reviews } = await supabase
+            .from('reviews')
+            .select('rating')
+            .eq('reviewee_id', gig.seller_id);
+
+          const avgRating = reviews && reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : 0;
+
+          return {
+            ...gig,
+            seller_profiles: profilesMap.get(gig.seller_id) || null,
+            avg_rating: avgRating,
+            review_count: reviews?.length || 0,
+          };
+        })
+      );
       
-      setGigs(gigsWithProfiles as Gig[]);
+      setGigs(gigsWithReviews as Gig[]);
     } catch (error) {
       console.error('Error fetching gigs:', error);
     } finally {
@@ -224,10 +253,33 @@ export const FeaturedGigs = () => {
                     <div className="p-5">
                       {/* Creator Info */}
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-cyan"></div>
-                        <span className="text-sm font-medium text-foreground">Creator</span>
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent-cyan overflow-hidden flex items-center justify-center">
+                          {gig.profiles?.avatar_url ? (
+                            <img 
+                              src={gig.profiles.avatar_url} 
+                              alt={gig.profiles.username}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-white text-xs font-semibold">
+                              {gig.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm font-medium text-foreground truncate block">
+                            {gig.profiles?.name || gig.profiles?.username || 'Anonymous'}
+                          </span>
+                          {(gig.review_count || 0) > 0 && (
+                            <div className="flex items-center gap-1 text-xs">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <span className="font-medium">{(gig.avg_rating || 0).toFixed(1)}</span>
+                              <span className="text-muted-foreground">({gig.review_count})</span>
+                            </div>
+                          )}
+                        </div>
                         {gig.seller_profiles?.pro_member && (
-                          <AnimatedBadge glow pulse className="bg-gradient-to-r from-accent-blue to-accent-cyan text-white text-xs">
+                          <AnimatedBadge glow pulse className="bg-gradient-to-r from-accent-blue to-accent-cyan text-white text-xs flex-shrink-0">
                             PRO
                           </AnimatedBadge>
                         )}
