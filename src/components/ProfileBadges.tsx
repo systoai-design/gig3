@@ -19,6 +19,60 @@ export function ProfileBadges({ userId, variant = 'full' }: ProfileBadgesProps) 
   
   if (earnedBadges.length === 0 && variant === 'compact') return null;
 
+  // Always show full variant even with no earned badges
+  if (variant === 'full' && earnedBadges.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Achievement Badges</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Complete your profile to earn badges and unlock exclusive perks!
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {badges.map((badge, index) => (
+              <motion.div
+                key={badge.type}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex flex-col items-center gap-2 p-4 rounded-lg border-2 border-muted bg-muted/20 opacity-40 hover:opacity-60 transition-all">
+                        <div className="text-4xl">{badge.icon}</div>
+                        <div className="text-center space-y-1">
+                          <p className="text-sm font-semibold">{badge.label}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {badge.threshold}%
+                          </Badge>
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="space-y-1 max-w-xs">
+                        <p className="font-semibold">{badge.label}</p>
+                        <p className="text-xs text-muted-foreground">{badge.description}</p>
+                        {badge.perk && (
+                          <p className="text-xs text-primary font-medium">✨ {badge.perk}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Complete {badge.threshold}% of your profile to unlock
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </motion.div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (variant === 'compact') {
     return (
       <div className="flex flex-wrap gap-2">
