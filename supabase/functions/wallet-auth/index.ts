@@ -68,29 +68,27 @@ Deno.serve(async (req) => {
     }
     
     if (existingProfile && !isSignup) {
-      // User exists - create session using password reset
+      // User exists - sign in to create session
       console.log('Existing wallet user logging in');
       
-      // Create a secure temporary password
-      const tempPassword = crypto.randomUUID() + crypto.randomUUID();
-      
-      // Update user password
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-        existingProfile.id,
-        { password: tempPassword }
+      const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(
+        existingProfile.id
       );
 
-      if (updateError) {
-        console.error('Error updating password:', updateError);
-        throw updateError;
+      if (userError || !user) {
+        console.error('Error fetching user:', userError);
+        throw userError || new Error('User not found');
       }
 
-      // Wait briefly for password update to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Update password to a known value temporarily
+      const tempPassword = crypto.randomUUID();
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: tempPassword
+      });
 
-      // Sign in with the temporary password
+      // Sign in with the temporary password to get valid tokens
       const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
-        email: `${walletAddress}@wallet.gig3.io`,
+        email: user.email || `${walletAddress}@wallet.gig3.io`,
         password: tempPassword
       });
 
@@ -144,9 +142,6 @@ Deno.serve(async (req) => {
       }
 
       console.log('User created successfully:', authData.user.id);
-
-      // Wait briefly for user creation to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
 
       // Sign in immediately to get valid tokens
       const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
