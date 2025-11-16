@@ -37,21 +37,29 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     try {
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
+      // Determine if userId is actually a username or an ID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId || '');
+      
+      // Fetch profile by username or id
+      const query = supabase
         .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+        .select('*');
+      
+      const { data: profileData, error: profileError } = isUUID 
+        ? await query.eq('id', userId).single()
+        : await query.eq('username', userId).single();
 
       if (profileError) throw profileError;
       setProfile(profileData);
+
+      // Use the actual profile.id for all subsequent queries
+      const actualUserId = profileData.id;
 
       // Fetch roles
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId);
+        .eq('user_id', actualUserId);
 
       if (rolesError) throw rolesError;
       setRoles(rolesData?.map(r => r.role) || []);
@@ -61,7 +69,7 @@ export default function Profile() {
         const { data: sellerData } = await supabase
           .from('seller_profiles')
           .select('*')
-          .eq('user_id', userId)
+          .eq('user_id', actualUserId)
           .maybeSingle();
 
         setSellerProfile(sellerData);
@@ -69,7 +77,7 @@ export default function Profile() {
         const { data: gigsData, error: gigsError } = await supabase
           .from('gigs')
           .select('*')
-          .eq('seller_id', userId)
+          .eq('seller_id', actualUserId)
           .eq('status', 'active')
           .order('created_at', { ascending: false });
 
@@ -80,7 +88,7 @@ export default function Profile() {
         const { count } = await supabase
           .from('orders')
           .select('*', { count: 'exact', head: true })
-          .eq('seller_id', userId);
+          .eq('seller_id', actualUserId);
 
         setTotalOrders(count || 0);
       }

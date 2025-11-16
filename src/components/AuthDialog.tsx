@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ import * as bs58 from 'bs58';
 import { Check, Wallet, FileSignature, UserCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const walletSignupSchema = z.object({
   name: z.string()
@@ -49,10 +50,12 @@ enum OnboardingStep {
 export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const { signInWithWallet, signUpWithWallet, signOut, user } = useAuth();
   const { publicKey, signMessage, connected, disconnect } = useWallet();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(OnboardingStep.CONNECT_WALLET);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isExistingUser, setIsExistingUser] = useState(false);
+  const authInProgressRef = useRef(false);
 
   // Steps configuration
   const steps = [
@@ -121,6 +124,12 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   }, [connected, publicKey, user, signOut, currentStep]);
 
   const handleSignMessage = async (retryCount = 0, maxRetries = 3) => {
+    // Prevent multiple simultaneous auth attempts
+    if (authInProgressRef.current) {
+      console.log('Auth already in progress, skipping');
+      return;
+    }
+
     // Check if signMessage is available as a function
     if (!publicKey || !signMessage || typeof signMessage !== 'function') {
       if (retryCount < maxRetries) {
@@ -140,6 +149,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       return;
     }
 
+    authInProgressRef.current = true;
     setIsSubmitting(true);
     
     try {
@@ -169,10 +179,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         setCurrentStep(OnboardingStep.PROFILE_SETUP);
         toast.info('New wallet detected. Please complete your profile.');
       } else if (!error) {
-        // Existing user - success
+        // Existing user - sign in complete
         setIsExistingUser(true);
-        setCurrentStep(OnboardingStep.COMPLETE);
+        onOpenChange(false);
         toast.success('Welcome back!');
+        navigate('/');
       } else {
         toast.error('Authentication failed. Please try again.');
         setCurrentStep(OnboardingStep.CONNECT_WALLET);
@@ -197,6 +208,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       }
     } finally {
       setIsSubmitting(false);
+      authInProgressRef.current = false;
     }
   };
 

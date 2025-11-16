@@ -108,13 +108,19 @@ export const Navbar = () => {
         return;
       }
 
-      const { data } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single();
 
-      setUsername(data?.username || null);
+        if (error) throw error;
+        setUsername(data?.username || user.id); // Fallback to ID
+      } catch (error) {
+        console.error('Error fetching username:', error);
+        setUsername(user.id); // Fallback to ID on error
+      }
     };
 
     fetchUsername();
