@@ -10,13 +10,19 @@ import { NoiseTexture } from "./ui/noise-texture";
 import { GradientMesh } from "./ui/gradient-mesh";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "./ui/skeleton";
+import { useCreatorRegistration } from "@/hooks/useCreatorRegistration";
 
 const CACHE_KEY = 'hero_stats_cache';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const Hero = () => {
+interface HeroProps {
+  onOpenAuthDialog?: () => void;
+}
+
+export const Hero = ({ onOpenAuthDialog }: HeroProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { handleBecomeCreator } = useCreatorRegistration();
   const [searchValue, setSearchValue] = useState("");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
