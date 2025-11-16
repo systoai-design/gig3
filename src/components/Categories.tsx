@@ -1,21 +1,24 @@
-import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase, Users, Languages } from "lucide-react";
+import { Code, Palette, Video, Megaphone, Music, PenTool, Sparkles, Briefcase, Users, Languages, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { HoverTilt } from "@/components/animations/HoverTilt";
 import { GlassmorphicCard } from "@/components/animations/GlassmorphicCard";
 import { motion } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { GradientMesh } from "@/components/ui/gradient-mesh";
+import { NoiseTexture } from "@/components/ui/noise-texture";
+import { useState } from "react";
 
 const categories = [
-  { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan" },
-  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-cyan to-accent-purple" },
-  { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary" },
-  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-blue" },
-  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-cyan" },
-  { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue" },
-  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-cyan" },
-  { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple" },
-  { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue" },
+  { name: "Programming & Tech", icon: Code, gradient: "from-accent-blue to-accent-cyan", count: 1234, trending: true },
+  { name: "Graphics & Design", icon: Palette, gradient: "from-accent-cyan to-accent-purple", count: 856, trending: false },
+  { name: "Digital Marketing", icon: Megaphone, gradient: "from-accent-amber to-primary", count: 643, trending: false },
+  { name: "AI Services", icon: Sparkles, gradient: "from-accent-purple to-accent-blue", count: 943, trending: true },
+  { name: "Video & Animation", icon: Video, gradient: "from-primary to-accent-cyan", count: 721, trending: false },
+  { name: "Writing & Translation", icon: Languages, gradient: "from-accent-cyan to-accent-blue", count: 521, trending: false },
+  { name: "Music & Audio", icon: Music, gradient: "from-accent-amber to-accent-cyan", count: 412, trending: false },
+  { name: "Business", icon: Users, gradient: "from-accent-blue to-accent-purple", count: 589, trending: true },
+  { name: "Consulting", icon: Briefcase, gradient: "from-accent-purple to-accent-blue", count: 367, trending: false },
 ];
 
 export const Categories = () => {
@@ -47,37 +50,91 @@ export const Categories = () => {
 
   const CategoryCard = ({ category, index }: { category: typeof categories[0], index: number }) => {
     const Icon = category.icon;
+    const [isHovered, setIsHovered] = useState(false);
     
     return (
-      <HoverTilt intensity={10} scale={1.03}>
+      <HoverTilt intensity={15} scale={1.05}>
         <GlassmorphicCard
           blur="sm"
           opacity={0.05}
           variant="light"
-          className="h-[200px] cursor-pointer overflow-hidden group relative border-2 hover:border-primary/30 dark:hover:border-primary/50 transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_15px_50px_rgba(0,0,0,0.6)]"
+          className="h-[200px] cursor-pointer overflow-hidden group relative border-2 hover:border-primary/50 dark:hover:border-primary/60 transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.25),0_0_40px_rgba(var(--primary),0.2)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_40px_rgba(var(--primary),0.3)]"
         >
           <button
             onClick={() => navigate('/explore')}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             className="w-full h-full p-6 flex flex-col justify-between relative"
           >
-            {/* Gradient Background */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-            
-            {/* Icon */}
-            <div className="relative">
+            {/* Trending Badge - Top Left */}
+            {category.trending && (
               <motion.div
-                whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute top-3 left-3 z-20 flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-accent-amber to-primary text-white text-xs font-semibold shadow-lg"
+              >
+                <TrendingUp className="w-3 h-3" />
+                <span>Trending</span>
+              </motion.div>
+            )}
+
+            {/* Service Count Badge - Top Right */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.1 }}
+              className="absolute top-3 right-3 z-20 px-2.5 py-1 rounded-full backdrop-blur-md bg-background/80 border border-border/50 text-xs font-semibold text-muted-foreground shadow-lg"
+            >
+              {category.count.toLocaleString()}
+            </motion.div>
+            
+            {/* Gradient Background - Enhanced */}
+            <motion.div
+              className={`absolute inset-0 bg-gradient-to-br ${category.gradient} transition-opacity duration-500`}
+              animate={{ opacity: isHovered ? 0.15 : 0 }}
+            />
+            
+            {/* Shimmer Effect on Hover */}
+            <motion.div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+              style={{
+                background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)`,
+                backgroundSize: '200% 100%',
+              }}
+              animate={isHovered ? {
+                backgroundPosition: ['0% 0%', '200% 0%'],
+              } : {}}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+            
+            {/* Icon - Enhanced Animation */}
+            <div className="relative z-10">
+              <motion.div
+                whileHover={{ 
+                  rotate: [0, -10, 10, 0], 
+                  scale: 1.2,
+                  rotateY: 10
+                }}
                 transition={{ duration: 0.5, type: 'spring', stiffness: 300 }}
-                className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg group-hover:shadow-2xl transition-shadow duration-300`}
+                className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${category.gradient} p-3 md:p-4 shadow-lg group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-shadow duration-300`}
+                style={{ transformStyle: 'preserve-3d' }}
               >
                 <Icon className="w-full h-full text-white" />
               </motion.div>
             </div>
             
-            {/* Title */}
-            <h3 className="text-sm md:text-base font-bold text-foreground text-left mt-auto group-hover:gradient-text transition-all duration-300">
+            {/* Title - Enhanced */}
+            <motion.h3
+              className={`text-sm md:text-base font-bold text-left mt-auto relative z-10 transition-all duration-300 ${
+                isHovered ? 'gradient-text' : 'text-foreground'
+              }`}
+            >
               {category.name}
-            </h3>
+            </motion.h3>
           </button>
         </GlassmorphicCard>
       </HoverTilt>
@@ -86,7 +143,20 @@ export const Categories = () => {
 
   return (
     <section className="py-24 bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent pointer-events-none"></div>
+      {/* Background - Match Hero pattern */}
+      <div className="absolute inset-0 z-0">
+        <GradientMesh 
+          colors={[
+            'hsl(212, 100%, 48%)',
+            'hsl(200, 100%, 55%)',
+            'hsl(180, 77%, 52%)'
+          ]}
+          className="opacity-30" 
+          animated={true} 
+        />
+        <NoiseTexture opacity={0.02} />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-muted/20 to-transparent pointer-events-none z-0"></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
