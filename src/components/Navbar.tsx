@@ -45,7 +45,7 @@ export const Navbar = () => {
   const { cartCount } = useCart();
   const { handleBecomeCreator } = useCreatorRegistration();
   const [username, setUsername] = useState<string | null>(null);
-  const [usernameLoading, setUsernameLoading] = useState(true);
+  const [usernameLoading, setUsernameLoading] = useState(false);
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -255,14 +255,7 @@ export const Navbar = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem 
-                      onClick={() => {
-                        if (usernameLoading) {
-                          toast.info('Loading profile...');
-                          return;
-                        }
-                        navigate(`/profile/${username || user.id}`);
-                      }}
-                      disabled={usernameLoading}
+                      onClick={() => navigate(`/profile/${username || user.id}`)}
                     >
                       <User className="h-4 w-4 mr-2" />
                       My Profile
