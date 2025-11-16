@@ -2,8 +2,12 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Quote, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCreatorRegistration } from "@/hooks/useCreatorRegistration";
 
 const SuccessStories = () => {
+  const { handleBecomeCreator } = useCreatorRegistration();
+  
   const stories = [
     {
       name: "Sarah Chen",
@@ -89,12 +93,12 @@ const SuccessStories = () => {
                 Join thousands of creators earning on GIG3. Low fees, instant payments, and a supportive community 
                 await you.
               </p>
-              <a 
-                href="/become-creator" 
-                className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-colors"
+              <Button 
+                onClick={() => handleBecomeCreator()}
+                className="px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-colors"
               >
                 Become a Creator
-              </a>
+              </Button>
             </div>
           </ScrollReveal>
 
