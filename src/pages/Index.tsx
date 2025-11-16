@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { StatisticsShowcase } from "@/components/StatisticsShowcase";
@@ -14,13 +15,16 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { ScrollProgressBar } from "@/components/animations/ScrollProgressBar";
+import { AuthDialog } from "@/components/AuthDialog";
 
 const Index = () => {
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <ScrollProgressBar />
       <Navbar />
-      <Hero />
+      <Hero onOpenAuthDialog={() => setAuthDialogOpen(true)} />
       
       <ScrollReveal animation="fadeUp">
         <StatisticsShowcase />
@@ -35,7 +39,7 @@ const Index = () => {
       </ScrollReveal>
       
       <ScrollReveal animation="fadeUp">
-        <ForCreators />
+        <ForCreators onOpenAuthDialog={() => setAuthDialogOpen(true)} />
       </ScrollReveal>
       
       <ScrollReveal animation="fadeUp">
@@ -55,7 +59,7 @@ const Index = () => {
       </ScrollReveal>
       
       <ScrollReveal animation="fadeUp" delay={0.1}>
-        <FeaturedGigs />
+        <FeaturedGigs onOpenAuthDialog={() => setAuthDialogOpen(true)} />
       </ScrollReveal>
       
       <ScrollReveal animation="fadeLeft">
@@ -67,6 +71,11 @@ const Index = () => {
       </ScrollReveal>
       
       <Footer />
+      
+      <AuthDialog 
+        open={authDialogOpen} 
+        onOpenChange={setAuthDialogOpen} 
+      />
     </div>
   );
 };

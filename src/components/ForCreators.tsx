@@ -63,7 +63,11 @@ const testimonials = [
   },
 ];
 
-export const ForCreators = () => {
+interface ForCreatorsProps {
+  onOpenAuthDialog?: () => void;
+}
+
+export const ForCreators = ({ onOpenAuthDialog }: ForCreatorsProps) => {
   const navigate = useNavigate();
   const { handleBecomeCreator } = useCreatorRegistration();
   const [gigsPerMonth, setGigsPerMonth] = useState(10);
@@ -306,7 +310,7 @@ export const ForCreators = () => {
         >
           <Button 
             size="lg" 
-            onClick={() => handleBecomeCreator()}
+            onClick={() => handleBecomeCreator(onOpenAuthDialog)}
             className="text-lg px-12"
           >
             Become a Creator

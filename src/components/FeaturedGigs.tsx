@@ -32,7 +32,11 @@ interface Gig {
   review_count?: number;
 }
 
-export const FeaturedGigs = () => {
+interface FeaturedGigsProps {
+  onOpenAuthDialog?: () => void;
+}
+
+export const FeaturedGigs = ({ onOpenAuthDialog }: FeaturedGigsProps) => {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -149,7 +153,7 @@ export const FeaturedGigs = () => {
               Be the first to create a service and start offering your expertise!
             </p>
             <MagneticButton 
-              onClick={() => handleBecomeCreator()}
+              onClick={() => handleBecomeCreator(onOpenAuthDialog)}
               className="bg-gradient-to-r from-primary to-accent-cyan text-white px-8 py-4 rounded-full font-semibold"
             >
               Become a Creator
