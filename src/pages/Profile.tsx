@@ -135,8 +135,9 @@ export default function Profile() {
       setFavoritesCount(favorites || 0);
       
     } catch (error: any) {
-      toast.error('Failed to load profile');
-      navigate('/');
+      console.error('Error loading profile data:', error);
+      // Don't navigate away on errors - just show the profile with whatever data we have
+      toast.error('Some profile data failed to load');
     } finally {
       setLoading(false);
     }
@@ -159,7 +160,7 @@ export default function Profile() {
   if (!profile) return null;
 
   const isSeller = roles.includes('seller');
-  const isOwnProfile = user?.id === userId;
+  const isOwnProfile = user?.id === profile?.id;
 
   return (
     <div className="min-h-screen bg-background">

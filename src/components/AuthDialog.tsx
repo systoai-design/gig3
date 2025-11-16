@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -85,11 +86,33 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   useEffect(() => {
     if (user && open) {
       setCurrentStep(OnboardingStep.COMPLETE);
-      setTimeout(() => {
-        onOpenChange(false);
-      }, 2000);
+      
+      // Check user roles and redirect appropriately
+      const checkRolesAndRedirect = async () => {
+        try {
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id);
+          
+          const isSeller = roles?.some(r => r.role === 'seller');
+          
+          setTimeout(() => {
+            onOpenChange(false);
+            // Redirect sellers to seller dashboard, buyers stay where they are
+            if (isSeller) {
+              navigate('/dashboard/seller');
+            }
+          }, 2000);
+        } catch (error) {
+          console.error('Error checking roles:', error);
+          setTimeout(() => onOpenChange(false), 2000);
+        }
+      };
+      
+      checkRolesAndRedirect();
     }
-  }, [user, open, onOpenChange]);
+  }, [user, open, onOpenChange, navigate]);
 
   // Handle wallet connection
   useEffect(() => {
