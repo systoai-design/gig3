@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +28,9 @@ export default function Profile() {
   const [gigs, setGigs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [buyerOrderCount, setBuyerOrderCount] = useState(0);
+  const [reviewsCount, setReviewsCount] = useState(0);
+  const [favoritesCount, setFavoritesCount] = useState(0);
 
   useEffect(() => {
     if (userId) {
@@ -108,6 +111,29 @@ export default function Profile() {
 
         setTotalOrders(count || 0);
       }
+
+      // Fetch buyer activity stats (for ALL users)
+      const { count: buyerOrders } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('buyer_id', actualUserId);
+      
+      setBuyerOrderCount(buyerOrders || 0);
+
+      const { count: reviews } = await supabase
+        .from('reviews')
+        .select('*', { count: 'exact', head: true })
+        .eq('reviewer_id', actualUserId);
+      
+      setReviewsCount(reviews || 0);
+
+      const { count: favorites } = await supabase
+        .from('favorites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', actualUserId);
+      
+      setFavoritesCount(favorites || 0);
+      
     } catch (error: any) {
       toast.error('Failed to load profile');
       navigate('/');
@@ -202,17 +228,64 @@ export default function Profile() {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* About Section */}
-              {profile.bio && (
+              {profile.bio ? (
                 <Card>
                   <CardContent className="p-6">
                     <h2 className="text-xl font-bold mb-4">About</h2>
                     <p className="text-muted-foreground whitespace-pre-wrap">{profile.bio}</p>
                   </CardContent>
                 </Card>
+              ) : isOwnProfile && (
+                <Card className="border-dashed border-2">
+                  <CardContent className="p-6 text-center">
+                    <p className="text-muted-foreground mb-4">Tell others about yourself</p>
+                    <Button variant="outline" onClick={() => navigate('/settings')}>
+                      Add Bio
+                    </Button>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Profile Badges */}
               <ProfileBadges userId={userId!} variant="full" />
+
+              {/* Activity Section - Show for ALL users */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-xl font-bold">Activity</h2>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Orders Placed</span>
+                      <span className="font-semibold text-lg">{buyerOrderCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Reviews Given</span>
+                      <span className="font-semibold text-lg">{reviewsCount}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Favorites</span>
+                      <span className="font-semibold text-lg">{favoritesCount}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Become a Creator CTA for Buyers */}
+              {!isSeller && isOwnProfile && (
+                <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-bold mb-2">Ready to Sell Your Skills?</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Join thousands of creators earning on GIG3
+                    </p>
+                    <Button onClick={() => navigate('/become-creator')}>
+                      Become a Creator
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Skills Section */}
               {isSeller && sellerProfile?.skills && (
