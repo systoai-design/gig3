@@ -89,12 +89,17 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         return;
       }
 
-      // Check if user is already logged in with a different wallet
+      // Check if user is already logged in with matching wallet - just close dialog
       if (user && connected && publicKey) {
         const userWalletAddress = user.user_metadata?.wallet_address;
         const currentWalletAddress = publicKey.toBase58();
         
-        if (userWalletAddress && userWalletAddress !== currentWalletAddress) {
+        if (userWalletAddress && userWalletAddress === currentWalletAddress) {
+          // Already authenticated with this wallet, close dialog
+          onOpenChange(false);
+          return;
+        } else if (userWalletAddress) {
+          // Different wallet detected
           toast.info('Different wallet detected. Please authenticate with this wallet.');
           await signOut();
           setCurrentStep(OnboardingStep.SIGN_MESSAGE);
@@ -105,13 +110,12 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       // Move to sign message step when wallet connects
       if (currentStep === OnboardingStep.CONNECT_WALLET) {
         setCurrentStep(OnboardingStep.SIGN_MESSAGE);
-        // Automatically trigger signature
-        setTimeout(() => handleSignMessage(), 500);
+        // DO NOT auto-trigger signature - wait for user to click Continue button
       }
     };
 
     handleWalletConnection();
-  }, [connected, publicKey, user, signOut, currentStep]);
+  }, [connected, publicKey, user, signOut, currentStep, onOpenChange]);
 
   const handleSignMessage = async () => {
     if (!publicKey || !signMessage) {
@@ -348,10 +352,10 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             ) : (
               <Button
                 onClick={handleSignMessage}
-                className="bg-gradient-primary hover:opacity-90 h-12 px-8 rounded-full"
+                className="bg-gradient-primary hover:opacity-90 h-12 px-8 rounded-full text-base font-semibold"
                 disabled={isSubmitting}
               >
-                Sign Message
+                Continue with Wallet
               </Button>
             )}
 
