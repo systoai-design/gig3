@@ -32,6 +32,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import gig3LogoLight from "@/assets/gig3_logo_light.png";
 import gig3LogoDark from "@/assets/gig3_logo_6.png";
+import { RoleSwitcher } from "@/components/RoleSwitcher";
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -246,14 +247,15 @@ export const Navbar = () => {
                 {user?.user_metadata?.wallet_address && (
                   <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90" />
                 )}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <RoleSwitcher />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       Account
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="z-50">
                     <DropdownMenuItem 
                       onClick={() => navigate(`/profile/${username || user.id}`)}
                     >
