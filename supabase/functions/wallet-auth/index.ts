@@ -79,36 +79,39 @@ Deno.serve(async (req) => {
         throw userError || new Error('User not found');
       }
 
-      // Generate session tokens directly using admin API
-      const { data, error: tokenError } = await supabaseAdmin.auth.admin.generateLink({
-        type: 'magiclink',
-        email: user.email || `${walletAddress}@wallet.gig3.io`,
-        options: {
-          redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify`
-        }
+      // Generate new password and update user
+      const dummyEmail = user.email || `${walletAddress}@wallet.gig3.io`;
+      const newPassword = crypto.randomUUID();
+
+      console.log('Updating user password for stable session');
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+        existingProfile.id,
+        { password: newPassword }
+      );
+
+      if (updateError) {
+        console.error('Error updating password:', updateError);
+        throw updateError;
+      }
+
+      // Sign in with the new password to get proper tokens
+      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+        email: dummyEmail,
+        password: newPassword
       });
 
-      if (tokenError || !data) {
-        console.error('Error generating tokens:', tokenError);
-        throw tokenError || new Error('Failed to generate session');
+      if (signInError || !signInData.session) {
+        console.error('Error signing in after password update:', signInError);
+        throw signInError || new Error('Failed to create session');
       }
 
-      // Extract access and refresh tokens from the magic link
-      const url = new URL(data.properties.action_link);
-      const access_token = url.searchParams.get('access_token');
-      const refresh_token = url.searchParams.get('refresh_token');
-
-      if (!access_token || !refresh_token) {
-        throw new Error('Failed to extract tokens from magic link');
-      }
-
-      console.log('Session tokens generated successfully');
+      console.log('Session created successfully for existing user');
       
       return new Response(
         JSON.stringify({ 
-          access_token,
-          refresh_token,
-          user: user,
+          access_token: signInData.session.access_token,
+          refresh_token: signInData.session.refresh_token,
+          user: signInData.user,
           is_new_account: false
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

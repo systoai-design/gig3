@@ -15,6 +15,7 @@ import { OnboardingWizard } from '@/components/OnboardingWizard';
 import { ProSubscriptionBanner } from '@/components/ProSubscriptionBanner';
 import { ProBadge } from '@/components/ProBadge';
 import { ProfileCompletionChecklist } from '@/components/ProfileCompletionChecklist';
+import { SellerWelcomeBanner } from '@/components/SellerWelcomeBanner';
 import { useProStatus } from '@/hooks/useProStatus';
 import { calculateProfileCompletion } from '@/lib/profileUtils';
 import { motion } from 'framer-motion';
@@ -238,6 +239,13 @@ export default function CreatorDashboard() {
             </Button>
           </motion.div>
         </div>
+
+        {/* Welcome Banner for First-Time Sellers */}
+        {gigs.length === 0 && (
+          <div className="mb-8">
+            <SellerWelcomeBanner />
+          </div>
+        )}
 
         {/* Profile Completion Checklist */}
         {completion < 100 && profile && (
