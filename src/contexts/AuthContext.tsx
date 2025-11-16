@@ -34,7 +34,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         // Only navigate on initial sign-in, not on token refresh or session restoration
         if (event === 'SIGNED_IN' && !previousUser && session?.user) {
-          navigate('/');
+          // Don't auto-navigate for wallet users - AuthDialog will handle it
+          const isWalletUser = session.user.user_metadata?.wallet_address;
+          if (!isWalletUser) {
+            navigate('/');
+          }
         }
       }
     );
@@ -99,6 +103,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         toast.error(sessionError.message);
         return { error: sessionError };
       }
+
+      // Wait a moment for UI to stabilize
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       toast.success('Signed in with wallet!');
       return { error: null };
