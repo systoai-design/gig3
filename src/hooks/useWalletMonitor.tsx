@@ -40,7 +40,7 @@ export const useWalletMonitor = () => {
         return;
       }
 
-      // User has a wallet account - monitor for changes
+      // User has a wallet account - ONLY monitor for wallet address changes (not disconnects)
       if (connected && currentWalletAddress) {
         // Clear any pending disconnect timeout (wallet reconnected)
         if (disconnectTimeoutRef.current) {
@@ -50,31 +50,17 @@ export const useWalletMonitor = () => {
         }
 
         // Check if wallet changed to a different address
-        // Only compare if we have a previous wallet and it's different
-        if (previousWalletRef.current && 
-            userWalletAddress.toLowerCase() !== currentWalletAddress.toLowerCase() &&
-            previousWalletRef.current.toLowerCase() === userWalletAddress.toLowerCase()) {
-          toast.info('Wallet changed. Please sign in with the new wallet.');
+        // Sign out ONLY if the connected wallet address doesn't match the user's registered wallet
+        if (userWalletAddress.toLowerCase() !== currentWalletAddress.toLowerCase()) {
+          toast.info('Different wallet detected. Please sign in with the correct wallet.');
           signOut();
           return;
         }
-      } else if (!connected && previousWalletRef.current && userWalletAddress) {
-        // Wallet disconnected - wait 5 seconds before signing out
-        // Longer grace period to handle page refreshes and wallet reconnections
-        if (!disconnectTimeoutRef.current && !hasShownDisconnectWarning.current) {
-          hasShownDisconnectWarning.current = true;
-          disconnectTimeoutRef.current = setTimeout(() => {
-            // Only sign out if still disconnected after grace period
-            if (!connected) {
-              toast.info('Wallet disconnected. You have been signed out.');
-              signOut();
-            }
-          }, 5000); // 5 second grace period
-        }
       }
+      // NOTE: Removed disconnect timeout - users stay logged in even if wallet disconnects temporarily
 
       previousWalletRef.current = currentWalletAddress;
-    }, 500); // 500ms debounce for more stability
+    }, 500); // 500ms debounce for stability
     
     return () => {
       if (disconnectTimeoutRef.current) {
