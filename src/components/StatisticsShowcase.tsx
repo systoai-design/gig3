@@ -1,6 +1,9 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import { Users, Briefcase, CheckCircle, Star } from 'lucide-react';
+import { GradientMesh } from '@/components/ui/gradient-mesh';
+import { NoiseTexture } from '@/components/ui/noise-texture';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StatItem {
   icon: typeof Users;
@@ -10,12 +13,12 @@ interface StatItem {
   prefix?: string;
 }
 
-const stats: StatItem[] = [
-  { icon: Briefcase, value: 10000, label: 'Gigs Available', suffix: '+' },
-  { icon: Users, value: 5000, label: 'Talented Creators', suffix: '+' },
-  { icon: CheckCircle, value: 50000, label: 'Projects Completed', suffix: '+' },
-  { icon: Star, value: 4.8, label: 'Average Rating', prefix: '★' },
-];
+interface Stats {
+  gigsAvailable: number;
+  talentedCreators: number;
+  projectsCompleted: number;
+  averageRating: number;
+}
 
 const Counter = ({ value, duration = 2000, suffix = '', prefix = '' }: { value: number; duration?: number; suffix?: string; prefix?: string }) => {
   const [count, setCount] = useState(0);
@@ -56,14 +59,59 @@ const Counter = ({ value, duration = 2000, suffix = '', prefix = '' }: { value: 
 };
 
 export const StatisticsShowcase = () => {
+  const [stats, setStats] = useState<Stats>({
+    gigsAvailable: 0,
+    talentedCreators: 0,
+    projectsCompleted: 0,
+    averageRating: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [gigsResult, creatorsResult, ordersResult, reviewsResult] = await Promise.all([
+          supabase.from('gigs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+          supabase.from('seller_profiles').select('user_id', { count: 'exact', head: true }),
+          supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+          supabase.from('reviews').select('rating'),
+        ]);
+
+        const ratings = reviewsResult.data || [];
+        const avgRating = ratings.length > 0
+          ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
+          : 0;
+
+        setStats({
+          gigsAvailable: gigsResult.count || 0,
+          talentedCreators: creatorsResult.count || 0,
+          projectsCompleted: ordersResult.count || 0,
+          averageRating: Number(avgRating.toFixed(1)),
+        });
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statItems: StatItem[] = [
+    { icon: Briefcase, value: stats.gigsAvailable, label: 'Gigs Available', suffix: '+' },
+    { icon: Users, value: stats.talentedCreators, label: 'Talented Creators', suffix: '+' },
+    { icon: CheckCircle, value: stats.projectsCompleted, label: 'Projects Completed', suffix: '+' },
+    { icon: Star, value: stats.averageRating, label: 'Average Rating', prefix: '★' },
+  ];
+
   return (
-    <section className="py-32 relative overflow-hidden bg-gradient-to-b from-background via-muted/20 to-background">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      
-      {/* Gradient blobs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent-blue/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent-cyan/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+    <section className="py-32 relative overflow-hidden">
+      {/* Unified Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <GradientMesh className="opacity-30" animated={true} />
+        <NoiseTexture opacity={0.02} />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10">
         <motion.div
@@ -82,7 +130,7 @@ export const StatisticsShowcase = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, index) => {
+          {statItems.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <motion.div
