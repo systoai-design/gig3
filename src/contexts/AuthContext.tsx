@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Wait a moment for UI to stabilize
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      toast.success('Signed in with wallet!');
+      toast.success('Signed in successfully!');
       return { error: null };
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in with wallet');
