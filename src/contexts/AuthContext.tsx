@@ -28,12 +28,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        const previousUser = user;
         setSession(session);
         setUser(session?.user ?? null);
         
-      if (event === 'SIGNED_IN') {
-        navigate('/');
-      }
+        // Only navigate on initial sign-in, not on token refresh or session restoration
+        if (event === 'SIGNED_IN' && !previousUser && session?.user) {
+          navigate('/');
+        }
       }
     );
 
