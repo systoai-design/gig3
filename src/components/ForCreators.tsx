@@ -7,6 +7,7 @@ import { GlassmorphicCard } from '@/components/animations/GlassmorphicCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations/StaggerContainer';
 import { GradientMesh } from '@/components/ui/gradient-mesh';
 import { NoiseTexture } from '@/components/ui/noise-texture';
+import { useCreatorRegistration } from '@/hooks/useCreatorRegistration';
 
 const benefits = [
   {
@@ -64,6 +65,7 @@ const testimonials = [
 
 export const ForCreators = () => {
   const navigate = useNavigate();
+  const { handleBecomeCreator } = useCreatorRegistration();
   const [gigsPerMonth, setGigsPerMonth] = useState(10);
   const [avgPrice, setAvgPrice] = useState(2);
   const platformFee = 0.05;
@@ -106,7 +108,7 @@ export const ForCreators = () => {
           <div className="flex gap-4 justify-center flex-wrap">
             <Button 
               size="lg" 
-              onClick={() => navigate('/become-creator')}
+              onClick={() => handleBecomeCreator()}
               className="text-lg px-8"
             >
               Start Selling
@@ -304,7 +306,7 @@ export const ForCreators = () => {
         >
           <Button 
             size="lg" 
-            onClick={() => navigate('/become-creator')}
+            onClick={() => handleBecomeCreator()}
             className="text-lg px-12"
           >
             Become a Creator

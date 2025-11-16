@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useSignOut } from "@/hooks/useSignOut";
+import { useCreatorRegistration } from "@/hooks/useCreatorRegistration";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +42,7 @@ export const Navbar = () => {
   const [isSeller, setIsSeller] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const { cartCount } = useCart();
+  const { handleBecomeCreator } = useCreatorRegistration();
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -176,7 +178,12 @@ export const Navbar = () => {
             <ThemeToggle />
             
             {!isSeller && user && (
-              <Button variant="ghost" size="sm" onClick={() => navigate('/become-creator')} className="hover:text-primary">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => handleBecomeCreator(() => setAuthDialogOpen(true))} 
+                className="hover:text-primary"
+              >
                 Become a Creator
               </Button>
             )}
@@ -335,7 +342,7 @@ export const Navbar = () => {
                       variant="ghost" 
                       className="justify-start text-base"
                       onClick={() => {
-                        navigate('/become-creator');
+                        handleBecomeCreator(() => setAuthDialogOpen(true));
                         setIsMenuOpen(false);
                       }}
                     >

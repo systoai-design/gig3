@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { ProBadge } from "@/components/ProBadge";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCreatorRegistration } from "@/hooks/useCreatorRegistration";
 
 interface Gig {
   id: string;
@@ -35,6 +36,7 @@ export const FeaturedGigs = () => {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { handleBecomeCreator } = useCreatorRegistration();
 
   useEffect(() => {
     fetchGigs();
@@ -147,7 +149,7 @@ export const FeaturedGigs = () => {
               Be the first to create a service and start offering your expertise!
             </p>
             <MagneticButton 
-              onClick={() => navigate('/become-creator')}
+              onClick={() => handleBecomeCreator()}
               className="bg-gradient-to-r from-primary to-accent-cyan text-white px-8 py-4 rounded-full font-semibold"
             >
               Become a Creator
