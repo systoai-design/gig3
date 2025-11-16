@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     }
     
     if (existingProfile && !isSignup) {
-      // User exists - sign in to create session
+      // User exists - create session using admin powers
       console.log('Existing wallet user logging in');
       
       const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(
@@ -80,14 +80,29 @@ Deno.serve(async (req) => {
         throw userError || new Error('User not found');
       }
 
-      // Update password to a known value temporarily
+      // Update password to ensure we can sign in
       const tempPassword = crypto.randomUUID();
-      await supabaseAdmin.auth.admin.updateUserById(user.id, {
-        password: tempPassword
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: tempPassword,
+        email_confirm: true  // Ensure email is confirmed
       });
 
-      // Sign in with the temporary password to get valid tokens
-      const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
+      if (updateError) {
+        console.error('Error updating user password:', updateError);
+        throw updateError;
+      }
+
+      // Wait a moment for the password update to propagate
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Create a separate client for signing in (not the admin client)
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_ANON_KEY')!
+      );
+
+      // Sign in with the temporary password to get valid session tokens
+      const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
         email: user.email || `${walletAddress}@wallet.gig3.io`,
         password: tempPassword
       });
