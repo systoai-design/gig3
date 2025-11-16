@@ -85,8 +85,8 @@ Deno.serve(async (req) => {
         throw updateError;
       }
 
-      // Wait briefly for password update to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for password update to propagate
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Sign in with the temporary password
       const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
@@ -145,8 +145,8 @@ Deno.serve(async (req) => {
 
       console.log('User created successfully:', authData.user.id);
 
-      // Wait briefly for user creation to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for user creation to propagate
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       // Sign in immediately to get valid tokens
       const { data: signInData, error: signInError } = await supabaseAdmin.auth.signInWithPassword({
