@@ -104,18 +104,39 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
       // Move to sign message step when wallet connects
       if (currentStep === OnboardingStep.CONNECT_WALLET) {
+        // Verify wallet has signMessage capability
+        if (!signMessage || typeof signMessage !== 'function') {
+          toast.error('This wallet does not support message signing. Please use Phantom or Solflare.');
+          if (disconnect) await disconnect();
+          return;
+        }
+        
         setCurrentStep(OnboardingStep.SIGN_MESSAGE);
-        // Automatically trigger signature
-        setTimeout(() => handleSignMessage(), 500);
+        // Automatically trigger signature with increased delay for wallet initialization
+        setTimeout(() => handleSignMessage(), 1500);
       }
     };
 
     handleWalletConnection();
   }, [connected, publicKey, user, signOut, currentStep]);
 
-  const handleSignMessage = async () => {
-    if (!publicKey || !signMessage) {
-      toast.error('Wallet not properly connected');
+  const handleSignMessage = async (retryCount = 0, maxRetries = 3) => {
+    // Check if signMessage is available as a function
+    if (!publicKey || !signMessage || typeof signMessage !== 'function') {
+      if (retryCount < maxRetries) {
+        // Wait and retry with exponential backoff
+        const delay = 1000 * Math.pow(2, retryCount); // 1s, 2s, 4s
+        toast.info(`Waiting for wallet to initialize... (${retryCount + 1}/${maxRetries})`, {
+          id: 'wallet-init'
+        });
+        await new Promise(resolve => setTimeout(resolve, delay));
+        toast.dismiss('wallet-init');
+        return handleSignMessage(retryCount + 1, maxRetries);
+      }
+      
+      toast.error('Wallet does not support message signing. Please try reconnecting.');
+      setCurrentStep(OnboardingStep.CONNECT_WALLET);
+      if (disconnect) await disconnect();
       return;
     }
 
@@ -160,15 +181,20 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     } catch (error: any) {
       toast.dismiss('wallet-sign');
       
-      if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
+      if (error.message?.includes('not a function')) {
+        toast.error('Wallet connection issue. Please disconnect and reconnect your wallet.');
+        setCurrentStep(OnboardingStep.CONNECT_WALLET);
+        if (disconnect) await disconnect();
+      } else if (error.message?.includes('User rejected') || error.message?.includes('rejected')) {
         toast.error('Signature rejected. Please try again.');
+        setCurrentStep(OnboardingStep.SIGN_MESSAGE);
       } else if (error.message?.includes('Wallet locked')) {
         toast.error('Please unlock your wallet and try again.');
+        setCurrentStep(OnboardingStep.SIGN_MESSAGE);
       } else {
         toast.error(`Authentication error: ${error.message || 'Unknown error'}`);
+        setCurrentStep(OnboardingStep.SIGN_MESSAGE);
       }
-      
-      setCurrentStep(OnboardingStep.SIGN_MESSAGE);
     } finally {
       setIsSubmitting(false);
     }
@@ -347,10 +373,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
               </div>
             ) : (
               <Button
-                onClick={handleSignMessage}
+                onClick={() => handleSignMessage()}
                 className="bg-gradient-primary hover:opacity-90 h-12 px-8 rounded-full"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !signMessage || typeof signMessage !== 'function'}
               >
+                <FileSignature className="mr-2 h-5 w-5" />
                 Sign Message
               </Button>
             )}
