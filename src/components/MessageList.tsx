@@ -17,6 +17,7 @@ interface Message {
   created_at: string;
   read_at: string | null;
   edited_at: string | null;
+  order_id: string | null;
   attachments: string[] | null;
   profiles?: {
     username: string;
@@ -57,7 +58,17 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
           table: 'messages',
         },
         (payload) => {
-          fetchMessages();
+          const newMessage = payload.new as Message;
+          // Only add message if it's relevant to this conversation
+          const isRelevant = orderId 
+            ? newMessage.order_id === orderId
+            : newMessage.order_id === null && 
+              ((newMessage.sender_id === user?.id && newMessage.receiver_id === otherUserId) ||
+               (newMessage.sender_id === otherUserId && newMessage.receiver_id === user?.id));
+          
+          if (isRelevant) {
+            setMessages(prev => [...prev, newMessage]);
+          }
         }
       )
       .on(
@@ -68,7 +79,22 @@ export const MessageList = ({ orderId, otherUserId }: MessageListProps) => {
           table: 'messages',
         },
         (payload) => {
-          fetchMessages();
+          const updatedMessage = payload.new as Message;
+          setMessages(prev => 
+            prev.map(msg => msg.id === updatedMessage.id ? updatedMessage : msg)
+          );
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          const deletedId = payload.old.id;
+          setMessages(prev => prev.filter(msg => msg.id !== deletedId));
         }
       )
       .subscribe();
