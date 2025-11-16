@@ -762,6 +762,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_statistics: {
+        Args: never
+        Returns: {
+          average_rating: number
+          gigs_available: number
+          projects_completed: number
+          talented_creators: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

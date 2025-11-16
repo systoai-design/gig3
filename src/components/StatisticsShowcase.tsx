@@ -49,7 +49,7 @@ const Counter = ({ value, duration = 2000, suffix = '', prefix = '' }: { value: 
     requestAnimationFrame(updateCount);
   }, [isInView, value, duration]);
 
-  const displayValue = value < 10 ? count.toFixed(1) : Math.floor(count).toLocaleString();
+  const displayValue = Math.floor(count).toLocaleString();
 
   return (
     <div ref={ref} className="text-5xl md:text-6xl font-bold">
@@ -70,24 +70,19 @@ export const StatisticsShowcase = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [gigsResult, creatorsResult, ordersResult, reviewsResult] = await Promise.all([
-          supabase.from('gigs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
-          supabase.from('seller_profiles').select('user_id', { count: 'exact', head: true }),
-          supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
-          supabase.from('reviews').select('rating'),
-        ]);
-
-        const ratings = reviewsResult.data || [];
-        const avgRating = ratings.length > 0
-          ? ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length
-          : 0;
-
-        setStats({
-          gigsAvailable: gigsResult.count || 0,
-          talentedCreators: creatorsResult.count || 0,
-          projectsCompleted: ordersResult.count || 0,
-          averageRating: Number(avgRating.toFixed(1)),
-        });
+        const { data, error } = await supabase.rpc('get_public_statistics');
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          const stats = data[0];
+          setStats({
+            gigsAvailable: Number(stats.gigs_available) || 0,
+            talentedCreators: Number(stats.talented_creators) || 0,
+            projectsCompleted: Number(stats.projects_completed) || 0,
+            averageRating: Math.round(Number(stats.average_rating)) || 0,
+          });
+        }
       } catch (error) {
         console.error('Error fetching stats:', error);
       } finally {
@@ -122,7 +117,7 @@ export const StatisticsShowcase = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold gradient-text mb-4">
-            Trusted by Thousands
+            Trusted and Secured
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Join a thriving community of creators and clients building the future of work
