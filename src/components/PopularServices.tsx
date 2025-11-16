@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { GradientMesh } from "@/components/ui/gradient-mesh";
+import { NoiseTexture } from "@/components/ui/noise-texture";
 
 const services = [
   { 
@@ -44,8 +46,14 @@ export const PopularServices = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background via-muted/30 to-background relative overflow-hidden">
-      <div className="container mx-auto px-4 mb-12">
+    <section className="py-20 relative overflow-hidden">
+      {/* Unified Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <GradientMesh className="opacity-30" animated={true} />
+        <NoiseTexture opacity={0.02} />
+      </div>
+      
+      <div className="container mx-auto px-4 mb-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

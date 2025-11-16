@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlassmorphicCard } from '@/components/animations/GlassmorphicCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations/StaggerContainer';
+import { GradientMesh } from '@/components/ui/gradient-mesh';
+import { NoiseTexture } from '@/components/ui/noise-texture';
 
 const benefits = [
   {
@@ -72,11 +74,12 @@ export const ForCreators = () => {
   const usdEstimate = (takeHome * 180).toFixed(0); // Rough SOL to USD conversion
 
   return (
-    <section className="py-32 bg-gradient-to-b from-background via-accent-blue/5 to-background relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-20 right-10 w-72 h-72 bg-accent-cyan/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
+    <section className="py-32 relative overflow-hidden">
+      {/* Unified Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <GradientMesh className="opacity-30" animated={true} />
+        <NoiseTexture opacity={0.02} />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Hero intro */}

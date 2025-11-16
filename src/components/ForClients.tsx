@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { GlassmorphicCard } from '@/components/animations/GlassmorphicCard';
 import { StaggerContainer, StaggerItem } from '@/components/animations/StaggerContainer';
+import { GradientMesh } from '@/components/ui/gradient-mesh';
+import { NoiseTexture } from '@/components/ui/noise-texture';
 
 const steps = [
   {
@@ -80,11 +82,12 @@ export const ForClients = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-32 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      <div className="absolute top-40 left-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-40 right-10 w-96 h-96 bg-accent-cyan/10 rounded-full blur-3xl"></div>
+    <section className="py-32 relative overflow-hidden">
+      {/* Unified Background Pattern */}
+      <div className="absolute inset-0 z-0">
+        <GradientMesh className="opacity-30" animated={true} />
+        <NoiseTexture opacity={0.02} />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
