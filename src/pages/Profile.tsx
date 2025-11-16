@@ -40,6 +40,8 @@ export default function Profile() {
       // Determine if userId is actually a username or an ID
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId || '');
       
+      console.log('Fetching profile for:', userId, 'isUUID:', isUUID);
+      
       // Fetch profile by username or id
       const query = supabase
         .from('profiles')
@@ -49,7 +51,21 @@ export default function Profile() {
         ? await query.eq('id', userId).single()
         : await query.eq('username', userId).single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        
+        // Only redirect if profile doesn't exist
+        if (profileError.code === 'PGRST116') {
+          toast.error('Profile not found');
+          navigate('/');
+          return;
+        }
+        
+        // For other errors, show error but don't redirect
+        toast.error('Failed to load profile. Please try again.');
+        throw profileError;
+      }
+      
       setProfile(profileData);
 
       // Use the actual profile.id for all subsequent queries
