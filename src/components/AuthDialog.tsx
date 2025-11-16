@@ -279,8 +279,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       // Validate input
       const validatedData = walletSignupSchema.parse(data);
       
-      if (!publicKey || !signMessage) {
-        throw new Error('Wallet not connected');
+      if (!publicKey || typeof signMessage !== 'function') {
+        throw new Error('Wallet does not support message signing');
       }
 
       // Sign message for account creation

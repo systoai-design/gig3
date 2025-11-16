@@ -69,7 +69,7 @@ export default function Auth() {
           const message = `Sign this message to authenticate with GIG3: ${Date.now()}`;
           const encodedMessage = new TextEncoder().encode(message);
           
-          if (!signMessage) {
+          if (!signMessage || typeof signMessage !== 'function') {
             throw new Error('Wallet does not support message signing');
           }
 
@@ -179,8 +179,8 @@ export default function Auth() {
     try {
       walletSignupSchema.parse(data);
       
-      if (!publicKey || !signMessage) {
-        throw new Error('Wallet not connected');
+      if (!publicKey || typeof signMessage !== 'function') {
+        throw new Error('Wallet does not support message signing');
       }
 
       const message = `Sign this message to create your GIG3 account: ${Date.now()}`;
