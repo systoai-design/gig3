@@ -2,20 +2,79 @@ import { useEffect, useRef } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import bs58 from 'bs58';
 
 /**
- * Monitors wallet connection changes and automatically signs out users
- * when their wallet address changes or disconnects.
+ * Monitors wallet connection changes, automatically signs in users when wallet connects,
+ * and signs out users when their wallet address changes or disconnects.
  * Includes a 3-second grace period to prevent sign-out during temporary disconnects.
  */
 export const useWalletMonitor = () => {
-  const { publicKey, connected } = useWallet();
-  const { user, signOut } = useAuth();
+  const { publicKey, connected, signMessage } = useWallet();
+  const { user, signOut, signInWithWallet } = useAuth();
   const previousWalletRef = useRef<string | null>(null);
   const disconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
+  const isSigningIn = useRef(false);
 
+  // Auto sign-in when wallet connects
+  useEffect(() => {
+    const attemptAutoSignIn = async () => {
+      // Only try auto sign-in if:
+      // 1. Wallet is connected
+      // 2. User is not already authenticated
+      // 3. We have publicKey
+      // 4. Not already in the process of signing in
+      if (!connected || !publicKey || user || isSigningIn.current) {
+        return;
+      }
+
+      // Check if wallet supports message signing
+      if (typeof signMessage !== 'function') {
+        console.log('Wallet does not support message signing');
+        return;
+      }
+
+      try {
+        isSigningIn.current = true;
+        const walletAddress = publicKey.toBase58();
+        
+        // Generate sign message
+        const message = `Sign this message to authenticate with GIG3.\n\nWallet: ${walletAddress}\nTimestamp: ${Date.now()}`;
+        const messageBytes = new TextEncoder().encode(message);
+        
+        // Request signature
+        const signature = await signMessage(messageBytes);
+        const signatureBase58 = bs58.encode(signature);
+
+        // Attempt sign in
+        const { error } = await signInWithWallet(walletAddress, signatureBase58, message);
+        
+        if (error) {
+          // If wallet not registered, silently ignore (user can manually sign up)
+          if (error.message?.includes('not registered')) {
+            console.log('Wallet not registered, user needs to sign up');
+          } else {
+            console.error('Auto sign-in failed:', error);
+          }
+        }
+      } catch (error: any) {
+        // Silently handle - don't spam user with errors if they reject signature
+        if (error?.message?.includes('User rejected')) {
+          console.log('User rejected signature request');
+        } else {
+          console.error('Auto sign-in error:', error);
+        }
+      } finally {
+        isSigningIn.current = false;
+      }
+    };
+
+    attemptAutoSignIn();
+  }, [connected, publicKey, user, signMessage, signInWithWallet]);
+
+  // Monitor for wallet changes and disconnects
   useEffect(() => {
     // Debounce wallet changes to prevent rapid-fire checks
     if (debounceTimeoutRef.current) {
