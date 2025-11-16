@@ -43,6 +43,7 @@ export const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const { cartCount } = useCart();
   const { handleBecomeCreator } = useCreatorRegistration();
+  const [username, setUsername] = useState<string | null>(null);
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -98,6 +99,25 @@ export const Navbar = () => {
     };
 
     checkAdminRole();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (!user) {
+        setUsername(null);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single();
+
+      setUsername(data?.username || null);
+    };
+
+    fetchUsername();
   }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -221,7 +241,7 @@ export const Navbar = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
+                    <DropdownMenuItem onClick={() => navigate(`/profile/${username || user.id}`)}>
                       <User className="h-4 w-4 mr-2" />
                       My Profile
                     </DropdownMenuItem>
@@ -396,7 +416,7 @@ export const Navbar = () => {
                         variant="ghost" 
                         className="justify-start text-base"
                         onClick={() => {
-                          navigate(`/profile/${user.id}`);
+                          navigate(`/profile/${username || user.id}`);
                           setIsMenuOpen(false);
                         }}
                       >
