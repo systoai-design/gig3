@@ -68,7 +68,6 @@ Deno.serve(async (req) => {
     }
     
     if (existingProfile && !isSignup) {
-      // User exists - create session using admin powers
       console.log('Existing wallet user logging in');
       
       const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(
@@ -80,45 +79,36 @@ Deno.serve(async (req) => {
         throw userError || new Error('User not found');
       }
 
-      // Update password to ensure we can sign in
-      const tempPassword = crypto.randomUUID();
-      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
-        password: tempPassword,
-        email_confirm: true  // Ensure email is confirmed
-      });
-
-      if (updateError) {
-        console.error('Error updating user password:', updateError);
-        throw updateError;
-      }
-
-      // Wait a moment for the password update to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Create a separate client for signing in (not the admin client)
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_ANON_KEY')!
-      );
-
-      // Sign in with the temporary password to get valid session tokens
-      const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
+      // Generate session tokens directly using admin API
+      const { data, error: tokenError } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'magiclink',
         email: user.email || `${walletAddress}@wallet.gig3.io`,
-        password: tempPassword
+        options: {
+          redirectTo: `${Deno.env.get('SUPABASE_URL')}/auth/v1/verify`
+        }
       });
 
-      if (signInError || !signInData.session) {
-        console.error('Error signing in:', signInError);
-        throw signInError || new Error('Failed to create session');
+      if (tokenError || !data) {
+        console.error('Error generating tokens:', tokenError);
+        throw tokenError || new Error('Failed to generate session');
       }
 
-      console.log('Session created successfully');
+      // Extract access and refresh tokens from the magic link
+      const url = new URL(data.properties.action_link);
+      const access_token = url.searchParams.get('access_token');
+      const refresh_token = url.searchParams.get('refresh_token');
+
+      if (!access_token || !refresh_token) {
+        throw new Error('Failed to extract tokens from magic link');
+      }
+
+      console.log('Session tokens generated successfully');
       
       return new Response(
         JSON.stringify({ 
-          access_token: signInData.session.access_token,
-          refresh_token: signInData.session.refresh_token,
-          user: signInData.user,
+          access_token,
+          refresh_token,
+          user: user,
           is_new_account: false
         }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

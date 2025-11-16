@@ -15,6 +15,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useSignOut } from "@/hooks/useSignOut";
 import { useCreatorRegistration } from "@/hooks/useCreatorRegistration";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,7 @@ export const Navbar = () => {
   const { cartCount } = useCart();
   const { handleBecomeCreator } = useCreatorRegistration();
   const [username, setUsername] = useState<string | null>(null);
+  const [usernameLoading, setUsernameLoading] = useState(true);
   
   // Monitor wallet changes and auto-signout if needed
   useWalletMonitor();
@@ -105,9 +107,12 @@ export const Navbar = () => {
     const fetchUsername = async () => {
       if (!user) {
         setUsername(null);
+        setUsernameLoading(false);
         return;
       }
 
+      setUsernameLoading(true);
+      
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -116,10 +121,12 @@ export const Navbar = () => {
           .single();
 
         if (error) throw error;
-        setUsername(data?.username || user.id); // Fallback to ID
+        setUsername(data?.username || user.id);
       } catch (error) {
         console.error('Error fetching username:', error);
-        setUsername(user.id); // Fallback to ID on error
+        setUsername(user.id);
+      } finally {
+        setUsernameLoading(false);
       }
     };
 
@@ -247,7 +254,16 @@ export const Navbar = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => navigate(`/profile/${username || user.id}`)}>
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        if (usernameLoading) {
+                          toast.info('Loading profile...');
+                          return;
+                        }
+                        navigate(`/profile/${username || user.id}`);
+                      }}
+                      disabled={usernameLoading}
+                    >
                       <User className="h-4 w-4 mr-2" />
                       My Profile
                     </DropdownMenuItem>

@@ -56,6 +56,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isExistingUser, setIsExistingUser] = useState(false);
   const authInProgressRef = useRef(false);
+  const signatureScheduledRef = useRef(false);
+  const signatureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Steps configuration
   const steps = [
@@ -71,6 +73,11 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       setErrors({});
       setIsSubmitting(false);
       setIsExistingUser(false);
+      signatureScheduledRef.current = false;
+      if (signatureTimeoutRef.current) {
+        clearTimeout(signatureTimeoutRef.current);
+        signatureTimeoutRef.current = null;
+      }
     }
   }, [open]);
 
@@ -87,8 +94,18 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   // Handle wallet connection
   useEffect(() => {
     const handleWalletConnection = async () => {
+      if (!open) {
+        signatureScheduledRef.current = false;
+        if (signatureTimeoutRef.current) {
+          clearTimeout(signatureTimeoutRef.current);
+          signatureTimeoutRef.current = null;
+        }
+        return;
+      }
+
       if (!connected || !publicKey) {
         setCurrentStep(OnboardingStep.CONNECT_WALLET);
+        signatureScheduledRef.current = false;
         return;
       }
 
@@ -101,13 +118,13 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           toast.info('Different wallet detected. Please authenticate with this wallet.');
           await signOut();
           setCurrentStep(OnboardingStep.SIGN_MESSAGE);
+          signatureScheduledRef.current = false;
           return;
         }
       }
 
-      // Move to sign message step when wallet connects
-      if (currentStep === OnboardingStep.CONNECT_WALLET) {
-        // Verify wallet has signMessage capability
+      // Move to sign message step when wallet connects (only once)
+      if (currentStep === OnboardingStep.CONNECT_WALLET && !signatureScheduledRef.current) {
         if (!signMessage || typeof signMessage !== 'function') {
           toast.error('This wallet does not support message signing. Please use Phantom or Solflare.');
           if (disconnect) await disconnect();
@@ -115,13 +132,25 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         }
         
         setCurrentStep(OnboardingStep.SIGN_MESSAGE);
-        // Automatically trigger signature with increased delay for wallet initialization
-        setTimeout(() => handleSignMessage(), 1500);
+        signatureScheduledRef.current = true;
+        
+        // Schedule signature request only once
+        signatureTimeoutRef.current = setTimeout(() => {
+          handleSignMessage();
+          signatureTimeoutRef.current = null;
+        }, 1500);
       }
     };
 
     handleWalletConnection();
-  }, [connected, publicKey, user, signOut, currentStep]);
+    
+    return () => {
+      if (signatureTimeoutRef.current) {
+        clearTimeout(signatureTimeoutRef.current);
+        signatureTimeoutRef.current = null;
+      }
+    };
+  }, [connected, publicKey, user, signOut, open]);
 
   const handleSignMessage = async (retryCount = 0, maxRetries = 3) => {
     // Prevent multiple simultaneous auth attempts
