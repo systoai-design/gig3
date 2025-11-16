@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X, Shield, Twitter } from "lucide-react";
+import { Search, Menu, User, LogOut, LayoutDashboard, Briefcase, ShoppingCart, Heart, Settings, X, Shield, Twitter, Package, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +20,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -253,7 +254,7 @@ export const Navbar = () => {
                       Account
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="z-[100]">
                     <DropdownMenuItem 
                       onClick={() => navigate(`/profile/${username || user.id}`)}
                     >
@@ -269,13 +270,14 @@ export const Navbar = () => {
                       Favorites
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/dashboard/buyer')}>
-                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      <Package className="h-4 w-4 mr-2" />
                       My Orders
                     </DropdownMenuItem>
                     {isSeller && (
                       <>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => navigate('/dashboard/seller')}>
-                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          <BarChart3 className="h-4 w-4 mr-2" />
                           Creator Dashboard
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate('/dashboard/seller?tab=gigs')}>
@@ -285,11 +287,15 @@ export const Navbar = () => {
                       </>
                     )}
                     {isAdmin && (
-                      <DropdownMenuItem onClick={() => navigate('/dashboard/admin')}>
-                        <Shield className="h-4 w-4 mr-2" />
-                        Admin Dashboard
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => navigate('/dashboard/admin')}>
+                          <Shield className="h-4 w-4 mr-2" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                      </>
                     )}
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut} className="text-destructive">
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
@@ -459,7 +465,7 @@ export const Navbar = () => {
                           setIsMenuOpen(false);
                         }}
                       >
-                        <LayoutDashboard className="h-5 w-5 mr-3" />
+                        <Package className="h-5 w-5 mr-3" />
                         My Orders
                       </Button>
                       
@@ -473,7 +479,7 @@ export const Navbar = () => {
                               setIsMenuOpen(false);
                             }}
                           >
-                            <LayoutDashboard className="h-5 w-5 mr-3" />
+                            <BarChart3 className="h-5 w-5 mr-3" />
                             Creator Dashboard
                           </Button>
                           
