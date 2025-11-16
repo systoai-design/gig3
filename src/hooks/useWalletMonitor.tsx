@@ -15,7 +15,6 @@ export const useWalletMonitor = () => {
   const disconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isInitialMount = useRef(true);
-  const hasShownDisconnectWarning = useRef(false);
 
   useEffect(() => {
     // Debounce wallet changes to prevent rapid-fire checks
@@ -31,36 +30,42 @@ export const useWalletMonitor = () => {
         return;
       }
 
-      const currentWalletAddress = publicKey?.toBase58() || null;
-      const userWalletAddress = user?.user_metadata?.wallet_address;
+    const currentWalletAddress = publicKey?.toBase58() || null;
+    const userWalletAddress = user?.user_metadata?.wallet_address;
 
-      // Skip monitoring if user doesn't have a wallet account (email/password users)
-      if (!user || !userWalletAddress) {
-        previousWalletRef.current = currentWalletAddress;
+    // Skip if no user or user doesn't have a wallet account
+    if (!user || !userWalletAddress) {
+      previousWalletRef.current = currentWalletAddress;
+      return;
+    }
+
+    // User has a wallet account - monitor for changes
+    if (connected && currentWalletAddress) {
+      // Clear any pending disconnect timeout (wallet reconnected)
+      if (disconnectTimeoutRef.current) {
+        clearTimeout(disconnectTimeoutRef.current);
+        disconnectTimeoutRef.current = null;
+      }
+
+      // Check if wallet changed to a different address
+      if (userWalletAddress !== currentWalletAddress) {
+        toast.info('Wallet changed. Please sign in with the new wallet.');
+        signOut();
         return;
       }
-
-      // User has a wallet account - ONLY monitor for wallet address changes (not disconnects)
-      if (connected && currentWalletAddress) {
-        // Clear any pending disconnect timeout (wallet reconnected)
-        if (disconnectTimeoutRef.current) {
-          clearTimeout(disconnectTimeoutRef.current);
-          disconnectTimeoutRef.current = null;
-          hasShownDisconnectWarning.current = false;
-        }
-
-        // Check if wallet changed to a different address
-        // Sign out ONLY if the connected wallet address doesn't match the user's registered wallet
-        if (userWalletAddress.toLowerCase() !== currentWalletAddress.toLowerCase()) {
-          toast.info('Different wallet detected. Please sign in with the correct wallet.');
+    } else if (!connected && previousWalletRef.current && userWalletAddress) {
+      // Wallet disconnected - wait 3 seconds before signing out
+      // This prevents sign-out during temporary disconnects (page navigation, etc.)
+      if (!disconnectTimeoutRef.current) {
+        disconnectTimeoutRef.current = setTimeout(() => {
+          toast.info('Wallet disconnected. You have been signed out.');
           signOut();
-          return;
-        }
+        }, 3000); // 3 second grace period
       }
-      // NOTE: Removed disconnect timeout - users stay logged in even if wallet disconnects temporarily
+    }
 
       previousWalletRef.current = currentWalletAddress;
-    }, 500); // 500ms debounce for stability
+    }, 300); // 300ms debounce
     
     return () => {
       if (disconnectTimeoutRef.current) {

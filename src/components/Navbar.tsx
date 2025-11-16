@@ -41,7 +41,6 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const [isSeller, setIsSeller] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [username, setUsername] = useState<string>('');
   const { cartCount } = useCart();
   const { handleBecomeCreator } = useCreatorRegistration();
   
@@ -99,27 +98,6 @@ export const Navbar = () => {
     };
 
     checkAdminRole();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchUsername = async () => {
-      if (!user) {
-        setUsername('');
-        return;
-      }
-
-      const { data } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('id', user.id)
-        .single();
-
-      if (data) {
-        setUsername(data.username);
-      }
-    };
-
-    fetchUsername();
   }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -242,12 +220,7 @@ export const Navbar = () => {
                       Account
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {username && (
-                      <div className="px-2 py-1.5 text-sm text-muted-foreground border-b border-border mb-1">
-                        Signed in as <span className="font-medium text-foreground">@{username}</span>
-                      </div>
-                    )}
+                  <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
                       <User className="h-4 w-4 mr-2" />
                       My Profile
@@ -290,18 +263,7 @@ export const Navbar = () => {
                 </DropdownMenu>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setAuthDialogOpen(true)}
-                  className="flex items-center gap-2"
-                >
-                  <User className="h-4 w-4" />
-                  Sign In
-                </Button>
-                <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90" />
-              </div>
+              <WalletMultiButton className="!bg-primary !text-primary-foreground hover:!bg-primary/90" />
             )}
           </div>
 
@@ -430,11 +392,6 @@ export const Navbar = () => {
 
                     {/* Account Links */}
                     <div className="flex flex-col space-y-3">
-                      {username && (
-                        <div className="px-3 py-2 text-sm text-muted-foreground border-b border-border -mt-3 mb-1">
-                          Signed in as <span className="font-medium text-foreground">@{username}</span>
-                        </div>
-                      )}
                       <Button 
                         variant="ghost" 
                         className="justify-start text-base"
@@ -543,17 +500,6 @@ export const Navbar = () => {
                   <>
                     <Separator />
                     <div className="flex flex-col space-y-3">
-                      <Button 
-                        variant="default" 
-                        className="w-full justify-center"
-                        onClick={() => {
-                          setAuthDialogOpen(true);
-                          setIsMenuOpen(false);
-                        }}
-                      >
-                        <User className="h-5 w-5 mr-2" />
-                        Sign In / Create Account
-                      </Button>
                       <WalletMultiButton className="!w-full !bg-primary !text-primary-foreground hover:!bg-primary/90" />
                     </div>
                   </>

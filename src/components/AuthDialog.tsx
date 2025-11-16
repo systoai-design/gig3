@@ -89,17 +89,12 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         return;
       }
 
-      // Check if user is already logged in with matching wallet - just close dialog
+      // Check if user is already logged in with a different wallet
       if (user && connected && publicKey) {
         const userWalletAddress = user.user_metadata?.wallet_address;
         const currentWalletAddress = publicKey.toBase58();
         
-        if (userWalletAddress && userWalletAddress === currentWalletAddress) {
-          // Already authenticated with this wallet, close dialog
-          onOpenChange(false);
-          return;
-        } else if (userWalletAddress) {
-          // Different wallet detected
+        if (userWalletAddress && userWalletAddress !== currentWalletAddress) {
           toast.info('Different wallet detected. Please authenticate with this wallet.');
           await signOut();
           setCurrentStep(OnboardingStep.SIGN_MESSAGE);
@@ -110,12 +105,13 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       // Move to sign message step when wallet connects
       if (currentStep === OnboardingStep.CONNECT_WALLET) {
         setCurrentStep(OnboardingStep.SIGN_MESSAGE);
-        // DO NOT auto-trigger signature - wait for user to click Continue button
+        // Automatically trigger signature
+        setTimeout(() => handleSignMessage(), 500);
       }
     };
 
     handleWalletConnection();
-  }, [connected, publicKey, user, signOut, currentStep, onOpenChange]);
+  }, [connected, publicKey, user, signOut, currentStep]);
 
   const handleSignMessage = async () => {
     if (!publicKey || !signMessage) {
@@ -352,10 +348,10 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             ) : (
               <Button
                 onClick={handleSignMessage}
-                className="bg-gradient-primary hover:opacity-90 h-12 px-8 rounded-full text-base font-semibold"
+                className="bg-gradient-primary hover:opacity-90 h-12 px-8 rounded-full"
                 disabled={isSubmitting}
               >
-                Continue with Wallet
+                Sign Message
               </Button>
             )}
 
